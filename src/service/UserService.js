@@ -14,6 +14,18 @@ export const USER_API = {
         data: payload,
       })
     },
+    
+    getAllNotifications: async function (token) {
+      const  headers = { 
+          'Authorization': 'Bearer '+token, 
+          'Content-Type': 'application/json'
+      }
+      return axios.request({
+          method: 'get',
+          url: `${EndPoint}private/notifications`,
+          headers:headers
+      })
+  },
 
     
    

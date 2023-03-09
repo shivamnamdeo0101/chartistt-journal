@@ -13,8 +13,10 @@ export const BrokerProvider = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const contextData = [isOpen, setIsOpen];
     const user = useSelector(state => state?.userAuth?.user)
+    const auth = useSelector(state => state?.userAuth)
+
     const dispatch = useDispatch()
-    const { control, handleSubmit, reset, formState: { errors } } = useForm({});
+    const { control, handleSubmit, reset, formState: { errors } } = useForm({defaultValues:auth?.brokerObj});
 
     const onSubmit = async (data) => {
         try {
@@ -118,7 +120,7 @@ export const BrokerProvider = ({ children }) => {
                                                 placeholderTextColor={"#636b75"}
                                                 value={value}
                                                 placeholder="Depositted Amount"
-
+                                                keyboardType="numeric"
                                             />
                                         </View>
                                     )}

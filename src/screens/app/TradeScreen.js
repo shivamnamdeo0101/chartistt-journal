@@ -50,7 +50,10 @@ const TradeScreen = ({ navigation }) => {
                     <Ionicons name="add-circle-sharp" color={"#717da8"} size={26} />
                 </TouchableOpacity>
             </View>
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={{marginBottom:100}}>
+
+               
                 {
                     tradeList?.map((item, index) => {
                         return (
@@ -60,6 +63,7 @@ const TradeScreen = ({ navigation }) => {
                         )
                     })
                 }
+                 </View>
             </ScrollView>
         </View>
     </View>

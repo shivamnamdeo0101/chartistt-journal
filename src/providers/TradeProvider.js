@@ -6,6 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Picker } from '@react-native-picker/picker';
 import CustomButton from "../components/CustomButton";
 import { TRADE_API } from "../service/TradeService";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export const TradeContext = createContext(false, () => { }, {});
 
@@ -16,35 +17,47 @@ export const TradeProvider = ({ children }) => {
     const brokerId = useSelector(state => state?.userAuth?.brokerId)
 
     const dispatch = useDispatch()
-    const { control,reset, handleSubmit, formState: { errors } } = useForm({});
+    const { control, reset, handleSubmit, formState: { errors } } = useForm({});
+    const [date, setDate] = useState(new Date());
+    const [selectDate, setselectDate] = useState(false)
+
+    const [dateTimestamp, setdateTimestamp] = useState(0)
+
+    const onDateChange = (event, selectedDate) => {
+        setselectDate(!selectDate)
+        const currentDate = selectedDate || date;
+        setDate(currentDate);
+        setdateTimestamp(Math.round(data.getTime() / 1000))
+    };
+
 
     const onSubmit = async (data) => {
 
-        if(!brokerId){
+        if (!brokerId) {
             Alert.alert("Please select default broker")
             return
         }
 
-        try{
-            const tradePayload ={
+        try {
+            const tradePayload = {
                 "userId": user?._id,
                 "trade": {
-                    "brokerId":brokerId,
-                    "updateOn":Date.now(),
+                    "brokerId": brokerId,
+                    "updateOn": Date.now(),
                     ...data
                 }
             }
-    
-            const addTrade = await TRADE_API.addTrade(tradePayload,user?.token)
-            if(addTrade?.status === 200){
+
+            const addTrade = await TRADE_API.addTrade(tradePayload, user?.token)
+            if (addTrade?.status === 200) {
                 setIsOpen(!isOpen);
                 reset()
                 Alert.alert("Trade Added")
             }
-        }catch(e){
+        } catch (e) {
             console.log(e)
         }
-        
+
     };
 
 
@@ -60,38 +73,39 @@ export const TradeProvider = ({ children }) => {
                         setIsOpen(!isOpen);
                     }}
                 >
-                    <View style={{elevation:4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
+                    <View style={{ elevation: 4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
                         <ScrollView>
 
 
                             <View style={{ flex: 1 }}>
 
-                                <Text style={{fontSize:20,fontWeight:"bold",color:"#fff",paddingLeft:16}}>Add Your Trade</Text>
+                                <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff", paddingLeft: 16 }}>Add Your Trade</Text>
                                 <View style={{ marginTop: 16 }}>
 
 
                                     <Controller
                                         control={control}
-                                        name="date"
+                                        name='date'
                                         rules={{ required: true }}
-                                        defaultValue=""
+                                        defaultValue={date}
                                         render={({ field: { onChange, value } }) => (
-                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-
-                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Date</Text>
-                                                <TextInput
-                                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                                    placeholderTextColor={"#636b75"}
-                                                    onChangeText={onChange}
-                                                    value={value}
-                                                    placeholder="Date"
-                                                    keyboardType="numeric"
+                                            selectDate ?
+                                                <DateTimePicker
+                                                    value={date}
+                                                    mode='date'
+                                                    display='calendar'
+                                                    onChange={onDateChange}
                                                 />
-
-                                            </View>
+                                                :
+                                                <TouchableOpacity onPress={() => setselectDate(!selectDate)} style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                    <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Date</Text>
+                                                    <Text style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, padding: 10 }} >
+                                                        {date.toLocaleDateString()}
+                                                    </Text>
+                                                </TouchableOpacity>
                                         )}
                                     />
-                                    {errors.date && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                    {errors.date && <Text>This field is required.</Text>}
                                 </View>
 
 
@@ -421,23 +435,23 @@ export const TradeProvider = ({ children }) => {
                             <CustomButton
                                 filled={false}
                                 title={"Cancel"}
-                                onPress={()=>setIsOpen(!isOpen)}
+                                onPress={() => setIsOpen(!isOpen)}
                             />
                             <CustomButton
-                                 filled={true}
+                                filled={true}
                                 title={"Submit"}
                                 onPress={handleSubmit(onSubmit)}
                             />
                         </View>
-                        
+
                     </View>
                 </Modal>
-            </View>
+            </View >
 
 
             {children}
 
-        </TradeContext.Provider>
+        </TradeContext.Provider >
     );
 };
 

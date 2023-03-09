@@ -1,9 +1,13 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
 import React, { useEffect } from 'react'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { setAuthSuccess, setUserDetails } from '../../store/UserSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { USER_API } from '../../service/UserService';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
+import messaging from '@react-native-firebase/messaging';
+
 
 const LoginScreen = ({ navigation }) => {
   const user = useSelector(state => state?.userAuth)
@@ -17,6 +21,28 @@ const LoginScreen = ({ navigation }) => {
       profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
     });
   }, [])
+
+  async function requestUserPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+    }
+  }
+  const subscribe = async () => {
+    await requestUserPermission()
+    await messaging()
+      .subscribeToTopic('app')
+      .then(() => {
+        console.log('Subscribed to topic');
+      })
+      .catch(error => {
+        console.log('Error subscribing to topic:', error);
+      });
+  }
 
   const googleLogin = async () => {
 
@@ -36,12 +62,18 @@ const LoginScreen = ({ navigation }) => {
       }
 
       const login = await USER_API.userLogin(payload)
+      console.log(login)
+
       dispatch(setUserDetails(login?.data?.data))
       dispatch(setAuthSuccess())
-      console.log("User", user)
+      subscribe()
+
+
+
+      // Alert.alert(JSON.stringify("User", user))
 
     } catch (error) {
-      console.log(error)
+      // Alert.alert(JSON.stringify)
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -55,9 +87,17 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff", justifyContent: "center", alignItems: "center" }}>
-      <TouchableOpacity onPress={() => googleLogin()}>
-        <Text style={{ color: "#000" }}>Continue With Google</Text>
+    <View style={{ flex: 1, backgroundColor: "#1e294f", justifyContent: "center", alignItems: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>CHARTISTT</Text>
+          <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
+        </View>
+      </View>
+
+      <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
+        <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
+        <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with google</Text>
       </TouchableOpacity>
     </View>
   )
