@@ -7,6 +7,8 @@ import { Picker } from '@react-native-picker/picker';
 import CustomButton from "../components/CustomButton";
 import { TRADE_API } from "../service/TradeService";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { setTradeObj } from "../store/UserSlice";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const TradeContext = createContext(false, () => { }, {});
 
@@ -17,7 +19,23 @@ export const TradeProvider = ({ children }) => {
     const brokerId = useSelector(state => state?.userAuth?.brokerId)
 
     const dispatch = useDispatch()
-    const { control, reset, handleSubmit, formState: { errors } } = useForm({});
+
+
+    const auth = useSelector(state => state?.userAuth)
+
+    const { control, reset, handleSubmit, formState: { errors } } = useForm({ defaultValues: auth?.tradeObj });
+
+    useEffect(() => {
+        if (Object.keys(auth?.tradeObj).length > 0) {
+            reset(auth?.tradeObj);
+        } else {
+            reset({});
+        }
+
+    }, [auth])
+
+
+
     const [date, setDate] = useState(new Date());
     const [selectDate, setselectDate] = useState(false)
 
@@ -38,20 +56,22 @@ export const TradeProvider = ({ children }) => {
             return
         }
 
+
         try {
             const tradePayload = {
                 "userId": user?._id,
                 "trade": {
                     "brokerId": brokerId,
                     "updateOn": Date.now(),
-                    ...data
+                    ...data,
+                    "date": date
                 }
             }
-
+            console.log(tradePayload)
             const addTrade = await TRADE_API.addTrade(tradePayload, user?.token)
             if (addTrade?.status === 200) {
                 setIsOpen(!isOpen);
-                reset()
+                reset({})
                 Alert.alert("Trade Added")
             }
         } catch (e) {
@@ -59,6 +79,57 @@ export const TradeProvider = ({ children }) => {
         }
 
     };
+
+    const forUpdate = () => {
+        if (Object.keys(auth?.tradeObj).length > 0) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    const cancelForm = () => {
+        setIsOpen(!isOpen)
+        reset({})
+        dispatch(setTradeObj({}))
+    }
+
+    const deleteTrade = ()=>{
+        Alert.alert(
+            'Confirmation',
+            'Are you sure you want to delete this item?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel'
+                },
+                {
+                    text: 'OK',
+                    onPress: () => deleteFromDB()
+                }
+            ]
+        );
+    }
+
+    const deleteFromDB = async () => {
+        const payload = {
+            userId:user?._id,
+            tradeId:auth?.tradeObj?._id
+        }
+        console.log(payload,"Payload")
+        try {
+            const res = await TRADE_API.remTrade(payload, user?.token)
+            console.log(res,"res")
+
+            if (res?.status === 200) {
+                cancelForm()
+                Alert.alert("Trade Deleted")
+            }
+        }catch(e){
+            console.log(e)
+        }
+    }
 
 
     return (
@@ -70,7 +141,7 @@ export const TradeProvider = ({ children }) => {
                     visible={isOpen}
                     onRequestClose={() => {
                         //Alert.alert("Modal has been closed.");
-                        setIsOpen(!isOpen);
+                        cancelForm();
                     }}
                 >
                     <View style={{ elevation: 4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
@@ -79,7 +150,19 @@ export const TradeProvider = ({ children }) => {
 
                             <View style={{ flex: 1 }}>
 
-                                <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff", paddingLeft: 16 }}>Add Your Trade</Text>
+                                
+                                   
+                                    <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",paddingRight:16}}>
+                                      
+                                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff", paddingLeft: 16 }}>{forUpdate()===true ? "Update Your Trade" : "Add Your Trade"}</Text>
+                                        {forUpdate()===true && <TouchableOpacity onPress={()=>deleteTrade()}>
+                                            <MaterialCommunityIcons name="delete-empty" color={"#717da8"} size={26} />
+                                        </TouchableOpacity>}
+                                    
+                                    </View>
+
+                                   
+
                                 <View style={{ marginTop: 16 }}>
 
 
@@ -91,6 +174,7 @@ export const TradeProvider = ({ children }) => {
                                         render={({ field: { onChange, value } }) => (
                                             selectDate ?
                                                 <DateTimePicker
+                                                    
                                                     value={date}
                                                     mode='date'
                                                     display='calendar'
@@ -107,34 +191,34 @@ export const TradeProvider = ({ children }) => {
                                     />
                                     {errors.date && <Text>This field is required.</Text>}
                                 </View>
-
-
+                                
                                 <Controller
                                     control={control}
                                     name="tradeName"
-
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Enter Trade name</Text>
+                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Entry Trade Name</Text>
                                             <TextInput
                                                 style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
                                                 onChangeText={onChange}
-                                                placeholderTextColor={"#636b75"}
-                                                value={value}
-                                                placeholder="Trade Name"
+                                                placeholderTextColor={"#ccd3db"}
+                                                value={value?.toString()}
+                                                placeholder="Entry Trade Name"
                                             />
                                         </View>
                                     )}
                                 />
                                 {errors.tradeName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+             
+
 
                                 <Controller
                                     control={control}
                                     name="action"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Action</Text>
@@ -155,7 +239,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="segment"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Segment</Text>
@@ -180,7 +264,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="tradeType"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Trade Type</Text>
@@ -202,7 +286,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="chartTimeFrame"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Chart Time Frame</Text>
@@ -237,7 +321,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="mindSetBeforeTrade"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Mindset Before Trade</Text>
@@ -275,7 +359,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="mindSetAfterTrade"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Mindset After Trade</Text>
@@ -313,7 +397,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="session"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Session</Text>
@@ -334,7 +418,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="quantity"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Quantity</Text>
@@ -342,18 +426,19 @@ export const TradeProvider = ({ children }) => {
                                                 style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
                                                 onChangeText={onChange}
                                                 placeholderTextColor={"#ccd3db"}
-                                                value={value}
+                                                value={value?.toString()}
                                                 placeholder="Quantity"
                                             />
                                         </View>
                                     )}
                                 />
-                                {errors.mindSetBeforeTrade && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                {errors.quantity && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                
                                 <Controller
                                     control={control}
                                     name="entryPrice"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Entry Price</Text>
@@ -361,7 +446,7 @@ export const TradeProvider = ({ children }) => {
                                                 style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
                                                 onChangeText={onChange}
                                                 placeholderTextColor={"#ccd3db"}
-                                                value={value}
+                                                value={value?.toString()}
                                                 placeholder="Entry Price"
                                             />
                                         </View>
@@ -373,7 +458,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="exitPrice"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Exit Price</Text>
@@ -381,7 +466,7 @@ export const TradeProvider = ({ children }) => {
                                                 style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
                                                 onChangeText={onChange}
                                                 placeholderTextColor={"#ccd3db"}
-                                                value={value}
+                                                value={value?.toString()}
                                                 placeholder="Exit Price"
                                             />
                                         </View>
@@ -389,11 +474,53 @@ export const TradeProvider = ({ children }) => {
                                 />
                                 {errors.exitPrice && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
 
+                                
+                                <Controller
+                                    control={control}
+                                    name="stopLoss"
+                                    rules={{ required: true }}
+                                    
+                                    render={({ field: { onChange, value } }) => (
+                                        <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Stop Loss</Text>
+                                            <TextInput
+                                                style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
+                                                onChangeText={onChange}
+                                                placeholderTextColor={"#ccd3db"}
+                                                value={value?.toString()}
+                                                placeholder="Stop Loss"
+                                            />
+                                        </View>
+                                    )}
+                                />
+                                {errors.stopLoss && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                <Controller
+                                    control={control}
+                                    name="targetPoint"
+                                    rules={{ required: true }}
+                                    
+                                    render={({ field: { onChange, value } }) => (
+                                        <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Target Point</Text>
+                                            <TextInput
+                                                style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
+                                                onChangeText={onChange}
+                                                placeholderTextColor={"#ccd3db"}
+                                                value={value?.toString()}
+                                                placeholder="Target Point"
+                                            />
+                                        </View>
+                                    )}
+                                />
+                                {errors.targetPoint && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                
+
+                                
                                 <Controller
                                     control={control}
                                     name="entryNote"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Entry Note</Text>
@@ -401,7 +528,7 @@ export const TradeProvider = ({ children }) => {
                                                 style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
                                                 onChangeText={onChange}
                                                 placeholderTextColor={"#ccd3db"}
-                                                value={value}
+                                                value={value?.toString()}
                                                 placeholder="Entry Note"
                                             />
                                         </View>
@@ -412,7 +539,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="exitNote"
                                     rules={{ required: true }}
-                                    defaultValue=""
+                                    
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 16 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Exit Note</Text>
@@ -435,11 +562,11 @@ export const TradeProvider = ({ children }) => {
                             <CustomButton
                                 filled={false}
                                 title={"Cancel"}
-                                onPress={() => setIsOpen(!isOpen)}
+                                onPress={() => cancelForm()}
                             />
                             <CustomButton
                                 filled={true}
-                                title={"Submit"}
+                                title={forUpdate() ? "Update" : "Submit"}
                                 onPress={handleSubmit(onSubmit)}
                             />
                         </View>

@@ -95,8 +95,7 @@ const HomeScreen = ({ navigation }) => {
       if(item?.action === "sell"){
         temp = temp * (-1)
       }
-      
-
+    
 
       if(temp < 0){
         l++;
@@ -109,9 +108,32 @@ const HomeScreen = ({ navigation }) => {
       pAndL+=temp
     })
 
-   
+    if(l === 0 ){
+      l = 1
+    }
+    if(lAmt === 0 ){
+      l = 1
+    }
+
+    
+    if(p === 0 ){
+      p = 1
+    }
+    if(pAmt === 0 ){
+      pAmt = 1
+    }
+    
     let avgP = pAmt/p;
     let avgL = lAmt/l;
+
+    if(avgL === 0 ){
+      avgL = 1
+    }
+    if(avgP === 0 ){
+      avgP = 1
+    }
+    
+    
 
     pAndL = parseFloat(pAmt + lAmt).toFixed(2)
     avgP  = parseFloat(avgP).toFixed(2) 
@@ -122,13 +144,22 @@ const HomeScreen = ({ navigation }) => {
     tr = parseFloat(parseFloat(tf)+parseFloat(pAndL)).toFixed(2) 
 
     return {
-      "pAndL":pAndL,
+      "pAndL":checkNum(pAndL),
       "avgP":checkNumber(avgP) ,
-      "avgL": avgL,
+      "avgL": checkNum(avgL),
       "winLoss":checkNumber(winLoss),
       "riskReward": checkNumber(riskReward) ,
       "tf":checkNumber(tf),
       "tr":checkNumber(tr)
+    }
+  }
+
+  function checkNum(num) {
+    if (!Number.isFinite(num)) {
+        
+      return num;
+    } else {
+      return 0;
     }
   }
 

@@ -9,8 +9,9 @@ const BrokerComp = ({item}) => {
     const [isOpen, setIsOpen] = useContext(BrokerContext)
     const brokerId = useSelector(state=>state?.userAuth?.brokerId)
     const setBrokerIdFun = (item)=>{
+        dispatch(setBrokerObj(item))    
         dispatch(setBrokerId(item?._id))
-        dispatch(setBrokerObj(item))
+       
         setIsOpen(!isOpen)
         //Alert.alert("Default Broker Selected")
         

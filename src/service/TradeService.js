@@ -27,7 +27,19 @@ export const TRADE_API = {
             headers:headers
         })
     },
-
+    
+    remTrade: async function (payload,token) {
+        const  headers = { 
+            'Authorization': 'Bearer '+token, 
+            'Content-Type': 'application/json'
+        }
+        return axios.request({
+            method: 'delete',
+            url: `${EndPoint}private/trades`,
+            data: payload,
+            headers:headers
+        })
+    },
 
 
 

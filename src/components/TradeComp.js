@@ -1,10 +1,19 @@
-import { View, Text, StyleSheet } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet ,TouchableOpacity} from 'react-native'
+import React ,{useContext}from 'react'
 import moment from 'moment';
+import { useDispatch } from 'react-redux';
+import { setTradeObj } from '../store/UserSlice';
+import { TradeContext } from '../providers/TradeProvider';
 
 
 const TradeComp = ({ item }) => {
-
+  const dispatch = useDispatch()
+  const [isOpen, setIsOpen] = useContext(TradeContext)
+  
+  const setTradeFun = (item)=>{
+    dispatch(setTradeObj(item))
+    setIsOpen(!isOpen)
+  }
 
   const ProfitOrLoss =  () => {
     let amt = (item?.exitPrice - item?.entryPrice) * item?.quantity;
@@ -33,14 +42,23 @@ const TradeComp = ({ item }) => {
 
   }
 
+  const returnData = (d)=>{
+    const dateObj = new Date(d);
+    const localDate = dateObj.toLocaleDateString();
+    return localDate
+  }
+
   return (
-    <View>
+    <TouchableOpacity onPress={()=>setTradeFun(item)}>
       <View style={{ marginBottom: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <Text style={{ backgroundColor: "#070f4a", padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10, color: "#fff", fontWeight: "bold",textTransform:"capitalize" }}>{item?.segment} / {item?.tradeType}</Text>
-          <Text style={styles.text}>{moment(item?.addOn).fromNow()}</Text>
+          
+
+          <Text style={{...styles.text,fontSize:10}}>Created by {moment(item?.addOn).fromNow()}</Text>
         </View>
         <View style={{ backgroundColor: "#070f4a", borderTopLeftRadius: 0, borderRadius: 10, padding: 10 }}>
+          <Text style={{...styles.text,fontSize:10}}>Trade Date {returnData(item?.date)}</Text>
           <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingBottom: 10 }}>
             <View>
               <Text style={styles.title}>{item?.tradeName}</Text>
@@ -71,7 +89,7 @@ const TradeComp = ({ item }) => {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
