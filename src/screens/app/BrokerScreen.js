@@ -18,6 +18,7 @@ const BrokerScreen = ({ navigation }) => {
         setIsOpen(!isOpen);
     };
 
+    
     useEffect(() => {
       const fetchData = async ()=>{
         const res = await BROKER_API.getAllBrokers(user?._id,user?.token)

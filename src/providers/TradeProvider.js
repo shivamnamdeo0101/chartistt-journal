@@ -9,6 +9,7 @@ import { TRADE_API } from "../service/TradeService";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { setTradeObj } from "../store/UserSlice";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import SelectInput from "../components/SelectInput";
 
 export const TradeContext = createContext(false, () => { }, {});
 
@@ -17,22 +18,46 @@ export const TradeProvider = ({ children }) => {
     const contextData = [isOpen, setIsOpen];
     const user = useSelector(state => state?.userAuth?.user)
     const brokerId = useSelector(state => state?.userAuth?.brokerId)
-
+    const [loading, setloading] = useState(true)
     const dispatch = useDispatch()
+
+    const [action, setaction] = useState("buy")
+    const [segment, setsegment] = useState("equity")
+    const [tradeType, settradeType] = useState("intraday")
+    const [chartTimeFrame, setchartTimeFrame] = useState("1 min")
+    const [mindSetBeforeTrade, setmindSetBeforeTrade] = useState("Angry")
+    const [mindSetAfterTrade, setmindSetAfterTrade] = useState("Angry")
+    const [session, setsession] = useState("morning")
+
+    const addDefaultObj = {
+        "tradeName": "",
+        "action": "buy",
+        "segment": "equity",
+        "tradeType": "intraday",
+        "chartTimeFrame": "1 min",
+        "mindSetBeforeTrade": "Angry",
+        "mindSetAfterTrade": "Angry",
+        "session":"morning",
+    }
+    
+
+
+    
+    const data = useSelector(state => state?.data)
 
 
     const auth = useSelector(state => state?.userAuth)
 
-    const { control, reset, handleSubmit, formState: { errors } } = useForm({ defaultValues: auth?.tradeObj });
+    const { control, reset, handleSubmit, formState: { errors } } = useForm({ defaultValues: Object.keys(auth?.tradeObj).length > 0 ? auth?.tradeObj : addDefaultObj });
 
     useEffect(() => {
         if (Object.keys(auth?.tradeObj).length > 0) {
             reset(auth?.tradeObj);
         } else {
-            reset({});
+            reset(addDefaultObj);
         }
-
-    }, [auth])
+        setloading(false)
+    }, [auth?.tradeObj])
 
 
 
@@ -49,8 +74,20 @@ export const TradeProvider = ({ children }) => {
     };
 
 
-    const onSubmit = async (data) => {
 
+    const selectionData = {
+        "action": action,
+        "segment": segment,
+        "tradeType": tradeType,
+        "chartTimeFrame": chartTimeFrame,
+        "mindSetBeforeTrade": mindSetBeforeTrade,
+        "mindSetAfterTrade":mindSetAfterTrade,
+        "session":session,
+    }
+
+
+    const onSubmit = async (data) => {
+        setloading(true)
         if (!brokerId) {
             Alert.alert("Please select default broker")
             return
@@ -58,26 +95,30 @@ export const TradeProvider = ({ children }) => {
 
 
         try {
-            const tradePayload = {
-                "userId": user?._id,
-                "trade": {
-                    "brokerId": brokerId,
-                    "updateOn": Date.now(),
-                    ...data,
-                    "date": date
+
+            if (forUpdate()) {
+                const tradePayload = {
+                    "userId": user?._id,
+                    "tradeId": auth?.tradeObj?._id,
+                    "trade": { ...data,...selectionData, "date": date }
                 }
-            }
-            console.log(tradePayload)
-            const addTrade = await TRADE_API.addTrade(tradePayload, user?.token)
-            if (addTrade?.status === 200) {
-                setIsOpen(!isOpen);
-                reset({})
-                Alert.alert("Trade Added")
+                await updateTradeFun(tradePayload)
+            } else {
+                const tradePayload = {
+                    "userId": user?._id,
+                    "trade": {
+                        "brokerId": brokerId,
+                        "updateOn": Date.now(),
+                        ...data,...selectionData,
+                        "date": date
+                    }
+                }
+                await addTradeFun(tradePayload)
             }
         } catch (e) {
             console.log(e)
         }
-
+        setloading(false)
     };
 
     const forUpdate = () => {
@@ -94,7 +135,7 @@ export const TradeProvider = ({ children }) => {
         dispatch(setTradeObj({}))
     }
 
-    const deleteTrade = ()=>{
+    const deleteTrade = () => {
         Alert.alert(
             'Confirmation',
             'Are you sure you want to delete this item?',
@@ -112,24 +153,45 @@ export const TradeProvider = ({ children }) => {
         );
     }
 
-    const deleteFromDB = async () => {
-        const payload = {
-            userId:user?._id,
-            tradeId:auth?.tradeObj?._id
+    const addTradeFun = async (payload) => {
+        const res = await TRADE_API.addTrade(payload, user?.token)
+        if (res?.status === 200) {
+            cancelForm()
+            Alert.alert("Trade Added")
         }
-        console.log(payload,"Payload")
+    }
+    const updateTradeFun = async (payload) => {
+        const res = await TRADE_API.updateTrade(payload, user?.token)
+        if (res?.status === 200) {
+            cancelForm()
+            Alert.alert("Trade Updated")
+        }
+    }
+
+    const deleteFromDB = async () => {
+        setloading(true)
+        const payload = {
+            userId: user?._id,
+            tradeId: auth?.tradeObj?._id
+        }
+
         try {
             const res = await TRADE_API.remTrade(payload, user?.token)
-            console.log(res,"res")
-
             if (res?.status === 200) {
                 cancelForm()
                 Alert.alert("Trade Deleted")
             }
-        }catch(e){
+        } catch (e) {
             console.log(e)
         }
+        setloading(false)
     }
+
+    const [selectedValue, setSelectedValue] = useState('buy');
+
+    const handleSelectPress = value => {
+        setSelectedValue(value?.value);
+    };
 
 
     return (
@@ -144,24 +206,24 @@ export const TradeProvider = ({ children }) => {
                         cancelForm();
                     }}
                 >
-                    <View style={{ elevation: 4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
+                    {loading ? <Loading /> : <View style={{ elevation: 4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
                         <ScrollView>
 
 
                             <View style={{ flex: 1 }}>
 
-                                
-                                   
-                                    <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",paddingRight:16}}>
-                                      
-                                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff", paddingLeft: 16 }}>{forUpdate()===true ? "Update Your Trade" : "Add Your Trade"}</Text>
-                                        {forUpdate()===true && <TouchableOpacity onPress={()=>deleteTrade()}>
-                                            <MaterialCommunityIcons name="delete-empty" color={"#717da8"} size={26} />
-                                        </TouchableOpacity>}
-                                    
-                                    </View>
 
-                                   
+
+                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingRight: 16 }}>
+
+                                    <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff", paddingLeft: 16 }}>{forUpdate() === true ? "Update Your Trade" : "Add Your Trade"}</Text>
+                                    {forUpdate() === true && <TouchableOpacity onPress={() => deleteTrade()}>
+                                        <MaterialCommunityIcons name="delete-empty" color={"#717da8"} size={26} />
+                                    </TouchableOpacity>}
+
+                                </View>
+
+
 
                                 <View style={{ marginTop: 16 }}>
 
@@ -172,31 +234,39 @@ export const TradeProvider = ({ children }) => {
                                         rules={{ required: true }}
                                         defaultValue={date}
                                         render={({ field: { onChange, value } }) => (
-                                            selectDate ?
-                                                <DateTimePicker
-                                                    
-                                                    value={date}
-                                                    mode='date'
-                                                    display='calendar'
-                                                    onChange={onDateChange}
-                                                />
-                                                :
+                                            <View>
+                                                {selectDate &&
+                                                    <DateTimePicker
+
+                                                        value={date}
+                                                        mode='date'
+                                                        display='calendar'
+                                                        onChange={onDateChange}
+                                                    />}
+
                                                 <TouchableOpacity onPress={() => setselectDate(!selectDate)} style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                                     <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Date</Text>
                                                     <Text style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, padding: 10 }} >
                                                         {date.toLocaleDateString()}
                                                     </Text>
                                                 </TouchableOpacity>
+                                            </View>
                                         )}
                                     />
                                     {errors.date && <Text>This field is required.</Text>}
                                 </View>
-                                
+
+
+
+
+                                {errors.tradeName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+
+
                                 <Controller
                                     control={control}
                                     name="tradeName"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Entry Trade Name</Text>
@@ -211,14 +281,34 @@ export const TradeProvider = ({ children }) => {
                                     )}
                                 />
                                 {errors.tradeName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
-             
+
 
 
                                 <Controller
                                     control={control}
                                     name="action"
                                     rules={{ required: true }}
-                                    
+                                    value={action}
+                                    render={({ field: { onChange, value } }) => (
+                                        <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Action</Text>
+                                            <SelectInput
+                                                options={data?.actionList}
+                                                label="Select an option"
+                                                value={action}
+                                                setValue={setaction}
+                                            />
+                                        </View>
+                                    )}
+                                />
+                                {errors.action && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+
+
+                                {/* <Controller
+                                    control={control}
+                                    name="action"
+                                    rules={{ required: true }}
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Action</Text>
@@ -227,34 +317,32 @@ export const TradeProvider = ({ children }) => {
                                                 selectedValue={value}
                                                 onValueChange={onChange}
                                             >
-                                                <Picker.Item label="Buy" value="buy" />
-                                                <Picker.Item label="Sell" value="sell" />
+                                                {data?.actionList.map(item => (
+                                                    <Picker.Item
+                                                        key={item.value}
+                                                        label={item.label}
+                                                        value={item.value}
+                                                    />
+                                                ))}
                                             </Picker>
                                         </View>
                                     )}
                                 />
-                                {errors.action && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                {errors.action && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>} */}
 
                                 <Controller
                                     control={control}
                                     name="segment"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Segment</Text>
-                                            <Picker
-                                                style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                                selectedValue={value}
-                                                onValueChange={onChange}
-                                            >
-                                                <Picker.Item label="Equity" value="equity" />
-                                                <Picker.Item label="Future" value="future" />
-                                                <Picker.Item label="Option" value="option" />
-                                                <Picker.Item label="Commodity" value="commodity" />
-                                                <Picker.Item label="Currency" value="currency" />
-                                                <Picker.Item label="Crypto Currency" value="crypto" />
-                                            </Picker>
+                                            <SelectInput
+                                                options={data?.segmentList}
+                                                value={segment}
+                                                setValue={setsegment}
+                                            />
                                         </View>
                                     )}
                                 />
@@ -264,19 +352,15 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="tradeType"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Trade Type</Text>
-                                            <Picker
-                                                style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                                selectedValue={value}
-                                                onValueChange={onChange}
-                                            >
-                                                <Picker.Item label="Intraday" value="intraday" />
-                                                <Picker.Item label="Positional" value="positional" />
-                                                <Picker.Item label="Investment" value="investment" />
-                                            </Picker>
+                                            <SelectInput
+                                                options={data?.tradeTypeList}
+                                                value={tradeType}
+                                                setValue={settradeType}
+                                            />
                                         </View>
                                     )}
                                 />
@@ -286,31 +370,15 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="chartTimeFrame"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Chart Time Frame</Text>
-                                            <Picker
-                                                style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                                selectedValue={value}
-                                                onValueChange={onChange}
-                                            >
-                                                <Picker.Item label="1min" value="1min" />
-                                                <Picker.Item label="2min" value="2min" />
-                                                <Picker.Item label="3min" value="3min" />
-                                                <Picker.Item label="5min" value="5min" />
-                                                <Picker.Item label="10min" value="10min" />
-                                                <Picker.Item label="15min" value="15min" />
-                                                <Picker.Item label="30min" value="30min" />
-                                                <Picker.Item label="45min" value="45min" />
-                                                <Picker.Item label="1hr" value="1hr" />
-                                                <Picker.Item label="2hr" value="2hr" />
-                                                <Picker.Item label="3hr" value="3hr" />
-                                                <Picker.Item label="4hr" value="4hr" />
-                                                <Picker.Item label="5hr" value="5hr" />
-                                                <Picker.Item label="1week" value="1week" />
-                                                <Picker.Item label="1month" value="1month" />
-                                            </Picker>
+                                            <SelectInput
+                                                options={data?.chartTimeFrameList}
+                                                value={chartTimeFrame}
+                                                setValue={setchartTimeFrame}
+                                            />
                                         </View>
                                     )}
                                 />
@@ -321,35 +389,15 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="mindSetBeforeTrade"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Mindset Before Trade</Text>
-                                            <Picker
-                                                style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                                selectedValue={value}
-                                                onValueChange={onChange}
-                                            >
-                                                <Picker.Item label="Angry" value="angry" />
-                                                <Picker.Item label="Confident" value="confident" />
-                                                <Picker.Item label="Excited" value="excited" />
-                                                <Picker.Item label="Fear" value="fear" />
-                                                <Picker.Item label="Fomo" value="fomo" />
-                                                <Picker.Item label="Greedy" value="greedy" />
-                                                <Picker.Item label="Happy" value="happy" />
-                                                <Picker.Item label="Joyful" value="joyful" />
-                                                <Picker.Item label="Lazy" value="lazy" />
-                                                <Picker.Item label="Non Confident" value="nonconfident" />
-                                                <Picker.Item label="Other" value="other" />
-                                                <Picker.Item label="Regret" value="regret" />
-                                                <Picker.Item label="Sad" value="sad" />
-                                                <Picker.Item label="Sentimental" value="sentimental" />
-                                                <Picker.Item label="Sorrow" value="sorrow" />
-                                                <Picker.Item label="Confident" value="confident" />
-                                                <Picker.Item label="Gut Feeling" value="gutfelling" />
-
-
-                                            </Picker>
+                                            <SelectInput
+                                                options={data?.emotionList}
+                                                value={mindSetBeforeTrade}
+                                                setValue={setmindSetBeforeTrade}
+                                            />
                                         </View>
                                     )}
                                 />
@@ -359,35 +407,15 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="mindSetAfterTrade"
                                     rules={{ required: true }}
-                                    
+                                    value={mindSetBeforeTrade}
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Mindset After Trade</Text>
-                                            <Picker
-                                                style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                                selectedValue={value}
-                                                onValueChange={onChange}
-                                            >
-                                                <Picker.Item label="Angry" value="angry" />
-                                                <Picker.Item label="Confident" value="confident" />
-                                                <Picker.Item label="Excited" value="excited" />
-                                                <Picker.Item label="Fear" value="fear" />
-                                                <Picker.Item label="Fomo" value="fomo" />
-                                                <Picker.Item label="Greedy" value="greedy" />
-                                                <Picker.Item label="Happy" value="happy" />
-                                                <Picker.Item label="Joyful" value="joyful" />
-                                                <Picker.Item label="Lazy" value="lazy" />
-                                                <Picker.Item label="Non Confident" value="nonconfident" />
-                                                <Picker.Item label="Other" value="other" />
-                                                <Picker.Item label="Regret" value="regret" />
-                                                <Picker.Item label="Sad" value="sad" />
-                                                <Picker.Item label="Sentimental" value="sentimental" />
-                                                <Picker.Item label="Sorrow" value="sorrow" />
-                                                <Picker.Item label="Confident" value="confident" />
-                                                <Picker.Item label="Gut Feeling" value="gutfelling" />
-
-
-                                            </Picker>
+                                            <SelectInput
+                                                options={data?.emotionList}
+                                                value={mindSetAfterTrade}
+                                                setValue={setmindSetAfterTrade}
+                                            />
                                         </View>
                                     )}
                                 />
@@ -397,19 +425,15 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="session"
                                     rules={{ required: true }}
-                                    
+                                    value={session}
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Session</Text>
-                                            <Picker
-                                                style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                                selectedValue={value}
-                                                onValueChange={onChange}
-                                            >
-                                                <Picker.Item label="Morning" value="morning" />
-                                                <Picker.Item label="Mid" value="mid" />
-                                                <Picker.Item label="Last" value="investment" />
-                                            </Picker>
+                                            <SelectInput
+                                                options={data?.sessionList}
+                                                value={session}
+                                                setValue={setsession}
+                                            />
                                         </View>
                                     )}
                                 />
@@ -418,7 +442,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="quantity"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Quantity</Text>
@@ -433,12 +457,12 @@ export const TradeProvider = ({ children }) => {
                                     )}
                                 />
                                 {errors.quantity && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
-                                
+
                                 <Controller
                                     control={control}
                                     name="entryPrice"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Entry Price</Text>
@@ -458,7 +482,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="exitPrice"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Exit Price</Text>
@@ -474,12 +498,12 @@ export const TradeProvider = ({ children }) => {
                                 />
                                 {errors.exitPrice && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
 
-                                
+
                                 <Controller
                                     control={control}
                                     name="stopLoss"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Stop Loss</Text>
@@ -498,7 +522,7 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="targetPoint"
                                     rules={{ required: true }}
-                                    
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Target Point</Text>
@@ -513,14 +537,14 @@ export const TradeProvider = ({ children }) => {
                                     )}
                                 />
                                 {errors.targetPoint && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
-                                
 
-                                
+
+
                                 <Controller
                                     control={control}
                                     name="entryNote"
-                                    rules={{ required: true }}
-                                    
+                                    rules={{ required: false }}
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Entry Note</Text>
@@ -538,8 +562,8 @@ export const TradeProvider = ({ children }) => {
                                 <Controller
                                     control={control}
                                     name="exitNote"
-                                    rules={{ required: true }}
-                                    
+                                    rules={{ required: false }}
+
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 16 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Exit Note</Text>
@@ -571,7 +595,7 @@ export const TradeProvider = ({ children }) => {
                             />
                         </View>
 
-                    </View>
+                    </View>}
                 </Modal>
             </View >
 

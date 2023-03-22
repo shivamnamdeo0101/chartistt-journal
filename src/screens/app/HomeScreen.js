@@ -3,43 +3,116 @@ import React, { useEffect, useContext, useState } from 'react'
 import { TouchableOpacity } from 'react-native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useDispatch, useSelector } from 'react-redux';
-import { flushAuthData } from '../../store/UserSlice';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { BrokerContext } from '../../providers/BrokerProvider';
 import { TRADE_API } from '../../service/TradeService';
-import TradeComp from '../../components/TradeComp';
 import DashComp from '../../components/DashComp';
 import { BROKER_API } from '../../service/BrokerService';
-import { CALC } from '../../utils/Calc';
+import Loading from '../../components/Loading';
+import RangeComp from '../../components/RangeComp';
+import FilterComp from '../../components/FilterComp';
+import { setTradeList } from '../../store/DataSlice';
+import { setFilterObj } from '../../store/UserSlice';
+
+import RNFS from 'react-native-fs';
+import { PermissionsAndroid } from 'react-native';
+
+
 
 const HomeScreen = ({ navigation }) => {
 
   const [isOpen, setIsOpen] = useContext(BrokerContext)
-
+  const dispatch = useDispatch()
   const toggleModal = () => {
     setIsOpen(!isOpen);
   };
 
   const user = useSelector(state => state?.userAuth?.user)
+
+  useEffect(() => {
+    dispatch(setFilterObj({
+      "userId": auth?.user?._id,
+      "filterType": "a",
+    }))
+  }, [])
+
+
+
+  const data = useSelector(state => state?.data)
+
+  const auth = useSelector(state => state?.userAuth)
+
   const [loading, setloading] = useState(true)
   const [tradeList, settradeList] = useState([])
   const [brokerList, setbrokerList] = useState([])
   useEffect(() => {
     const fetchData = async () => {
-      const res = await TRADE_API.getAllTrades(user?._id, user?.token)
+      const res = await TRADE_API.getAllTrades(auth?.filterObj, user?.token)
       if (res?.status === 200) {
         settradeList(res?.data?.data)
+        setloading(false)
       }
     }
 
     fetchData()
 
-  }, [tradeList])
+  }, [])
+
+  // useEffect(() => {
+  //   dispatch(setTradeList(tradeList))
+  //   setloading(false)
+  // }, [tradeList])
 
 
+  useEffect(() => {
+    requestWriteFilePermission()
+  }, [])
+  
+
+  async function requestWriteFilePermission() {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission Required',
+          message:
+            'This app needs access to your storage to download the file',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn(err);
+    }
+}
+
+
+function convertAndSaveDataToCSV(data) {
+  let csvData = '';
+  const separator = ',';
+
+  // Add header row
+  const header = Object.keys(data[0]).join(separator);
+  csvData += `${header}\n`;
+
+  // Add rows
+  data.forEach((item) => {
+      const row = Object.values(item).join(separator);
+      csvData += `${row}\n`;
+  });
+
+  // Save file to device
+  const path = `${RNFS.DownloadsDirectoryPath}/data.csv`;
+  RNFS.writeFile(path, csvData, 'utf8')
+      .then(() => {
+          console.log('File written at:', path);
+      })
+      .catch((err) => {
+          console.log(err.message);
+      });
+}
 
 
   useEffect(() => {
@@ -53,10 +126,11 @@ const HomeScreen = ({ navigation }) => {
 
     fetchData()
 
+
   }, [brokerList])
 
 
-  const dispatch = useDispatch()
+
   useEffect(() => {
     GoogleSignin.configure({
       scopes: ['https://www.googleapis.com/auth/userinfo.profile'], // what API you want to access on behalf of the user, default is email and profile
@@ -67,96 +141,123 @@ const HomeScreen = ({ navigation }) => {
     });
   }, [])
 
-  
-  const getData = ()=>{
 
-    if(tradeList?.length === 0){
+  const getData = () => {
+
+    if (tradeList?.length === 0) {
       return {
-        "pAndL":0,
-        "avgP":0 ,
+        "pAndL": 0,
+        "avgP": 0,
         "avgL": 0,
-        "winLoss":0,
-        "riskReward": 0 ,
-        "tf":0,
-        "tr":0
+        "winLoss": 0,
+        "riskReward": 0,
+        "tf": 0,
+        "tr": 0
       }
     }
 
     let pAndL = 0;
     let tf = 0;
 
-    let p = 0,l = 0,pAmt = 0,lAmt = 0;
-    tradeList.forEach((item)=>{
+    let p = 0, l = 0, pAmt = 0, lAmt = 0;
+    let riskAndRewardSum = 0;
+    tradeList?.forEach((item) => {
 
       const tempTf = item?.entryPrice * item?.quantity
-      tf+=tempTf
-      let temp = (item?.exitPrice - item?.entryPrice )*item?.quantity 
+      tf += tempTf
+      let temp = (item?.exitPrice - item?.entryPrice) * item?.quantity
 
-      if(item?.action === "sell"){
+
+
+      //RR C
+
+      let val1 = item?.targetPoint - item?.entryPrice
+      let val2 = item?.entryPrice - item?.stopLoss
+
+
+      let riskAndReward = parseFloat(val1 / val2).toFixed(2);
+
+      if (val1 === 0) {
+        riskAndReward = 0
+      }
+
+      if (val2 === 0) {
+        riskAndReward = item?.targetPoint - item?.entryPrice
+      }
+
+      riskAndRewardSum += parseFloat(riskAndReward).toFixed(2);
+
+      //RR C
+
+
+      if (item?.action === "sell") {
         temp = temp * (-1)
       }
-    
 
-      if(temp < 0){
+
+      if (temp < 0) {
         l++;
-        lAmt+=temp;
-      }else{
+        lAmt += temp;
+      } else {
         p++;
-        pAmt+=temp;
+        pAmt += temp;
       }
 
-      pAndL+=temp
+      pAndL += temp
     })
 
-    if(l === 0 ){
+    if (l === 0) {
       l = 1
     }
-    if(lAmt === 0 ){
+    if (lAmt === 0) {
       l = 1
     }
 
-    
-    if(p === 0 ){
+
+    if (p === 0) {
       p = 1
     }
-    if(pAmt === 0 ){
+    if (pAmt === 0) {
       pAmt = 1
     }
-    
-    let avgP = pAmt/p;
-    let avgL = lAmt/l;
 
-    if(avgL === 0 ){
+    let avgP = pAmt / p;
+    let avgL = lAmt / l;
+
+    if (avgL === 0) {
       avgL = 1
     }
-    if(avgP === 0 ){
+    if (avgP === 0) {
       avgP = 1
     }
-    
-    
+
+
 
     pAndL = parseFloat(pAmt + lAmt).toFixed(2)
-    avgP  = parseFloat(avgP).toFixed(2) 
-    avgL = parseFloat(avgL).toFixed(2) 
-    const winLoss = parseFloat(p/l).toFixed(2) 
-    const riskReward = parseFloat(avgP/avgL).toFixed(2) 
-    tf = parseFloat(tf).toFixed(2) 
-    tr = parseFloat(parseFloat(tf)+parseFloat(pAndL)).toFixed(2) 
+    avgP = parseFloat(avgP).toFixed(2)
+    avgL = parseFloat(avgL).toFixed(2)
+    const winLoss = parseFloat(p / l).toFixed(2)
+    tf = parseFloat(tf).toFixed(2)
+    tr = parseFloat(parseFloat(tf) + parseFloat(pAndL)).toFixed(2)
+
+    rr = parseFloat(riskAndRewardSum / tradeList?.length).toFixed(2)
+
+    // console.log(riskAndRewardSum)
 
     return {
-      "pAndL":checkNum(pAndL),
-      "avgP":checkNumber(avgP) ,
+      "pAndL": checkNum(pAndL),
+      "avgP": checkNumber(avgP),
       "avgL": checkNum(avgL),
-      "winLoss":checkNumber(winLoss),
-      "riskReward": checkNumber(riskReward) ,
-      "tf":checkNumber(tf),
-      "tr":checkNumber(tr)
+      "winLoss": checkNumber(winLoss),
+      "riskReward": rr,
+      "tf": checkNumber(tf),
+      "tr": checkNumber(tr),
     }
   }
 
   function checkNum(num) {
     if (!Number.isFinite(num)) {
-        
+
       return num;
     } else {
       return 0;
@@ -166,17 +267,17 @@ const HomeScreen = ({ navigation }) => {
   function checkNumber(num) {
     if (!Number.isFinite(num)) {
 
-      if(num < 0){
+      if (num < 0) {
         num = num * (-1)
       }
-        
+
       return num;
     } else {
       return 0;
     }
   }
 
-  
+
 
 
 
@@ -217,6 +318,16 @@ const HomeScreen = ({ navigation }) => {
   ]
 
 
+
+
+  if (loading) {
+    return (
+      <Loading />
+    )
+  }
+  
+
+
   return (
     <View style={{ flex: 1, backgroundColor: "#1e294f" }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
@@ -226,7 +337,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
         </View>
 
-        <TouchableOpacity onPress={() => toggleModal()}>
+        <TouchableOpacity onPress={() => convertAndSaveDataToCSV(tradeList)}>
           <Entypo name="download" color={"#717da8"} size={26} />
         </TouchableOpacity>
 
@@ -258,7 +369,16 @@ const HomeScreen = ({ navigation }) => {
       </View>
 
 
+
+
       <View style={{ margin: 10, padding: 10, marginTop: 0 }}>
+
+
+        <FilterComp />
+
+
+
+
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
             <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>OVERVIEW</Text>
