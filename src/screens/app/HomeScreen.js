@@ -104,7 +104,7 @@ function convertAndSaveDataToCSV(data) {
   });
 
   // Save file to device
-  const path = `${RNFS.DownloadsDirectoryPath}/data.csv`;
+  const path = `${RNFS.DocumentDirectoryPath}/data.pdf`;
   RNFS.writeFile(path, csvData, 'utf8')
       .then(() => {
           console.log('File written at:', path);
