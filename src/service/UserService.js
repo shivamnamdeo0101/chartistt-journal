@@ -15,18 +15,26 @@ export const USER_API = {
       })
     },
     
-    getAllNotifications: async function (token) {
-      const  headers = { 
-          'Authorization': 'Bearer '+token, 
-          'Content-Type': 'application/json'
-      }
-      return axios.request({
-          method: 'get',
-          url: `${EndPoint}private/notifications`,
-          headers:headers
-      })
+  getAllNotifications: async function (token) {
+    const headers = {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    }
+    return axios.request({
+      method: 'get',
+      url: `${EndPoint}private/notifications`,
+      headers: headers
+    })
   },
+  getData: async function (name,token) {
+   
+    return axios.request({
+        method: 'get',
+        url: `${EndPoint}private/data/`+name,
+        
 
+    })
+},
     
    
     

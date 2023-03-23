@@ -8,7 +8,6 @@ import CustomButton from "../components/CustomButton";
 import { BROKER_API } from "../service/BrokerService";
 import { setBrokerObj } from "../store/UserSlice";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 export const BrokerContext = createContext(false, () => { }, {});
 
 export const BrokerProvider = ({ children }) => {
@@ -16,12 +15,12 @@ export const BrokerProvider = ({ children }) => {
     const contextData = [isOpen, setIsOpen];
     const user = useSelector(state => state?.userAuth?.user)
     const auth = useSelector(state => state?.userAuth)
-
+    const [loading, setloading] = useState(true)
 
     const dispatch = useDispatch()
     const { control, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: auth?.brokerObj });
 
-
+    
 
     useEffect(() => {
         if (Object.keys(auth?.brokerObj).length > 0) {
@@ -29,30 +28,59 @@ export const BrokerProvider = ({ children }) => {
         } else {
             reset({});
         }
+        setloading(false)
 
     }, [auth])
 
 
+    const addBrokerFun  = async (brokerPayload)=>{
+        const addBroker = await BROKER_API.addBroker(brokerPayload, user?.token)
+            
+        if (addBroker?.status === 200) {
+            setIsOpen(!isOpen);
+            reset()
+            Alert.alert("Broker Added")
+        }
+
+        
+    }
+    const updateBrokerFun  = async (brokerPayload)=>{
+        console.log(brokerPayload)
+        const updateBroker = await BROKER_API.updateBroker(brokerPayload, user?.token)
+            
+        if (updateBroker?.status === 200) {
+            setIsOpen(!isOpen);
+            reset()
+            Alert.alert("Broker Updated")
+        }
+    }
 
     const onSubmit = async (data) => {
+        setloading(true)
         try {
-            const brokerPayload = {
-                "userId": user?._id,
-                "brokerName": data?.brokerName,
-                "amtWithdraw": data?.amtWithdraw,
-                "amtDeposit": data?.amtDeposit
-            }
+            
 
-            const addBroker = await BROKER_API.addBroker(brokerPayload, user?.token)
-            if (addBroker?.status === 200) {
-                setIsOpen(!isOpen);
-                reset()
-                Alert.alert("Broker Added")
+            if(forUpdate()){
+                const brokerPayload = {
+                    "userId": user?._id,
+                    "brokerId":auth?.brokerObj?._id,
+                    "broker":data
+                }
+                await updateBrokerFun(brokerPayload)
+            }else{
+                const brokerPayload = {
+                    "userId": user?._id,
+                    ...data
+                }
+                await addBrokerFun(brokerPayload)
             }
+            
+            
 
         } catch (e) {
             console.log(e)
         }
+        setloading(false)
     };
 
     const cancelForm = () => {
@@ -87,9 +115,10 @@ export const BrokerProvider = ({ children }) => {
     }
 
     const deleteFromDB = async () => {
+        setloading(true)
         const payload = {
             userId:user?._id,
-            brokerId:brokerObj?._id
+            brokerId:auth.brokerObj?._id
         }
         try {
             const res = await BROKER_API.remBroker(payload, user?.token)
@@ -100,8 +129,10 @@ export const BrokerProvider = ({ children }) => {
         }catch(e){
             console.log(e)
         }
+        setloading(false)
     }
 
+    
 
 
     return (
@@ -116,7 +147,8 @@ export const BrokerProvider = ({ children }) => {
                         cancelForm();
                     }}
                 >
-                    <View style={{ elevation: 4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
+                    
+                   { loading ? <Loading /> : <View style={{ elevation: 4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
 
 
                         <ScrollView>
@@ -219,12 +251,13 @@ export const BrokerProvider = ({ children }) => {
                             />
                             <CustomButton
                                 filled={true}
-                                title={"Submit"}
+                                title={forUpdate() === true ? "Update" : "Submit"}
                                 onPress={handleSubmit(onSubmit)}
                             />
                         </View>
 
-                    </View>
+                    </View>}
+                   
 
 
 

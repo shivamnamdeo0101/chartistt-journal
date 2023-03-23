@@ -1,61 +1,114 @@
-import { View, Text, TouchableOpacity, Button,ScrollView } from 'react-native'
-import React, { useState,useContext ,useEffect} from 'react'
+import { View, Text, TouchableOpacity, Button, ScrollView, Alert } from 'react-native'
+import React, { useState, useContext, useEffect } from 'react'
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { TradeContext } from '../../providers/TradeProvider';
 import TradeComp from '../../components/TradeComp';
 import { BROKER_API } from '../../service/BrokerService';
 import { TRADE_API } from '../../service/TradeService';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../../components/Loading';
+import FilterComp from '../../components/FilterComp';
+import { BrokerContext } from '../../providers/BrokerProvider';
+import { setTradeList } from '../../store/DataSlice';
+import { setClearRange, setCustomDate, setFilterObj } from '../../store/UserSlice';
 
 const TradeScreen = ({ navigation }) => {
-    const user = useSelector(state=>state?.userAuth?.user)
+    const user = useSelector(state => state?.userAuth?.user)
+    const auth = useSelector(state => state?.userAuth)
+    const data = useSelector(state => state?.data)
+
+    const filter = useSelector(state => state?.filterObj)
+
+
+    const brokerObj = useSelector(state => state?.userAuth)
+
+
     const [loading, setloading] = useState(true)
     const [isOpen, setIsOpen] = useContext(TradeContext)
+
+    const dispatch = useDispatch()
+
+
+    const [BrokerisOpen, setBrokerIsOpen] = useContext(BrokerContext)
+
     const [tradeList, settradeList] = useState([])
+
+
     useEffect(() => {
-        const fetchData = async ()=>{
-          const res = await TRADE_API.getAllTrades(user?._id,user?.token)
-          if(res?.status === 200){
+        setloading(true)
+        const fetchData = async () => {
+
+            const res = await TRADE_API.getAllTrades(auth?.filterObj, user?.token)
+            if (res?.status === 200) {
                 settradeList(res?.data?.data)
+
                 setloading(false)
-          }
+            }
         }
-  
+
         fetchData()
-  
-      }, [tradeList])
-  
-      if(loading){
-          return(
-              <Loading />
-          )
-      }
+
+       
+
+
+    }, [auth])
+
+    // useEffect(() => {
+    //   return () => {
+    //     dispatch(setClearRange())
+    //   }
+    // }, [])
+
+
+    //   useEffect(() => {
+    //     dispatch(setTradeList(tradeList))
+    //     setloading(false)
+    //   }, [tradeList])
+
+    if (loading) {
+        return (
+            <Loading />
+        )
+    }
+
+
 
     const toggleModal = () => {
+        if ((brokerObj?.brokerId === "" || brokerObj?.brokerId === null)) {
+
+            Alert.alert(
+                'Message',
+                'You need to add one default broker first ...',
+                [
+                    {
+                        text: 'Cancel',
+                        onPress: () => console.log('Cancel Pressed'),
+                        style: 'cancel'
+                    },
+                    {
+                        text: 'OK',
+                        onPress: () => navigation.navigate("Broker")
+                    }
+                ]
+            );
+            return
+        }
+
+
+
         setIsOpen(!isOpen);
     };
 
-    return (
 
-        <View style={{ flex: 1, backgroundColor: "#1e294f", padding: 10, }}>
-        <View style={{ padding: 10, marginTop: 0,paddingTop:0 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-                    <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>TRADE</Text>
-                    <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>LIST</Text>
-                </View>
-                <TouchableOpacity onPress={() => toggleModal()}>
-                    <Ionicons name="add-circle-sharp" color={"#717da8"} size={26} />
-                </TouchableOpacity>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={{marginBottom:100}}>
+    const RenderTradeList = ({ list }) => {
 
-               
+
+
+        return (
+            <View>
                 {
-                    tradeList?.map((item, index) => {
+                    list?.map((item, index) => {
                         return (
                             <View key={index}>
                                 <TradeComp item={item} />
@@ -63,10 +116,35 @@ const TradeScreen = ({ navigation }) => {
                         )
                     })
                 }
-                 </View>
-            </ScrollView>
+            </View>
+        )
+    }
+
+    return (
+
+        <View style={{ flex: 1, backgroundColor: "#1e294f", padding: 10, }}>
+            <View style={{ padding: 10, marginTop: 0, paddingTop: 0 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+                        <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>TRADE</Text>
+                        <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>LIST</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => toggleModal()}>
+                        <Ionicons name="add-circle-sharp" color={"#717da8"} size={26} />
+                    </TouchableOpacity>
+                </View>
+
+                <FilterComp />
+
+                <Text style={{ marginBottom: 10, marginTop: 10, color: "#fff", fontWeight: "bold" }}>Total Trades {tradeList?.length}</Text>
+
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={{ marginBottom: 100 }}>
+                        <RenderTradeList list={tradeList} />
+                    </View>
+                </ScrollView>
+            </View>
         </View>
-    </View>
     )
 }
 

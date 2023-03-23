@@ -35,19 +35,15 @@ const NotificationScreen = ({ navigation }) => {
     )
   }
 
-  const openUrl = async (item) => {
-    try {
-      const res = await Linking.canOpenURL(item?.linkUrl)
-      if (res) {
-        await Linking.openURL(item?.linkUrl)
-      } else {
-        Alert.alert("Can't open url")
-      }
-    }catch(e){
-      console.log(e)
+  const OpenUrl = (item) => {
+    if (Linking.canOpenURL(item?.linkUrl)) {
+      Linking.openURL(item?.linkUrl)
+    } else {
+      Alert.alert("Can't open url")
     }
-    
   }
+
+
   return (
     <View style={{ flex: 1, backgroundColor: "#1e294f", padding: 10, }}>
       <View style={{ padding: 10, marginTop: 0, paddingTop: 0 }}>
@@ -71,7 +67,7 @@ const NotificationScreen = ({ navigation }) => {
                     <Text style={styles.timestamp}>{moment(item?.timestamp).fromNow()}</Text>
                     <Text style={styles.title}>{item?.title}</Text>
                     <Text style={styles.text}>{item?.text} </Text>
-                    { item?.linkUrl &&  <Text style={{...styles.text,backgroundColor:"#975bd9",marginTop:10, alignSelf:"flex-start",padding:10,paddingTop:5,paddingBottom:5, borderRadius:10,fontSize:12}} onPress={() => openUrl(item)}>{item?.linkTitle}</Text>}                 
+                    { item?.linkUrl &&  <Text style={{ ...styles.text, backgroundColor: "#975bd9", marginTop: 10, alignSelf: "flex-start", padding: 10, paddingTop: 5, paddingBottom: 5, borderRadius: 10, fontSize: 12 }} onPress={() => OpenUrl(item)}> {item?.linkTitle}</Text>}                 
                   </View>
                 )
               })
