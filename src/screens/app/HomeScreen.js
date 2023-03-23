@@ -5,7 +5,7 @@ import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-si
 import { useDispatch, useSelector } from 'react-redux';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-
+import RNFetchBlob from 'rn-fetch-blob'
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { BrokerContext } from '../../providers/BrokerProvider';
 import { TRADE_API } from '../../service/TradeService';
@@ -88,7 +88,6 @@ const HomeScreen = ({ navigation }) => {
     }
 }
 
-
 function convertAndSaveDataToCSV(data) {
   let csvData = '';
   const separator = ',';
@@ -103,8 +102,9 @@ function convertAndSaveDataToCSV(data) {
       csvData += `${row}\n`;
   });
 
+  const { config, fs } = RNFetchBlob;
   // Save file to device
-  const path = `${RNFS.DocumentDirectoryPath}/data.pdf`;
+  const path = `${fs.dirs.DownloadDir}/data.csv`;
   RNFS.writeFile(path, csvData, 'utf8')
       .then(() => {
           console.log('File written at:', path);
