@@ -33,15 +33,15 @@ const FilterComp = () => {
     {
       "value": "1Y",
       "title": "1Y"
-    },
-    {
-      "value": "d",
-      "title": "Custom Date"
-    },
-    {
-      "value": "r",
-      "title": "Custom Range"
     }
+    // {
+    //   "value": "d",
+    //   "title": "Custom Date"
+    // },
+    // {
+    //   "value": "r",
+    //   "title": "Custom Range"
+    // }
   ]
 
     return (

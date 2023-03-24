@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, Image, StyleSheet, ScrollView, Alert } from 'react-native'
 import React, { useEffect, useContext, useState } from 'react'
 import { TouchableOpacity } from 'react-native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
@@ -19,6 +19,7 @@ import { setFilterObj } from '../../store/UserSlice';
 
 import RNFS from 'react-native-fs';
 import { PermissionsAndroid } from 'react-native';
+import moment from 'moment';
 
 
 
@@ -59,7 +60,9 @@ const HomeScreen = ({ navigation }) => {
 
     fetchData()
 
-  }, [])
+  }, [auth])
+
+
 
   // useEffect(() => {
   //   dispatch(setTradeList(tradeList))
@@ -89,6 +92,9 @@ const HomeScreen = ({ navigation }) => {
 }
 
 function convertAndSaveDataToCSV(data) {
+
+  setloading(true)
+
   let csvData = '';
   const separator = ',';
 
@@ -102,16 +108,33 @@ function convertAndSaveDataToCSV(data) {
       csvData += `${row}\n`;
   });
 
+<<<<<<< Updated upstream
   const { config, fs } = RNFetchBlob;
   // Save file to device
   const path = `${fs.dirs.DownloadDir}/data.csv`;
+=======
+<<<<<<< Updated upstream
+  // Save file to device
+  const path = `${RNFS.DocumentDirectoryPath}/data.pdf`;
+=======
+  const { config, fs } = RNFetchBlob;
+
+
+
+  // Save file to device
+  const path = `${fs.dirs.DownloadDir}/Trades.csv`;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   RNFS.writeFile(path, csvData, 'utf8')
       .then(() => {
           console.log('File written at:', path);
+          Alert.alert("File Saved In Download Folder...")
       })
       .catch((err) => {
           console.log(err.message);
       });
+
+      setloading(false)
 }
 
 
