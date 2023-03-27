@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Button, ScrollView, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, Button, ScrollView, Alert, RefreshControl } from 'react-native'
 import React, { useState, useContext, useEffect } from 'react'
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -12,6 +12,7 @@ import FilterComp from '../../components/FilterComp';
 import { BrokerContext } from '../../providers/BrokerProvider';
 import { setTradeList } from '../../store/DataSlice';
 import { setClearRange, setCustomDate, setFilterObj } from '../../store/UserSlice';
+import AllBrokerComp from '../../components/AllBrokerComp';
 
 const TradeScreen = ({ navigation }) => {
     const user = useSelector(state => state?.userAuth?.user)
@@ -35,36 +36,37 @@ const TradeScreen = ({ navigation }) => {
     const [tradeList, settradeList] = useState([])
 
 
-    useEffect(() => {
-        setloading(true)
-        const fetchData = async () => {
+    const [filterObj, setfilterObj] = useState({
+        "userId": auth?.user?._id,
+        "filterType": "a",
+        "brokerId": "0"
+    })
 
-            const res = await TRADE_API.getAllTrades(auth?.filterObj, user?.token)
+
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setloading(true)
+
+            const res = await TRADE_API.getAllTrades(filterObj, user?.token)
             if (res?.status === 200) {
                 settradeList(res?.data?.data)
-
                 setloading(false)
             }
         }
 
         fetchData()
-
-       
-
-
-    }, [auth])
-
-    // useEffect(() => {
-    //   return () => {
-    //     dispatch(setClearRange())
-    //   }
-    // }, [])
+    }, [filterObj, refreshing])
 
 
-    //   useEffect(() => {
-    //     dispatch(setTradeList(tradeList))
-    //     setloading(false)
-    //   }, [tradeList])
 
     if (loading) {
         return (
@@ -134,11 +136,19 @@ const TradeScreen = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
 
-                <FilterComp />
+                <ScrollView
+                    
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
+                    showsVerticalScrollIndicator={false}>
 
-                <Text style={{ marginBottom: 10, marginTop: 10, color: "#fff", fontWeight: "bold" }}>Total Trades {tradeList?.length}</Text>
+                    <FilterComp value={filterObj} setValue={setfilterObj} />
+                    <AllBrokerComp value={filterObj} setValue={setfilterObj} />
 
-                <ScrollView showsVerticalScrollIndicator={false}>
+                    <Text style={{ marginBottom: 10, marginTop: 10, color: "#fff", fontWeight: "bold" }}>Total Trades {tradeList?.length}</Text>
+
+
                     <View style={{ marginBottom: 100 }}>
                         <RenderTradeList list={tradeList} />
                     </View>

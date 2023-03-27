@@ -472,6 +472,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Entry Price"
+                                                keyboardType="number-pad"
                                             />
                                         </View>
                                     )}
@@ -492,6 +493,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Exit Price"
+                                                keyboardType="number-pad"
                                             />
                                         </View>
                                     )}
@@ -513,6 +515,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Stop Loss"
+                                                keyboardType="number-pad"
                                             />
                                         </View>
                                     )}
@@ -531,6 +534,7 @@ export const TradeProvider = ({ children }) => {
                                                 onChangeText={onChange}
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
+                                                keyboardType="number-pad"
                                                 placeholder="Target Point"
                                             />
                                         </View>
