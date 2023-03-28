@@ -49,7 +49,7 @@ const TradeScreen = ({ navigation }) => {
         setRefreshing(true);
         setTimeout(() => {
             setRefreshing(false);
-        }, 2000);
+        }, 1000);
     }, []);
 
     useEffect(() => {
@@ -136,19 +136,26 @@ const TradeScreen = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
 
+
+
                 <ScrollView
-                    
+
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }
                     showsVerticalScrollIndicator={false}>
 
+                    {/* <TouchableOpacity style={{ marginBottom:10,backgroundColor:"#070f4a",padding:10,borderRadius:10 }} onPress={() => navigation.navigate("Broker")}>
+                        <Text style={{ color: "#fff", fontWeight: "bold" }}>Default Broker (Click To Change)</Text>
+                        <Text style={{ color: "#fff", fontWeight: "400" }}>{data?.defaultBrokerObj?.brokerName}</Text>
+                    </TouchableOpacity> */}
+
+                     <AllBrokerComp value={filterObj} setValue={setfilterObj} />
+
                     <FilterComp value={filterObj} setValue={setfilterObj} />
-                    <AllBrokerComp value={filterObj} setValue={setfilterObj} />
-
+                    
                     <Text style={{ marginBottom: 10, marginTop: 10, color: "#fff", fontWeight: "bold" }}>Total Trades {tradeList?.length}</Text>
-
-
+                    
                     <View style={{ marginBottom: 100 }}>
                         <RenderTradeList list={tradeList} />
                     </View>

@@ -23,9 +23,15 @@ export const BrokerProvider = ({ children }) => {
 
     const dispatch = useDispatch()
     const { control, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: auth?.brokerObj });
-
-    const [brokerName, setbrokerName] = useState({})
     
+    
+    const [brokerName, setbrokerName] = useState({
+        "userId": user?._id,
+        "id": "0",
+        "brokerName": "All",
+        "iconLink": "https://ik.imagekit.io/lajz2ta7n/Brokers/ALL.png"
+    })
+
 
     useEffect(() => {
         if (Object.keys(auth?.brokerObj).length > 0) {
@@ -38,21 +44,21 @@ export const BrokerProvider = ({ children }) => {
     }, [auth])
 
 
-    const addBrokerFun  = async (brokerPayload)=>{
+    const addBrokerFun = async (brokerPayload) => {
         const addBroker = await BROKER_API.addBroker(brokerPayload, user?.token)
-            
+
         if (addBroker?.status === 200) {
             setIsOpen(!isOpen);
             reset()
             Alert.alert("Broker Added")
         }
 
-        
+
     }
-    const updateBrokerFun  = async (brokerPayload)=>{
-        console.log(brokerPayload,"Update")
+    const updateBrokerFun = async (brokerPayload) => {
+        console.log(brokerPayload, "Update")
         const updateBroker = await BROKER_API.updateBroker(brokerPayload, user?.token)
-            
+
         if (updateBroker?.status === 200) {
             setIsOpen(!isOpen);
             reset()
@@ -62,27 +68,29 @@ export const BrokerProvider = ({ children }) => {
 
     const onSubmit = async (e) => {
 
-        
+
         setloading(true)
         try {
-            
 
-            if(forUpdate()){
+
+            if (forUpdate()) {
                 const brokerPayload = {
                     "userId": user?._id,
-                    "brokerId":auth?.brokerObj?._id,
-                    "broker":{...e,brokerName:brokerName?.label}
+                    "brokerId": auth?.brokerObj?._id,
+                    "broker": { ...e, brokerName: auth?.brokerObj?.brokerName, id: auth?.brokerObj?.id, iconLink: auth?.brokerObj?.iconLink }
                 }
                 await updateBrokerFun(brokerPayload)
-            }else{
+            } else {
                 const brokerPayload = {
                     "userId": user?._id,
-                    ...e
+                    ...e, id: brokerName?.id,
+                    brokerName: brokerName?.label,
+                    iconLink: brokerName?.iconLink
                 }
                 await addBrokerFun(brokerPayload)
             }
-            
-            
+
+
 
         } catch (e) {
             console.log(e)
@@ -124,8 +132,8 @@ export const BrokerProvider = ({ children }) => {
     const deleteFromDB = async () => {
         setloading(true)
         const payload = {
-            userId:user?._id,
-            brokerId:auth.brokerObj?._id
+            userId: user?._id,
+            brokerId: auth.brokerObj?._id
         }
         try {
             const res = await BROKER_API.remBroker(payload, user?.token)
@@ -133,13 +141,13 @@ export const BrokerProvider = ({ children }) => {
                 cancelForm()
                 Alert.alert("Broker Deleted")
             }
-        }catch(e){
+        } catch (e) {
             console.log(e)
         }
         setloading(false)
     }
 
-    
+
 
 
     return (
@@ -154,8 +162,8 @@ export const BrokerProvider = ({ children }) => {
                         cancelForm();
                     }}
                 >
-                    
-                   { loading ? <Loading /> : <View style={{ elevation: 4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
+
+                    {loading ? <Loading /> : <View style={{ elevation: 4, flex: 1, marginTop: 100, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#1e294f", padding: 16 }}>
 
 
                         <ScrollView>
@@ -173,27 +181,41 @@ export const BrokerProvider = ({ children }) => {
                                 </View>
 
                                 <View style={{ marginTop: 16 }}>
-                                <Controller
-                                    control={control}
-                                    name="brokerName"
-                                    rules={{ required: true }}
-                                    value={brokerName?.brokerName}
-                                    render={({ field: { onChange, value } }) => (
-                                        <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Broker  </Text>
-                                            <SelectObjInput
 
-                                                options={data?.allBrokerList}
-                                                label="Select broker"
-                                                value={brokerName?.brokerName}
-                                                setValue={setbrokerName}
-                                            />
+                                    {
+                                        forUpdate() ? <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Broker  </Text>
+                                            <View style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", padding: 14, marginBottom: 2 }}>
+                                                <Text style={{ color: "#fff", fontWeight: "bold", textTransform: "capitalize" }}>{auth?.brokerObj?.brokerName}</Text>
+                                            </View>
                                         </View>
-                                    )}
-                                />
-                                {errors.brokerName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                            :
 
+                                            <View>
+                                                <Controller
+                                                    control={control}
+                                                    name="brokerName"
 
+                                                    value={brokerName}
+                                                    render={({ field: { onChange, value } }) => (
+                                                        <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Broker  </Text>
+
+                                                            {console.log(brokerName)}
+                                                            <SelectObjInput
+
+                                                                options={data?.allBrokerList}
+                                                                label="Select broker"
+                                                                value={brokerName}
+                                                                setValue={setbrokerName}
+                                                            />
+                                                        </View>
+                                                    )}
+                                                />
+                                                {errors.brokerName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+
+                                            </View>
+                                    }
                                 </View>
 
 
@@ -262,7 +284,7 @@ export const BrokerProvider = ({ children }) => {
                         </View>
 
                     </View>}
-                   
+
 
 
 

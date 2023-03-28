@@ -62,7 +62,6 @@ const HomeScreen = ({ navigation }) => {
       setloading(true)
       const res = await TRADE_API.getAllTrades(filterObj, user?.token)
       if (res?.status === 200) {
-        console.log(res?.data?.data,"Object Filter",filterObj)
         settradeList(res?.data?.data)
         setloading(false)
         
