@@ -73,7 +73,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     requestWriteFilePermission()
   }, [])
-  
+
 
   async function requestWriteFilePermission() {
     try {
@@ -89,53 +89,38 @@ const HomeScreen = ({ navigation }) => {
     } catch (err) {
       console.warn(err);
     }
-}
+  }
 
-function convertAndSaveDataToCSV(data) {
+  function convertAndSaveDataToCSV(data) {
 
-  setloading(true)
+    setloading(true)
 
-  let csvData = '';
-  const separator = ',';
+    let csvData = '';
+    const separator = ',';
 
-  // Add header row
-  const header = Object.keys(data[0]).join(separator);
-  csvData += `${header}\n`;
+    // Add header row
+    const header = Object.keys(data[0]).join(separator);
+    csvData += `${header}\n`;
 
-  // Add rows
-  data.forEach((item) => {
+    // Add rows
+    data.forEach((item) => {
       const row = Object.values(item).join(separator);
       csvData += `${row}\n`;
-  });
+    });
 
-<<<<<<< Updated upstream
-  const { config, fs } = RNFetchBlob;
-  // Save file to device
-  const path = `${fs.dirs.DownloadDir}/data.csv`;
-=======
-<<<<<<< Updated upstream
-  // Save file to device
-  const path = `${RNFS.DocumentDirectoryPath}/data.pdf`;
-=======
-  const { config, fs } = RNFetchBlob;
-
-
-
-  // Save file to device
-  const path = `${fs.dirs.DownloadDir}/Trades.csv`;
->>>>>>> Stashed changes
->>>>>>> Stashed changes
-  RNFS.writeFile(path, csvData, 'utf8')
+    // Save file to device
+    const path = `${fs.dirs.DownloadDir}/Trades.csv`;
+    RNFS.writeFile(path, csvData, 'utf8')
       .then(() => {
-          console.log('File written at:', path);
-          Alert.alert("File Saved In Download Folder...")
+        console.log('File written at:', path);
+        Alert.alert("File Saved In Download Folder...")
       })
       .catch((err) => {
-          console.log(err.message);
+        console.log(err.message);
       });
 
-      setloading(false)
-}
+    setloading(false)
+  }
 
 
   useEffect(() => {
@@ -348,7 +333,7 @@ function convertAndSaveDataToCSV(data) {
       <Loading />
     )
   }
-  
+
 
 
   return (
