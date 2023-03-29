@@ -38,6 +38,8 @@ const BrokerScreen = ({ navigation }) => {
         )
     }
 
+    
+
 
     return (
         <View style={{ flex: 1, backgroundColor: "#1e294f", padding: 10, }}>

@@ -3,25 +3,32 @@ import React ,{useContext}from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setBrokerId, setBrokerObj } from '../store/UserSlice'
 import { BrokerContext } from '../providers/BrokerProvider'
+import { setDefaultBrokerObj } from '../store/DataSlice'
 
 const BrokerComp = ({item}) => {
     const dispatch = useDispatch()
     const [isOpen, setIsOpen] = useContext(BrokerContext)
     const brokerId = useSelector(state=>state?.userAuth?.brokerId)
     const setBrokerIdFun = (item)=>{
-        dispatch(setBrokerObj(item))    
-        dispatch(setBrokerId(item?._id))
-       
+        
         setIsOpen(!isOpen)
         //Alert.alert("Default Broker Selected")
-        
+        dispatch(setBrokerObj(item))    
+        dispatch(setBrokerId(item?._id))
+        dispatch(setDefaultBrokerObj(item))
+    }
+    const makeDeault = ()=>{
+        dispatch(setBrokerObj(item))    
+        dispatch(setBrokerId(item?._id))
+        dispatch(setDefaultBrokerObj(item))
     }
 
 
-
     return (
-        <TouchableOpacity onPress={()=>setBrokerIdFun(item)} style={{ backgroundColor: "#070f4a", padding: 16, margin: 10, borderRadius: 10, borderWidth: 2, borderColor: brokerId === item?._id ? "#975bd9" : "#070f4a" }}>
-            <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingBottom: 10 }}>
+        <View  >
+            
+            
+            <TouchableOpacity  style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between" , backgroundColor: "#070f4a", padding: 16, margin: 10,marginBottom:0, borderTopLeftRadius:10,borderTopRightRadius:10, borderWidth: 2, borderColor: brokerId === item?._id ? "#975bd9" : "#070f4a" }} >
                 <View>
                     <Text style={styles.title}>Broker</Text>
                     <Text style={styles.text}>{item?.brokerName}</Text>
@@ -34,8 +41,20 @@ const BrokerComp = ({item}) => {
                     <Text style={styles.title}>Withdraw</Text>
                     <Text style={styles.text}>{item?.amtWithdraw}</Text>
                 </View>
+            </TouchableOpacity>
+
+            <View  style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between" ,backgroundColor: "#070f4a", padding: 16, margin: 10,marginTop:0,borderBottomLeftRadius:10,borderBottomRightRadius:10 }}>
+                <TouchableOpacity onPress={()=>setBrokerIdFun(item)}>
+                    <Text style={styles.title}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>makeDeault(item)}>
+                    <Text style={styles.title}>Make It Default</Text>
+                </TouchableOpacity>
+               
             </View>
-        </TouchableOpacity>
+
+
+        </View>
     )
 }
 

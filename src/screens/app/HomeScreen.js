@@ -20,6 +20,7 @@ import { setFilterObj } from '../../store/UserSlice';
 import RNFS from 'react-native-fs';
 import { PermissionsAndroid } from 'react-native';
 import moment from 'moment';
+import AllBrokerComp from '../../components/AllBrokerComp';
 
 
 
@@ -33,41 +34,43 @@ const HomeScreen = ({ navigation }) => {
 
   const user = useSelector(state => state?.userAuth?.user)
 
-  useEffect(() => {
-    dispatch(setFilterObj({
-      "userId": auth?.user?._id,
-      "filterType": "a",
-    }))
-  }, [])
 
 
 
   const data = useSelector(state => state?.data)
+
+
 
   const auth = useSelector(state => state?.userAuth)
 
   const [loading, setloading] = useState(true)
   const [tradeList, settradeList] = useState([])
   const [brokerList, setbrokerList] = useState([])
+
+  
+
+  const [filterObj, setfilterObj] = useState({
+    "userId":auth?.user?._id,
+    "filterType":"a",
+    "brokerId":"0"
+  })
+ 
+
   useEffect(() => {
+
     const fetchData = async () => {
-      const res = await TRADE_API.getAllTrades(auth?.filterObj, user?.token)
+      setloading(true)
+      const res = await TRADE_API.getAllTrades(filterObj, user?.token)
       if (res?.status === 200) {
         settradeList(res?.data?.data)
         setloading(false)
+        
       }
     }
-
     fetchData()
 
-  }, [auth])
+  }, [filterObj])
 
-
-
-  // useEffect(() => {
-  //   dispatch(setTradeList(tradeList))
-  //   setloading(false)
-  // }, [tradeList])
 
 
   useEffect(() => {
@@ -108,8 +111,11 @@ const HomeScreen = ({ navigation }) => {
       csvData += `${row}\n`;
     });
 
+    const { config, fs } = RNFetchBlob;
+
     // Save file to device
     const path = `${fs.dirs.DownloadDir}/Trades.csv`;
+
     RNFS.writeFile(path, csvData, 'utf8')
       .then(() => {
         console.log('File written at:', path);
@@ -149,8 +155,37 @@ const HomeScreen = ({ navigation }) => {
     });
   }, [])
 
+  const RiskReward = (item) => {
+
+
+    let val1 = item?.targetPoint - item?.entryPrice
+    let val2 = item?.entryPrice - item?.stopLoss
+
+
+    let riskAndReward = parseFloat(val1 / val2).toFixed(2);
+
+    if (val1 === 0) {
+      riskAndReward = 0
+    }
+
+    if (val2 === 0) {
+      riskAndReward = val1
+    }
+
+    return parseFloat(riskAndReward).toFixed(2);
+  }
 
   const getData = () => {
+
+    var riskRewardAll = 0;
+
+    tradeList?.forEach(async (item, index) => {
+      riskRewardAll += parseFloat(RiskReward(item))
+    })
+
+
+
+
 
     if (tradeList?.length === 0) {
       return {
@@ -160,7 +195,8 @@ const HomeScreen = ({ navigation }) => {
         "winLoss": 0,
         "riskReward": 0,
         "tf": 0,
-        "tr": 0
+        "tr": 0,
+        "rateOfreturn":0
       }
     }
 
@@ -168,32 +204,12 @@ const HomeScreen = ({ navigation }) => {
     let tf = 0;
 
     let p = 0, l = 0, pAmt = 0, lAmt = 0;
-    let riskAndRewardSum = 0;
     tradeList?.forEach((item) => {
 
       const tempTf = item?.entryPrice * item?.quantity
       tf += tempTf
       let temp = (item?.exitPrice - item?.entryPrice) * item?.quantity
 
-
-
-      //RR C
-
-      let val1 = item?.targetPoint - item?.entryPrice
-      let val2 = item?.entryPrice - item?.stopLoss
-
-
-      let riskAndReward = parseFloat(val1 / val2).toFixed(2);
-
-      if (val1 === 0) {
-        riskAndReward = 0
-      }
-
-      if (val2 === 0) {
-        riskAndReward = item?.targetPoint - item?.entryPrice
-      }
-
-      riskAndRewardSum += parseFloat(riskAndReward).toFixed(2);
 
       //RR C
 
@@ -248,18 +264,21 @@ const HomeScreen = ({ navigation }) => {
     tf = parseFloat(tf).toFixed(2)
     tr = parseFloat(parseFloat(tf) + parseFloat(pAndL)).toFixed(2)
 
-    rr = parseFloat(riskAndRewardSum / tradeList?.length).toFixed(2)
+    riskAndReward = parseFloat(riskRewardAll / tradeList?.length).toFixed(2)
 
-    // console.log(riskAndRewardSum)
+    rateOfreturn = tr === 0 ? 0 : (parseFloat((tr - tf) / (tr)) * 100).toFixed(2);
+
+
 
     return {
       "pAndL": checkNum(pAndL),
       "avgP": checkNumber(avgP),
       "avgL": checkNum(avgL),
       "winLoss": checkNumber(winLoss),
-      "riskReward": rr,
+      "riskReward": checkNum(riskAndReward),
       "tf": checkNumber(tf),
       "tr": checkNumber(tr),
+      "rateOfreturn": rateOfreturn
     }
   }
 
@@ -316,12 +335,15 @@ const HomeScreen = ({ navigation }) => {
     },
     {
       "title": "Rate Of Return",
-      "value": "Temp"
+      "value": getData()["rateOfreturn"] + " %"
     },
     {
       "title": "Total Brokers",
       "value": brokerList?.length
     }
+
+
+
 
   ]
 
@@ -339,7 +361,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={{ flex: 1, backgroundColor: "#1e294f" }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
-        <AntDesign name="apple1" color={"#717da8"} size={26} />
+        <Image source={{ uri: "https://ik.imagekit.io/lajz2ta7n/LOGO/chartistt.png" }} style={{ height: 38, width: 38, borderRadius: 19 }} />
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>CHARTISTT</Text>
           <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
@@ -382,7 +404,8 @@ const HomeScreen = ({ navigation }) => {
       <View style={{ margin: 10, padding: 10, marginTop: 0 }}>
 
 
-        <FilterComp />
+        <AllBrokerComp value={filterObj} setValue={setfilterObj}  />
+        <FilterComp value={filterObj} setValue={setfilterObj}/>
 
 
 

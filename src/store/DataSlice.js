@@ -7,13 +7,21 @@ const initialState = {
     segmentList: [],
     sessionList: [],
     tradeList:[],
+    defaultBrokerObj:[],
+
+    brokerUpdateObj:{},
+
     brokerList:[],
     chartTimeFrameList: [],
+    allBrokerList:[],
+    brokerListRedux:[]
 };
 export const DataSlice = createSlice({
     name: 'data',
     initialState: initialState,
     reducers: {
+
+
 
         setActionList: (state, action) => {
             state.actionList = action.payload;
@@ -39,25 +47,45 @@ export const DataSlice = createSlice({
         setTradeList: (state, action) => {
             state.tradeList = action.payload;
         },
+        setUserBrokerListRedux: (state, action) => {
+            state.brokerListRedux = action.payload;
+        },
+        setAllBrokerListRedux: (state, action) => {
+            state.allBrokerList = action.payload;
+        },
+        setDefaultBrokerObj: (state, action) => {
+            state.defaultBrokerObj = action.payload;
+        },
+        setBrokerUpdateObj: (state, action) => {
+            state.brokerUpdateObj = action.payload;
+        },
+
+        
+
+        
 
         
 
 
         flushAuthData: (state) => {
+            state.defaultbrokerObj = [];
             state.brokerList = [];
             state.tradeList = [];
             state.actionList = [];
+            state.allBrokerList = [];
+            state.brokerUpdateObj ={};
             state.emotionList = [];
             state.tradeTypeList = [];
             state.segmentList = [];
             state.sessionList = [];
             state.chartTimeFrameList = [];
+            state.brokerListRedux = [];
             AsyncStorage.clear();
 
         }
 
     },
 });
-export const { setActionList,setBrokerList,setTradeList, setChartTimeFrameList,setSegmentList,setSessionList,setTradeTypeList,setEmotionList, flushAuthData, } = DataSlice.actions;
+export const { setActionList,setBrokerList,setTradeList,setBrokerUpdateObj, setAllBrokerListRedux,setDefaultBrokerObj, setBrokerListRedux, setChartTimeFrameList,setSegmentList,setSessionList,setTradeTypeList,setEmotionList, flushAuthData, } = DataSlice.actions;
 
 export default DataSlice.reducer;

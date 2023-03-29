@@ -74,7 +74,7 @@ const TradeComp = ({ item }) => {
           <Text style={{ backgroundColor: "#070f4a", padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10, color: "#fff", fontWeight: "bold", textTransform: "capitalize" }}>{item?.segment} / {item?.tradeType}</Text>
 
 
-          <Text style={{ ...styles.text, fontSize: 10 }}>Created by {moment(item?.addOn).fromNow()}</Text>
+          <Text style={{ ...styles.text, fontSize: 10 }}>Created {moment(item?.addOn).fromNow()}</Text>
         </View>
         <View style={{ backgroundColor: "#070f4a", borderTopLeftRadius: 0, borderRadius: 10, padding: 10 }}>
           <Text style={{ ...styles.text, fontSize: 10 }}>Trade Date {returnData(item?.date)}</Text>

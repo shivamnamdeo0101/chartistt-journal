@@ -17,7 +17,8 @@ export const TradeProvider = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const contextData = [isOpen, setIsOpen];
     const user = useSelector(state => state?.userAuth?.user)
-    const brokerId = useSelector(state => state?.userAuth?.brokerId)
+    const brokerId = useSelector(state => state?.data?.defaultBrokerObj?.id)
+    const defaultBroker = useSelector(state => state?.data?.defaultBrokerObj)
     const [loading, setloading] = useState(true)
     const dispatch = useDispatch()
 
@@ -37,14 +38,13 @@ export const TradeProvider = ({ children }) => {
         "chartTimeFrame": "1 min",
         "mindSetBeforeTrade": "Angry",
         "mindSetAfterTrade": "Angry",
-        "session":"morning",
-    }
+        "session":"morning"   
+     }
     
 
 
     
     const data = useSelector(state => state?.data)
-
 
     const auth = useSelector(state => state?.userAuth)
 
@@ -83,6 +83,7 @@ export const TradeProvider = ({ children }) => {
         "mindSetBeforeTrade": mindSetBeforeTrade,
         "mindSetAfterTrade":mindSetAfterTrade,
         "session":session,
+        
     }
 
 
@@ -100,7 +101,7 @@ export const TradeProvider = ({ children }) => {
                 const tradePayload = {
                     "userId": user?._id,
                     "tradeId": auth?.tradeObj?._id,
-                    "trade": { ...data,...selectionData, "date": date }
+                    "trade": { ...data,...selectionData,"updateOn":Date.now(), "date": date }
                 }
                 await updateTradeFun(tradePayload)
             } else {
@@ -108,7 +109,7 @@ export const TradeProvider = ({ children }) => {
                     "userId": user?._id,
                     "trade": {
                         "brokerId": brokerId,
-                        "updateOn": Date.now(),
+                        "addOn": Date.now(),
                         ...data,...selectionData,
                         "date": date
                     }
@@ -227,7 +228,7 @@ export const TradeProvider = ({ children }) => {
 
                                 <View style={{ marginTop: 16 }}>
 
-
+                                
                                     <Controller
                                         control={control}
                                         name='date'
@@ -452,6 +453,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Quantity"
+                                                keyboardType="number-pad"
                                             />
                                         </View>
                                     )}
@@ -472,6 +474,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Entry Price"
+                                                keyboardType="number-pad"
                                             />
                                         </View>
                                     )}
@@ -492,6 +495,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Exit Price"
+                                                keyboardType="number-pad"
                                             />
                                         </View>
                                     )}
@@ -513,6 +517,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Stop Loss"
+                                                keyboardType="number-pad"
                                             />
                                         </View>
                                     )}
@@ -531,6 +536,7 @@ export const TradeProvider = ({ children }) => {
                                                 onChangeText={onChange}
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
+                                                keyboardType="number-pad"
                                                 placeholder="Target Point"
                                             />
                                         </View>
