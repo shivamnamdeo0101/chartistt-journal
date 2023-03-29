@@ -46,48 +46,57 @@ export const TradeProvider = ({ children }) => {
 
     const auth = useSelector(state => state?.userAuth)
 
-    const { control, reset,watch,setValue,validate, handleSubmit, formState: { errors } } = useForm({ defaultValues: Object.keys(auth?.tradeObj).length > 0 ? auth?.tradeObj : addDefaultObj });
-
-    const entryWatch = watch("entryPrice");
-    const targetWatch = watch("targetPoint");
-    const stopLossWatch = watch("stopLoss")
+    const { control, reset, watch, setValue, validate, handleSubmit, formState: { errors } } = useForm({ defaultValues: Object.keys(auth?.tradeObj).length > 0 ? auth?.tradeObj : addDefaultObj });
 
 
-    const validateFun = ()=>{
-        if(action === "buy"){
 
-            if(targetWatch > entryWatch){
-                if(entryWatch > stopLossWatch){
+
+
+
+    const validateFun = (e) => {
+
+
+        let entryWatch = e?.entryPrice;
+        let targetWatch = e?.targetPoint;
+        let stopLossWatch = e?.stopLoss;
+
+
+        console.log("entryPrice",entryWatch,"Target Point",targetWatch,"Stop Loss",stopLossWatch)
+
+        if (action === "buy") {
+
+            if (targetWatch > entryWatch) {
+                if (entryWatch > stopLossWatch) {
                     return true
-                }else{
-                    Alert.alert("Entry price should be grater then stop loss")
+                } else {
+                    Alert.alert("Entry price should be greater then Stop Loss")
                     return false
                 }
-            }else{
-                Alert.alert("target price should be grater then entry price")
+            } else {
+                Alert.alert("Target Price should be greater then Entry Price")
                 return false
             }
 
 
-        }else if(action === "sell"){
+        } else if (action === "sell") {
 
-            if(stopLossWatch > entryWatch){
-                if(entryWatch > targetWatch){
+            if (stopLossWatch > entryWatch) {
+                if (entryWatch > targetWatch) {
                     return true
-                }else{
-                    Alert.alert("Entry price should be grater then target price")
+                } else {
+                    Alert.alert("Entry Price should be greater then Target Price")
                     return false
                 }
-            }else{
-                Alert.alert("stop loss should be grater then entry price")
+            } else {
+                Alert.alert("Stop Loss should be greater then Entry Price")
                 return false
             }
 
 
         }
-    }  
+    }
 
-    
+
     useEffect(() => {
         if (Object.keys(auth?.tradeObj).length > 0) {
             reset(auth?.tradeObj);
@@ -127,7 +136,7 @@ export const TradeProvider = ({ children }) => {
 
     const onSubmit = async (data) => {
 
-        if(!validateFun()){
+        if (!validateFun(data)) {
             return
         }
 
@@ -199,7 +208,7 @@ export const TradeProvider = ({ children }) => {
 
     const addTradeFun = async (payload) => {
 
-        
+
 
         const res = await TRADE_API.addTrade(payload, user?.token)
         if (res?.status === 200) {
@@ -208,7 +217,7 @@ export const TradeProvider = ({ children }) => {
         }
     }
     const updateTradeFun = async (payload) => {
-        
+
         const res = await TRADE_API.updateTrade(payload, user?.token)
         if (res?.status === 200) {
             cancelForm()
@@ -260,7 +269,7 @@ export const TradeProvider = ({ children }) => {
 
                             <View style={{ flex: 1 }}>
 
-                               
+
 
 
                                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingRight: 16 }}>
@@ -573,7 +582,7 @@ export const TradeProvider = ({ children }) => {
                                 />
                                 {errors.stopLoss && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
                                 {errors.stopLoss?.type === "validate" && <p>Stop Loss should be less than Entry Price</p>}
-                               
+
                                 <Controller
                                     control={control}
                                     name="targetPoint"

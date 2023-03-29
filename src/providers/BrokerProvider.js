@@ -114,7 +114,7 @@ export const BrokerProvider = ({ children }) => {
     const deleteBroker = () => {
         Alert.alert(
             'Confirmation',
-            'Are you sure you want to delete this item?',
+            'Are you sure to delete this broker , it will also delete all the trades which belongs to this broker..?',
             [
                 {
                     text: 'Cancel',
@@ -133,7 +133,7 @@ export const BrokerProvider = ({ children }) => {
         setloading(true)
         const payload = {
             userId: user?._id,
-            brokerId: auth.brokerObj?._id
+            brokerId: auth?.brokerObj?.id
         }
         try {
             const res = await BROKER_API.remBroker(payload, user?.token)
@@ -200,8 +200,6 @@ export const BrokerProvider = ({ children }) => {
                                                     render={({ field: { onChange, value } }) => (
                                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Broker  </Text>
-
-                                                            {console.log(brokerName)}
                                                             <SelectObjInput
 
                                                                 options={data?.allBrokerList}
