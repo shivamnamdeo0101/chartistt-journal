@@ -10,6 +10,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { setTradeObj } from "../store/UserSlice";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SelectInput from "../components/SelectInput";
+import TradeForm from "../components/TradeForm";
 
 export const TradeContext = createContext(false, () => { }, {});
 
@@ -38,18 +39,55 @@ export const TradeProvider = ({ children }) => {
         "chartTimeFrame": "1 min",
         "mindSetBeforeTrade": "Angry",
         "mindSetAfterTrade": "Angry",
-        "session":"morning"   
-     }
-    
+        "session": "morning"
+    }
 
-
-    
     const data = useSelector(state => state?.data)
 
     const auth = useSelector(state => state?.userAuth)
 
-    const { control, reset, handleSubmit, formState: { errors } } = useForm({ defaultValues: Object.keys(auth?.tradeObj).length > 0 ? auth?.tradeObj : addDefaultObj });
+    const { control, reset,watch,setValue,validate, handleSubmit, formState: { errors } } = useForm({ defaultValues: Object.keys(auth?.tradeObj).length > 0 ? auth?.tradeObj : addDefaultObj });
 
+    const entryWatch = watch("entryPrice");
+    const targetWatch = watch("targetPoint");
+    const stopLossWatch = watch("stopLoss")
+
+
+    const validateFun = ()=>{
+        if(action === "buy"){
+
+            if(targetWatch > entryWatch){
+                if(entryWatch > stopLossWatch){
+                    return true
+                }else{
+                    Alert.alert("Entry price should be grater then stop loss")
+                    return false
+                }
+            }else{
+                Alert.alert("target price should be grater then entry price")
+                return false
+            }
+
+
+        }else if(action === "sell"){
+
+            if(stopLossWatch > entryWatch){
+                if(entryWatch > targetWatch){
+                    return true
+                }else{
+                    Alert.alert("Entry price should be grater then target price")
+                    return false
+                }
+            }else{
+                Alert.alert("stop loss should be grater then entry price")
+                return false
+            }
+
+
+        }
+    }  
+
+    
     useEffect(() => {
         if (Object.keys(auth?.tradeObj).length > 0) {
             reset(auth?.tradeObj);
@@ -81,13 +119,18 @@ export const TradeProvider = ({ children }) => {
         "tradeType": tradeType,
         "chartTimeFrame": chartTimeFrame,
         "mindSetBeforeTrade": mindSetBeforeTrade,
-        "mindSetAfterTrade":mindSetAfterTrade,
-        "session":session,
-        
+        "mindSetAfterTrade": mindSetAfterTrade,
+        "session": session,
+
     }
 
 
     const onSubmit = async (data) => {
+
+        if(!validateFun()){
+            return
+        }
+
         setloading(true)
         if (!brokerId) {
             Alert.alert("Please select default broker")
@@ -101,7 +144,7 @@ export const TradeProvider = ({ children }) => {
                 const tradePayload = {
                     "userId": user?._id,
                     "tradeId": auth?.tradeObj?._id,
-                    "trade": { ...data,...selectionData,"updateOn":Date.now(), "date": date }
+                    "trade": { ...data, ...selectionData, "updateOn": Date.now(), "date": date }
                 }
                 await updateTradeFun(tradePayload)
             } else {
@@ -110,7 +153,7 @@ export const TradeProvider = ({ children }) => {
                     "trade": {
                         "brokerId": brokerId,
                         "addOn": Date.now(),
-                        ...data,...selectionData,
+                        ...data, ...selectionData,
                         "date": date
                     }
                 }
@@ -155,6 +198,9 @@ export const TradeProvider = ({ children }) => {
     }
 
     const addTradeFun = async (payload) => {
+
+        
+
         const res = await TRADE_API.addTrade(payload, user?.token)
         if (res?.status === 200) {
             cancelForm()
@@ -162,6 +208,7 @@ export const TradeProvider = ({ children }) => {
         }
     }
     const updateTradeFun = async (payload) => {
+        
         const res = await TRADE_API.updateTrade(payload, user?.token)
         if (res?.status === 200) {
             cancelForm()
@@ -213,6 +260,7 @@ export const TradeProvider = ({ children }) => {
 
                             <View style={{ flex: 1 }}>
 
+                               
 
 
                                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingRight: 16 }}>
@@ -228,7 +276,7 @@ export const TradeProvider = ({ children }) => {
 
                                 <View style={{ marginTop: 16 }}>
 
-                                
+
                                     <Controller
                                         control={control}
                                         name='date'
@@ -480,6 +528,7 @@ export const TradeProvider = ({ children }) => {
                                     )}
                                 />
                                 {errors.entryPrice && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                {errors.entryPrice?.type === "validate" && <p>Entry Price should be greater than Entry Price</p>}
 
                                 <Controller
                                     control={control}
@@ -523,6 +572,8 @@ export const TradeProvider = ({ children }) => {
                                     )}
                                 />
                                 {errors.stopLoss && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                {errors.stopLoss?.type === "validate" && <p>Stop Loss should be less than Entry Price</p>}
+                               
                                 <Controller
                                     control={control}
                                     name="targetPoint"
@@ -543,7 +594,7 @@ export const TradeProvider = ({ children }) => {
                                     )}
                                 />
                                 {errors.targetPoint && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
-
+                                {errors.targetPoint?.type === "validate" && <p>Target should be greater than Entry Price</p>}
 
 
                                 <Controller
