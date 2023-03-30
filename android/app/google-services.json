@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "1070846552778-3p73ke6nu4uqlhn4skeopqm2kc2fvaso.apps.googleusercontent.com",
+          "client_id": "1070846552778-0uj87n0hud6n77h9u8tg8vv5laoieae1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chartistt_journal",
+            "certificate_hash": "606a0caf0e0e68107d2411fc491bb8970d65729e"
+          }
+        },
+        {
+          "client_id": "1070846552778-iupd8l8ta9igdur4r4vet1pnq6i6egr9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.chartistt_journal",

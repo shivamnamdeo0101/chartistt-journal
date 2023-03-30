@@ -73,6 +73,7 @@ const LoginScreen = ({ navigation }) => {
       // Alert.alert(JSON.stringify("User", user))
 
     } catch (error) {
+      console.log("error", error)
       // Alert.alert(JSON.stringify)
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
