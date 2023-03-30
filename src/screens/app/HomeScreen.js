@@ -96,8 +96,6 @@ const HomeScreen = ({ navigation }) => {
 
   function convertAndSaveDataToCSV(data) {
 
-    setloading(true)
-
     let csvData = '';
     const separator = ',';
 
@@ -402,7 +400,7 @@ const HomeScreen = ({ navigation }) => {
 
 
       <View style={{ margin: 10, padding: 10, marginTop: 0 }}>
-
+        <ScrollView>
 
         <AllBrokerComp value={filterObj} setValue={setfilterObj}  />
         <FilterComp value={filterObj} setValue={setfilterObj}/>
@@ -417,7 +415,7 @@ const HomeScreen = ({ navigation }) => {
           </View>
           {/* <Text style={{ color: "#717da8" }}>View More</Text> */}
         </View>
-        <ScrollView>
+        
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {
               overView?.map((item, index) => {

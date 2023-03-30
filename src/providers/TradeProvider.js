@@ -55,11 +55,9 @@ export const TradeProvider = ({ children }) => {
 
     const validateFun = (e) => {
 
-
         let entryWatch = e?.entryPrice;
         let targetWatch = e?.targetPoint;
         let stopLossWatch = e?.stopLoss;
-
 
         console.log("entryPrice",entryWatch,"Target Point",targetWatch,"Stop Loss",stopLossWatch)
 
@@ -145,7 +143,6 @@ export const TradeProvider = ({ children }) => {
             Alert.alert("Please select default broker")
             return
         }
-
 
         try {
 
