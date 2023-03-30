@@ -47,14 +47,14 @@ const HomeScreen = ({ navigation }) => {
   const [tradeList, settradeList] = useState([])
   const [brokerList, setbrokerList] = useState([])
 
-  
+
 
   const [filterObj, setfilterObj] = useState({
-    "userId":auth?.user?._id,
-    "filterType":"a",
-    "brokerId":"0"
+    "userId": auth?.user?._id,
+    "filterType": "a",
+    "brokerId": "0"
   })
- 
+
 
   useEffect(() => {
 
@@ -64,7 +64,7 @@ const HomeScreen = ({ navigation }) => {
       if (res?.status === 200) {
         settradeList(res?.data?.data)
         setloading(false)
-        
+
       }
     }
     fetchData()
@@ -96,7 +96,17 @@ const HomeScreen = ({ navigation }) => {
 
   function convertAndSaveDataToCSV(data) {
 
-    setloading(true)
+    if(!requestWriteFilePermission()){
+      Alert.alert("Permission required to download the file")
+      requestWriteFilePermission()
+      return
+    }
+
+
+    if(data?.length === 0){
+      Alert.alert("You need to add one trade...")
+      return
+    }
 
     let csvData = '';
     const separator = ',';
@@ -196,7 +206,7 @@ const HomeScreen = ({ navigation }) => {
         "riskReward": 0,
         "tf": 0,
         "tr": 0,
-        "rateOfreturn":0
+        "rateOfreturn": 0
       }
     }
 
@@ -402,22 +412,22 @@ const HomeScreen = ({ navigation }) => {
 
 
       <View style={{ margin: 10, padding: 10, marginTop: 0 }}>
-
-
-        <AllBrokerComp value={filterObj} setValue={setfilterObj}  />
-        <FilterComp value={filterObj} setValue={setfilterObj}/>
-
-
-
-
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-            <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>OVERVIEW</Text>
-            {/* <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>TRADES</Text> */}
-          </View>
-          {/* <Text style={{ color: "#717da8" }}>View More</Text> */}
-        </View>
         <ScrollView>
+
+          <AllBrokerComp value={filterObj} setValue={setfilterObj} />
+          <FilterComp value={filterObj} setValue={setfilterObj} />
+
+
+
+
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+              <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>OVERVIEW</Text>
+              {/* <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>TRADES</Text> */}
+            </View>
+            {/* <Text style={{ color: "#717da8" }}>View More</Text> */}
+          </View>
+
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {
               overView?.map((item, index) => {
