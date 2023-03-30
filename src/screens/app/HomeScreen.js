@@ -96,12 +96,6 @@ const HomeScreen = ({ navigation }) => {
 
   function convertAndSaveDataToCSV(data) {
 
-    if(!requestWriteFilePermission()){
-      Alert.alert("Permission required to download the file")
-      requestWriteFilePermission()
-      return
-    }
-
 
     if(data?.length === 0){
       Alert.alert("You need to add one trade...")
