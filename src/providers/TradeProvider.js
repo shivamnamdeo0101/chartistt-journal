@@ -55,11 +55,11 @@ export const TradeProvider = ({ children }) => {
 
     const validateFun = (e) => {
 
-        let entryWatch = e?.entryPrice;
-        let targetWatch = e?.targetPoint;
-        let stopLossWatch = e?.stopLoss;
+        let entryWatch = parseFloat(e?.entryPrice);
+        let targetWatch = parseFloat(e?.targetPoint);
+        let stopLossWatch = parseFloat(e?.stopLoss);
 
-        console.log("entryPrice",entryWatch,"Target Point",targetWatch,"Stop Loss",stopLossWatch)
+        console.log(action, "entryPrice",typeof entryWatch,"Target Point",targetWatch,"Stop Loss",stopLossWatch)
 
         if (action === "buy") {
 
@@ -133,19 +133,12 @@ export const TradeProvider = ({ children }) => {
 
 
     const onSubmit = async (data) => {
-
-        if (!validateFun(data)) {
-            return
-        }
-
-        setloading(true)
+        if (validateFun(data)) {
         if (!brokerId) {
             Alert.alert("Please select default broker")
-            return
-        }
-
+        } else {
+        setloading(true)
         try {
-
             if (forUpdate()) {
                 const tradePayload = {
                     "userId": user?._id,
@@ -169,6 +162,8 @@ export const TradeProvider = ({ children }) => {
             console.log(e)
         }
         setloading(false)
+        }
+        }
     };
 
     const forUpdate = () => {
@@ -507,7 +502,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Quantity"
-                                                keyboardType="number-pad"
+                                                keyboardType="decimal-pad"
                                             />
                                         </View>
                                     )}
@@ -528,7 +523,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Entry Price"
-                                                keyboardType="number-pad"
+                                                keyboardType="decimal-pad"
                                             />
                                         </View>
                                     )}
@@ -550,7 +545,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Exit Price"
-                                                keyboardType="number-pad"
+                                                keyboardType="decimal-pad"
                                             />
                                         </View>
                                     )}
@@ -572,7 +567,7 @@ export const TradeProvider = ({ children }) => {
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
                                                 placeholder="Stop Loss"
-                                                keyboardType="number-pad"
+                                                keyboardType="decimal-pad"
                                             />
                                         </View>
                                     )}
@@ -593,7 +588,7 @@ export const TradeProvider = ({ children }) => {
                                                 onChangeText={onChange}
                                                 placeholderTextColor={"#ccd3db"}
                                                 value={value?.toString()}
-                                                keyboardType="number-pad"
+                                                keyboardType="decimal-pad"
                                                 placeholder="Target Point"
                                             />
                                         </View>
@@ -655,6 +650,7 @@ export const TradeProvider = ({ children }) => {
                                 filled={true}
                                 title={forUpdate() ? "Update" : "Submit"}
                                 onPress={handleSubmit(onSubmit)}
+                                
                             />
                         </View>
 

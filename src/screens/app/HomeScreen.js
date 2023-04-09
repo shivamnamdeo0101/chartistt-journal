@@ -94,10 +94,9 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
-  function convertAndSaveDataToCSV(data) {
-
-
-    if(data?.length === 0){
+  function convertAndSaveDataToCSV(email) {
+    console.log("data?.tradeList", data?.tradeList)
+    if(data?.tradeList?.length === 0){
       Alert.alert("You need to add one trade...")
       return
     }
@@ -106,11 +105,11 @@ const HomeScreen = ({ navigation }) => {
     const separator = ',';
 
     // Add header row
-    const header = Object.keys(data[0]).join(separator);
+    const header = Object.keys(data?.tradeList[0]).join(separator);
     csvData += `${header}\n`;
 
     // Add rows
-    data.forEach((item) => {
+    data?.tradeList.forEach((item) => {
       const row = Object.values(item).join(separator);
       csvData += `${row}\n`;
     });
