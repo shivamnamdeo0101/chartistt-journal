@@ -62,7 +62,7 @@ const HomeScreen = ({ navigation }) => {
       setloading(true)
       const res = await TRADE_API.getAllTrades(filterObj, user?.token)
       if (res?.status === 200) {
-        settradeList(res?.data?.data)
+        dispatch(setTradeList(res?.data?.data))
         setloading(false)
 
       }
@@ -145,7 +145,7 @@ const HomeScreen = ({ navigation }) => {
     fetchData()
 
 
-  }, [brokerList])
+  }, [brokerList,isOpen])
 
 
 
@@ -183,7 +183,9 @@ const HomeScreen = ({ navigation }) => {
 
     var riskRewardAll = 0;
 
-    tradeList?.forEach(async (item, index) => {
+    var list = data?.tradeList
+
+    list?.forEach(async (item, index) => {
       riskRewardAll += parseFloat(RiskReward(item))
     })
 
@@ -191,7 +193,7 @@ const HomeScreen = ({ navigation }) => {
 
 
 
-    if (tradeList?.length === 0) {
+    if (list?.length === 0) {
       return {
         "pAndL": 0,
         "avgP": 0,
@@ -208,7 +210,7 @@ const HomeScreen = ({ navigation }) => {
     let tf = 0;
 
     let p = 0, l = 0, pAmt = 0, lAmt = 0;
-    tradeList?.forEach((item) => {
+    list?.forEach((item) => {
 
       const tempTf = item?.entryPrice * item?.quantity
       tf += tempTf
@@ -268,7 +270,7 @@ const HomeScreen = ({ navigation }) => {
     tf = parseFloat(tf).toFixed(2)
     tr = parseFloat(parseFloat(tf) + parseFloat(pAndL)).toFixed(2)
 
-    riskAndReward = parseFloat(riskRewardAll / tradeList?.length).toFixed(2)
+    riskAndReward = parseFloat(riskRewardAll / list?.length).toFixed(2)
 
     rateOfreturn = tr === 0 ? 0 : (parseFloat((tr - tf) / (tr)) * 100).toFixed(2);
 
@@ -315,7 +317,7 @@ const HomeScreen = ({ navigation }) => {
   const overView = [
     {
       "title": "No Of Trades",
-      "value": tradeList?.length
+      "value": data?.tradeList?.length
     },
     {
       "title": "Net P&L",

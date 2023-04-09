@@ -58,13 +58,13 @@ const TradeScreen = ({ navigation }) => {
 
             const res = await TRADE_API.getAllTrades(filterObj, user?.token)
             if (res?.status === 200) {
-                settradeList(res?.data?.data)
+                dispatch(setTradeList(res?.data?.data))
                 setloading(false)
             }
         }
 
         fetchData()
-    }, [filterObj, refreshing,isOpen])
+    }, [filterObj, refreshing,data?.tradeList])
 
 
 
@@ -158,10 +158,10 @@ const TradeScreen = ({ navigation }) => {
                    
                     <FilterComp value={filterObj} setValue={setfilterObj} />
                     
-                    <Text style={{ marginBottom: 10, marginTop: 10, color: "#fff", fontWeight: "bold" }}>Total Trades {tradeList?.length}</Text>
+                    <Text style={{ marginBottom: 10, marginTop: 10, color: "#fff", fontWeight: "bold" }}>Total Trades {data?.tradeList?.length}</Text>
                     
                     <View style={{ marginBottom: 100 }}>
-                        <RenderTradeList list={tradeList} />
+                        <RenderTradeList list={data?.tradeList} />
                     </View>
                 </ScrollView>
             </View>
