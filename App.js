@@ -44,6 +44,8 @@ const Container = () => {
   // }, [])
 
 
+  
+  const user = useSelector(state => state?.userAuth)
 
 
 
@@ -101,11 +103,10 @@ const Container = () => {
     }
 
     fetchData()
-  }, [])
+  }, [user])
 
 
 
-  const user = useSelector(state => state?.userAuth)
 
   return (
       <NavigationContainer>
