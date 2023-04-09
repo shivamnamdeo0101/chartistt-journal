@@ -64,7 +64,7 @@ const TradeScreen = ({ navigation }) => {
         }
 
         fetchData()
-    }, [filterObj, refreshing,data?.tradeList])
+    }, [filterObj, refreshing,isOpen])
 
 
 
