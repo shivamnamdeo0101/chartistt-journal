@@ -64,7 +64,7 @@ const TradeScreen = ({ navigation }) => {
         }
 
         fetchData()
-    }, [filterObj, refreshing,isOpen])
+    }, [filterObj, refreshing, isOpen])
 
 
 
@@ -149,17 +149,17 @@ const TradeScreen = ({ navigation }) => {
                         <Text style={{ color: "#fff", fontWeight: "bold" }}>Default Broker (Click To Change)</Text>
                         <Text style={{ color: "#fff", fontWeight: "400" }}>{data?.defaultBrokerObj?.brokerName}</Text>
                     </TouchableOpacity> */}
-                    <View style={{flexDirection:"column",alignItems:"center"}}>
-                    <Text style={{color:"#fff",fontSize:10}}>Pull down To refresh...</Text>
-                    <Ionicons name="refresh-circle-outline" color={"#fff"} size={10} />
-                    </View>
+                    {/* <View style={{ flexDirection: "column", alignItems: "center" }}>
+                        <Text style={{ color: "#fff", fontSize: 10 }}>Pull down To refresh...</Text>
+                        <Ionicons name="refresh-circle-outline" color={"#fff"} size={10} />
+                    </View> */}
 
                     <AllBrokerComp value={filterObj} setValue={setfilterObj} />
-                   
+
                     <FilterComp value={filterObj} setValue={setfilterObj} />
-                    
+
                     <Text style={{ marginBottom: 10, marginTop: 10, color: "#fff", fontWeight: "bold" }}>Total Trades {data?.tradeList?.length}</Text>
-                    
+
                     <View style={{ marginBottom: 100 }}>
                         <RenderTradeList list={data?.tradeList} />
                     </View>

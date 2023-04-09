@@ -94,8 +94,18 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
-  function convertAndSaveDataToCSV(email) {
-    console.log("data?.tradeList", data?.tradeList)
+  const cnfmDownload = () =>
+  Alert.alert('Download PDF File', 'File will be saved in download folder in pdf format.', [
+    {
+      text: 'Cancel',
+      onPress: () => console.log('Cancel Pressed'),
+      style: 'cancel',
+    },
+    {text: 'OK', onPress: () => convertAndSaveDataToCSV()},
+  ]);
+
+  function convertAndSaveDataToCSV() {
+   
     if(data?.tradeList?.length === 0){
       Alert.alert("You need to add one trade...")
       return
@@ -122,7 +132,7 @@ const HomeScreen = ({ navigation }) => {
     RNFS.writeFile(path, csvData, 'utf8')
       .then(() => {
         console.log('File written at:', path);
-        Alert.alert("File Saved In Download Folder...")
+        Alert.alert("File saved in download folder")
       })
       .catch((err) => {
         console.log(err.message);
@@ -365,6 +375,8 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#1e294f" }}>
+
+     
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
         <Image source={{ uri: "https://ik.imagekit.io/lajz2ta7n/LOGO/chartistt.png" }} style={{ height: 38, width: 38, borderRadius: 19 }} />
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -372,12 +384,14 @@ const HomeScreen = ({ navigation }) => {
           <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
         </View>
 
-        <TouchableOpacity onPress={() => convertAndSaveDataToCSV(tradeList)}>
+        <TouchableOpacity onPress={() => cnfmDownload()}>
           <Entypo name="download" color={"#717da8"} size={26} />
         </TouchableOpacity>
 
       </View>
 
+
+    <ScrollView>
 
       <View style={{ backgroundColor: "#070f4a", flexDirection: "row", alignItems: "center", justifyContent: "space-around", padding: 14, margin: 14, borderRadius: 14 }}>
 
@@ -406,7 +420,7 @@ const HomeScreen = ({ navigation }) => {
 
 
 
-      <View style={{ margin: 10, padding: 10, marginTop: 0 }}>
+      <View style={{margin: 10, padding: 10, marginTop: 0 }}>
         <ScrollView>
 
           <AllBrokerComp value={filterObj} setValue={setfilterObj} />
@@ -435,6 +449,7 @@ const HomeScreen = ({ navigation }) => {
         </ScrollView>
       </View>
 
+      </ScrollView>
 
 
     </View>
