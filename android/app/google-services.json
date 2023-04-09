@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "1070846552778-ub2gvuudvf5recgdponb018ih0g0hadt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chartistt_journal",
+            "certificate_hash": "b1bda5d1af10e91c843e4bbccf748233ad39b38a"
+          }
+        },
+        {
           "client_id": "1070846552778-6fefn05h8q6q7eeuac0b9agv2b48rrb3.apps.googleusercontent.com",
           "client_type": 3
         }
