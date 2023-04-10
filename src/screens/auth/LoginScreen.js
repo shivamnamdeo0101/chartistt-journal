@@ -7,6 +7,7 @@ import { USER_API } from '../../service/UserService';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import messaging from '@react-native-firebase/messaging';
+import PhoneAuthComp from './PhoneAuthComp';
 
 
 const LoginScreen = ({ navigation }) => {
@@ -95,11 +96,16 @@ const LoginScreen = ({ navigation }) => {
           <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
         </View>
       </View>
+     <PhoneAuthComp />
+      <View>
+       
+        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
+          <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
+          <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with google</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
-        <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
-        <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with google</Text>
-      </TouchableOpacity>
+
     </View>
   )
 }
