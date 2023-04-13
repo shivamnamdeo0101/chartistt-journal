@@ -26,6 +26,7 @@ export default function PhoneAuthComp() {
 
   // Handle the button press
   async function signInWithPhoneNumber(phoneNumber) {
+    console.log("phoneNumber", phoneNumber)
     const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
     console.log("confirmation",confirmation)
     setConfirm(confirmation);
@@ -33,7 +34,8 @@ export default function PhoneAuthComp() {
 
   async function confirmCode() {
     try {
-      await confirm.confirm(code);
+      const response = await confirm.confirm(code);
+      console.log("response", response)
     } catch (error) {
       console.log('Invalid code.');
     }
@@ -43,7 +45,7 @@ export default function PhoneAuthComp() {
     return (
       <Button
         title="Phone Number Sign In"
-        onPress={() => signInWithPhoneNumber('+917828353784')}
+        onPress={() => signInWithPhoneNumber('+919329206169')}
       />
     );
   }
