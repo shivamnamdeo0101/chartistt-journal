@@ -8,7 +8,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import messaging from '@react-native-firebase/messaging';
 import PhoneAuthComp from './PhoneAuthComp';
-
+import {InputPhone} from "../../components"
 
 const LoginScreen = ({ navigation }) => {
   const user = useSelector(state => state?.userAuth)

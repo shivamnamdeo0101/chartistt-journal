@@ -1,9 +1,11 @@
 import React, { useState,useEffect } from 'react';
-import { Button, TextInput,View } from 'react-native';
+import { Alert, Button, TextInput,View } from 'react-native';
 import auth from '@react-native-firebase/auth';
-
+import {InputPhone, OtpInput} from "../../components"
 export default function PhoneAuthComp() {
   // If null, no SMS has been sent
+  const [phoneModal, setPhoneModal] = useState(false);
+  const [otpModal, setOtpModal] = useState(false);
   const [confirm, setConfirm] = useState(null);
 
   // verification code (OTP - One-Time-Passcode)
@@ -27,33 +29,58 @@ export default function PhoneAuthComp() {
   // Handle the button press
   async function signInWithPhoneNumber(phoneNumber) {
     console.log("phoneNumber", phoneNumber)
-    const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-    console.log("confirmation",confirmation)
-    setConfirm(confirmation);
+    setPhoneModal(false);
+    setOtpModal(true);
+    // const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+    // console.log("confirmation",confirmation)
+    // setPhoneModal(false);
+    // setOtpModal(true);
+    // setConfirm(confirmation);
   }
 
-  async function confirmCode() {
+  async function confirmCode(code) {
     try {
       const response = await confirm.confirm(code);
-      console.log("response", response)
+      console.log("response", response);
+      setOtpModal(false);
+      Alert.alert("OTP verified successfully")
     } catch (error) {
       console.log('Invalid code.');
     }
   }
 
-  if (!confirm) {
-    return (
+  // if (!confirm) {
+  //   return (
+  //     <Button
+  //       title="Phone Number Sign In"
+  //       onPress={() => setPhoneModal(true)}
+  //     />
+  //   );
+  // }
+
+  // return (
+  //   <View style={{}}>
+  //     <TextInput value={code} onChangeText={text => setCode(text)} />
+  //     <Button title="Confirm Code" onPress={() => confirmCode()} />
+      
+  //   </View>
+  // );
+  return (
+    <>
       <Button
         title="Phone Number Sign In"
-        onPress={() => signInWithPhoneNumber('+919329206169')}
+        onPress={() => setPhoneModal(true)}
       />
-    );
-  }
-
-  return (
-    <View style={{}}>
-      <TextInput value={code} onChangeText={text => setCode(text)} />
-      <Button title="Confirm Code" onPress={() => confirmCode()} />
-    </View>
+    <InputPhone 
+    onSendOtp={(phone) => signInWithPhoneNumber(phone)}
+    visible={phoneModal}
+    onClose={() => setPhoneModal(false)}
+    />
+    <OtpInput 
+    onSendOtp={(code) => confirmCode(code)}
+    visible={otpModal}
+    onClose={() => setOtpModal(false)}
+    />
+    </>
   );
 }
