@@ -96,7 +96,11 @@ const LoginScreen = ({ navigation }) => {
           <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
         </View>
       </View>
-     <PhoneAuthComp />
+     <PhoneAuthComp navigation={navigation} />
+
+      <View style={{margin:10}}>
+        <Text style={{color:"#fff"}}>OR</Text>
+      </View>
       <View>
        
         <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
