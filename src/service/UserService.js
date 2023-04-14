@@ -14,6 +14,15 @@ export const USER_API = {
         data: payload,
       })
     },
+
+    userPhoneLogin:async function(payload){
+      var data = JSON.stringify(payload);
+      return axios.request({
+        method: 'post',
+        url: `${EndPoint}auth/phone-auth`,
+        data: payload,
+      })
+    },
     
   getAllNotifications: async function (token) {
     const headers = {

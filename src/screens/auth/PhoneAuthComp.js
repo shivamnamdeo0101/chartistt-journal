@@ -10,20 +10,35 @@ import {
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import PhoneInput from "react-native-phone-number-input";
 import { OTP_API } from "../../service/OtpService";
+import Loading from "../../components/Loading";
+import { ActivityIndicator } from "react-native-paper";
 
 const PhoneAuthComp = ({navigation}) => {
   const [value, setValue] = useState("");
   const [formattedValue, setFormattedValue] = useState("");
   const phoneInput = useRef(null);
+  const [loading, setloading] = useState(false)
 
   const sendOtp = async ()=>{
+
+    setloading(true)
+
     const res = await OTP_API.sendOtp({"to":formattedValue})
     if(res?.status === 200){
+      setloading(false)
       navigation.navigate("OtpInput",{"to":formattedValue})
     }else{
       Alert.alert("Can not send otp")
     }
    
+  }
+
+  if(loading){
+    return(
+      <View style={{flex:1,alignItems:"center",justifyContent:"center"}}>
+        <ActivityIndicator size={"large"} color="#f02"/>
+      </View>
+    )
   }
 
   return (
@@ -67,7 +82,6 @@ const PhoneAuthComp = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
-
   },
 
   wrapper: {

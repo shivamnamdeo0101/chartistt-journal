@@ -3,6 +3,7 @@ import { SafeAreaView, StyleSheet, Button, Text,Alert } from "react-native";
 
 import OTPInputView from "@twotalltotems/react-native-otp-input";
 import { OTP_API } from "../../service/OtpService";
+import { USER_API } from "../../service/UserService";
 
 const OtpInputScreen = ({ route, navigation }) => {
   const { to } = route.params;
@@ -12,8 +13,16 @@ const OtpInputScreen = ({ route, navigation }) => {
 
 
   const checkOtp = async(otp)=>{
-    const res = await OTP_API.checkOtp({otp,to})
-    console.log(res?.data)
+    const res = await OTP_API.checkOtp({code:otp,to})
+    
+    if(res?.data?.data.status === "approved"){
+      console.log(res?.data)
+      const login = await USER_API.userPhoneLogin({phoneNumber:to})
+      console.log(login)
+      // if(login?.success === 200){
+      
+      // }
+    }
   }
 
 
@@ -35,7 +44,7 @@ const OtpInputScreen = ({ route, navigation }) => {
         codeInputFieldStyle={styles.underlineStyleBase}
         codeInputHighlightStyle={styles.underlineStyleHighLighted}
         onCodeFilled={(code) => {
-            
+          checkOtp(code)
         }}
       />
       {invalidCode && <Text style={styles.error}>Incorrect code.</Text>}
