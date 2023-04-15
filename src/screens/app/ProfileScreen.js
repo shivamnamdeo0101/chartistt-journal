@@ -69,7 +69,7 @@ const ProfileScreen = ({ navigation }) => {
             <Feather name="user" color={"#717da8"} size={24} />
             <View style={{marginLeft:10}} >
               <Text style={styles.title}>Name</Text>
-              <Text style={styles.text}>{user?.firstName + " " + user?.lastName} </Text>
+              <Text style={styles.text}>{user?.firstName ?   user?.firstName + " " + user?.lastName  : ""} </Text>
             </View>
           </View>
 
@@ -78,6 +78,14 @@ const ProfileScreen = ({ navigation }) => {
             <View style={{marginLeft:10}} >
               <Text style={styles.title}>Email</Text>
               <Text style={styles.text}>{user?.email} </Text>
+            </View>
+          </View>
+
+          <View style={{flexDirection:"row",alignItems:"center", backgroundColor: "#070f4a", margin: 5, padding: 10, borderRadius: 10 }}> 
+            <MaterialIcons name="local-phone" color={"#717da8"} size={24} />
+            <View style={{marginLeft:10}} >
+              <Text style={styles.title}>Phone Number</Text>
+              <Text style={styles.text}>{user?.phoneNumber} </Text>
             </View>
           </View>
 
@@ -117,11 +125,6 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
           
-
-
-
-          
-
 
           <TouchableOpacity onPress={() => logoutUser()} style={{ backgroundColor: "#070f4a", margin: 5, padding: 10, borderRadius: 10 }}>
             <Text style={{ ...styles.title, color: "#f03" }}>Logout</Text>

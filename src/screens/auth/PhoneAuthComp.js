@@ -33,13 +33,7 @@ const PhoneAuthComp = ({navigation}) => {
    
   }
 
-  if(loading){
-    return(
-      <View style={{flex:1,alignItems:"center",justifyContent:"center"}}>
-        <ActivityIndicator size={"large"} color="#f02"/>
-      </View>
-    )
-  }
+ 
 
   return (
     <>
@@ -72,7 +66,7 @@ const PhoneAuthComp = ({navigation}) => {
               sendOtp()
             }}
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
+            <Text style={styles.buttonText}> {loading ? <ActivityIndicator size={"small"} color="#fff"/> : "Continue with Phone Number"}</Text>
           </TouchableOpacity>
         </SafeAreaView>
       </View>

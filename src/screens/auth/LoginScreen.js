@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect ,useContext} from 'react'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { setAuthSuccess, setUserDetails } from '../../store/UserSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,11 @@ import PhoneAuthComp from './PhoneAuthComp';
 
 const LoginScreen = ({ navigation }) => {
   const user = useSelector(state => state?.userAuth)
+
+
+
+
+
   const dispatch = useDispatch()
   useEffect(() => {
     GoogleSignin.configure({
@@ -96,13 +101,15 @@ const LoginScreen = ({ navigation }) => {
           <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
         </View>
       </View>
-     <PhoneAuthComp navigation={navigation} />
+      <PhoneAuthComp navigation={navigation} />
+      
+      <View style={{ margin: 10 }}>
 
-      <View style={{margin:10}}>
-        <Text style={{color:"#fff"}}>OR</Text>
+
+        <Text style={{ color: "#fff" }}>OR</Text>
       </View>
       <View>
-       
+
         <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
           <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
           <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with google</Text>

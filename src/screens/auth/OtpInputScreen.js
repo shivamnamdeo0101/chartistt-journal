@@ -1,33 +1,39 @@
-import React, { useState,useEffect } from "react";
-import { SafeAreaView, StyleSheet, Button, Text,Alert } from "react-native";
+import React, { useState, useEffect } from "react";
+import { SafeAreaView, StyleSheet, Button, Text, Alert } from "react-native";
 
 import OTPInputView from "@twotalltotems/react-native-otp-input";
 import { OTP_API } from "../../service/OtpService";
 import { USER_API } from "../../service/UserService";
+import { useDispatch } from "react-redux";
+import { setAuthSuccess, setUserDetails } from "../../store/UserSlice";
 
 const OtpInputScreen = ({ route, navigation }) => {
   const { to } = route.params;
   const [invalidCode, setInvalidCode] = useState(false);
+  const dispatch = useDispatch()
+  const checkOtp = async (otp) => {
+    const res = await OTP_API.checkOtp({ code: otp, to })
 
-
-
-
-  const checkOtp = async(otp)=>{
-    const res = await OTP_API.checkOtp({code:otp,to})
-    
-    if(res?.data?.data.status === "approved"){
+    if (res?.data?.data?.status === "approved") {
       console.log(res?.data)
-      const login = await USER_API.userPhoneLogin({phoneNumber:to})
-      console.log(login)
-      // if(login?.success === 200){
-      
-      // }
+      const login = await USER_API.userPhoneLogin({ phoneNumber: to })
+      if (login?.status === 200) {
+        dispatch(setUserDetails(login?.data?.data))
+        // dispatch(setAuthSuccess())
+      }
+
+      if(login?.data?.data?.email && login?.data?.data?.phoneNumber){
+        dispatch(setAuthSuccess())
+      }else{
+        navigation.navigate("CompleteProfile")
+      }
+
     }
   }
 
 
   return (
-    
+
     <SafeAreaView style={styles.wrapper}>
       <Text style={styles.prompt}>Enter the code we sent you</Text>
       <Text style={styles.message}>
@@ -57,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor:"#1e294f"
+    backgroundColor: "#1e294f"
   },
 
   borderStyleBase: {
@@ -86,14 +92,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingHorizontal: 30,
     paddingBottom: 20,
-    color:"#fff"
+    color: "#fff"
   },
 
   message: {
     fontSize: 16,
     paddingHorizontal: 30,
-    marginBottom:10,
-    color:"#fff"
+    marginBottom: 10,
+    color: "#fff"
   },
 
   error: {
