@@ -9,6 +9,10 @@ const OtpInput = (props) => {
     const [valid, setValid] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
     const phoneInput = useRef(null);
+
+    handleCodeFilled = () => {
+
+    }
   return (
     <View >
         <Modal
@@ -20,12 +24,13 @@ const OtpInput = (props) => {
             <View style={styles.container}>
                     <Text style={styles.header}>Chartist-Journal</Text>
                     <View style={styles.modalView}>
-                        <Text style={styles.title}>Your Phone!</Text>
+                        <Text style={styles.title}>OTP Verification</Text>
                         <View style={styles.inputView}>
-                        <Text style={styles.label}>Phone number</Text>
+                        <Text style={styles.helperText}>Enter the otp you received to</Text>
+                        <Text style={styles.helperText}>{props.mobileNo}</Text>
                         <OTPInputView
-                            style={{width: '80%', height: 200}}
-                            pinCount={4}
+                            style={{width: '90%', height: 100, alignSelf:"center"}}
+                            pinCount={6}
                             // code={this.state.code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
                             // onCodeChanged = {code => { this.setState({code})}}
                             autoFocusOnLoad
@@ -35,12 +40,12 @@ const OtpInput = (props) => {
                                 console.log(`Code is ${code}, you are good to go!`)
                             })}
                         />
-                        <Text style={styles.helperText}>A 6 digit OTP will be sent via SMS to verify your mobile number!</Text>
+                        
                         </View>
                         <TouchableOpacity
                         onPress={() => props.onClose()}
                         >
-                        <Text style={styles.backBtn}>Back</Text>
+                        <Text style={styles.backBtn}>Resend Otp</Text>
                         </TouchableOpacity>
                     </View>
                     <View>
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
     helperText: {
         fontSize:14,
         fontWeight:"500",
-        color:"#111110",
+        color:"#5299cc",
         marginTop:25
     },
     backBtn: {
@@ -144,10 +149,11 @@ const styles = StyleSheet.create({
       },
     
       underlineStyleBase: {
-        width: 30,
-        height: 45,
-        borderWidth: 0,
-        borderBottomWidth: 1,
+        width: 40,
+        height: 50,
+        backgroundColor:"#ebf4fc",
+        borderRadius:5,
+        color:"#000"
       },
     
       underlineStyleHighLighted: {

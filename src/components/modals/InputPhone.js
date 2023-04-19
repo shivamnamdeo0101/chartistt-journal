@@ -27,8 +27,8 @@ const InputPhone = (props) => {
                   <PhoneInput
                       ref={phoneInput}
                       defaultValue={value}
-                      defaultCode="DM"
-                      layout="first"
+                      defaultCode="IN"
+                      layout="second"
                       onChangeText={(text) => {
                       setValue(text);
                       }}
@@ -37,7 +37,7 @@ const InputPhone = (props) => {
                       }}
                       withDarkTheme
                       withShadow
-                      autoFocus
+                      autoFocus={false}
                       containerStyle={styles.containerStyle}
                       codeTextStyle={styles.codeTextStyle}
                       textContainerStyle={styles.textContainerStyle}

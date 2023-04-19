@@ -7,6 +7,7 @@ export default function PhoneAuthComp() {
   const [phoneModal, setPhoneModal] = useState(false);
   const [otpModal, setOtpModal] = useState(false);
   const [confirm, setConfirm] = useState(null);
+  const [mobileNo, setMobileNo] = useState("");
 
   // verification code (OTP - One-Time-Passcode)
   const [code, setCode] = useState('');
@@ -29,13 +30,12 @@ export default function PhoneAuthComp() {
   // Handle the button press
   async function signInWithPhoneNumber(phoneNumber) {
     console.log("phoneNumber", phoneNumber)
+    setMobileNo(phoneNumber);
+    const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+    console.log("confirmation",confirmation)
     setPhoneModal(false);
     setOtpModal(true);
-    // const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-    // console.log("confirmation",confirmation)
-    // setPhoneModal(false);
-    // setOtpModal(true);
-    // setConfirm(confirmation);
+    setConfirm(confirmation);
   }
 
   async function confirmCode(code) {
@@ -69,7 +69,7 @@ export default function PhoneAuthComp() {
     <>
       <Button
         title="Phone Number Sign In"
-        onPress={() => setPhoneModal(true)}
+        onPress={() => setOtpModal(true)}
       />
     <InputPhone 
     onSendOtp={(phone) => signInWithPhoneNumber(phone)}
@@ -77,9 +77,10 @@ export default function PhoneAuthComp() {
     onClose={() => setPhoneModal(false)}
     />
     <OtpInput 
-    onSendOtp={(code) => confirmCode(code)}
+    onOtpConfirm={(code) => confirmCode(code)}
     visible={otpModal}
     onClose={() => setOtpModal(false)}
+    mobileNo={mobileNo}
     />
     </>
   );
