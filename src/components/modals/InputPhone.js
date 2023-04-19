@@ -37,7 +37,7 @@ const InputPhone = (props) => {
                       }}
                       withDarkTheme
                       withShadow
-                      autoFocus={false}
+                      autoFocus
                       containerStyle={styles.containerStyle}
                       codeTextStyle={styles.codeTextStyle}
                       textContainerStyle={styles.textContainerStyle}
