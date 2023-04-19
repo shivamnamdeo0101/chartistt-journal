@@ -7,7 +7,7 @@ import { USER_API } from '../../service/UserService';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import messaging from '@react-native-firebase/messaging';
-import PhoneAuthComp from './PhoneAuthComp';
+import PhoneAuthComp from './PhoneAuthScreen';
 
 
 const LoginScreen = ({ navigation }) => {
@@ -68,13 +68,19 @@ const LoginScreen = ({ navigation }) => {
       }
 
       const login = await USER_API.userLogin(payload)
-      console.log(login)
 
-      dispatch(setUserDetails(login?.data?.data))
-      dispatch(setAuthSuccess())
+      console.log(login?.data?.data)
+      
+      if (login?.status === 200) {
+        dispatch(setUserDetails(login?.data?.data))
+        dispatch(setAuthSuccess())
+
+        
+  
+      }
+
+      
       subscribe()
-
-
 
       // Alert.alert(JSON.stringify("User", user))
 
@@ -101,19 +107,21 @@ const LoginScreen = ({ navigation }) => {
           <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
         </View>
       </View>
-      <PhoneAuthComp navigation={navigation} />
-      
-      <View style={{ margin: 10 }}>
+      <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => navigation.navigate("PhoneAuth")}>
+          <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
+          <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with phone</Text>
+        </TouchableOpacity>
+      {/* <View style={{ margin: 10 }}>
 
 
         <Text style={{ color: "#fff" }}>OR</Text>
-      </View>
+      </View> */}
       <View>
 
-        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
+        {/* <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
           <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
           <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with google</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
 

@@ -15,12 +15,29 @@ export const USER_API = {
       })
     },
 
+    userUpdate:async function(payload){
+      var data = JSON.stringify(payload);
+      const headers = {
+        'Authorization': 'Bearer ' + payload?.token,
+        'Content-Type': 'application/json'
+      }
+      return axios.request({
+        method: 'post',
+        
+        url: `${EndPoint}auth/update-profile`,
+        data: payload,
+        headers: headers
+      })
+    },
+
     userPhoneLogin:async function(payload){
+      
       var data = JSON.stringify(payload);
       return axios.request({
         method: 'post',
         url: `${EndPoint}auth/phone-auth`,
         data: payload,
+       
       })
     },
     

@@ -30,18 +30,6 @@ const Container = () => {
 
   const [brokerList, setbrokerList] = useState([])
 
-  // useEffect(() => {
-  //   if(data?.allBrokerList.length > 0){
-  //       dispatch(setDefaultBrokerObj(data?.allBrokerList[0]))
-
-
-  //       dispatch(setBrokerUpdateObj(data?.allBrokerList[0]))
-  //       dispatch(setFilterObj({
-  //         "userId": userAuth?._id,
-  //         "filterType": "a",
-  //       }))
-  //   }
-  // }, [])
 
 
   
@@ -52,10 +40,7 @@ const Container = () => {
   useEffect(() => {
     const fetchData = async () => {
 
-      // await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
-      //   dispatch(setBrokerList(res?.data?.data))
-      // })
-
+     
       await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
         dispatch(setBrokerList(res?.data?.data))
       })
@@ -81,31 +66,12 @@ const Container = () => {
       await USER_API.getData("brokers").then((res) => {
         dispatch(setAllBrokerListRedux(res?.data?.data))
       })
-
-
-
-
-
-      // await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
-      //   let arr = res?.data?.data;
-      //   arr = arr.map(item => {
-      //     return {
-      //       _id: item._id,
-      //       label: item?.brokerName,
-      //       value: item?.brokerName
-      //     };
-
-      //   });
-      //   dispatch(setBrokerListRedux(arr))
-      // })
-
+   
 
     }
 
     fetchData()
   }, [user])
-
-
 
 
   return (

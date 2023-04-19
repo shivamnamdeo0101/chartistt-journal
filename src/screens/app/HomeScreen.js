@@ -43,6 +43,11 @@ const HomeScreen = ({ navigation }) => {
 
   const auth = useSelector(state => state?.userAuth)
 
+
+  console.log(auth)
+
+
+
   const [loading, setloading] = useState(true)
   const [tradeList, settradeList] = useState([])
   const [brokerList, setbrokerList] = useState([])

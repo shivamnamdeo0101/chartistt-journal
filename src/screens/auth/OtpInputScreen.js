@@ -11,25 +11,28 @@ const OtpInputScreen = ({ route, navigation }) => {
   const { to } = route.params;
   const [invalidCode, setInvalidCode] = useState(false);
   const dispatch = useDispatch()
+  
   const checkOtp = async (otp) => {
+    
     const res = await OTP_API.checkOtp({ code: otp, to })
 
     if (res?.data?.data?.status === "approved") {
-      console.log(res?.data)
       const login = await USER_API.userPhoneLogin({ phoneNumber: to })
+
+      console.log(login?.data?.data)
+
       if (login?.status === 200) {
         dispatch(setUserDetails(login?.data?.data))
-        // dispatch(setAuthSuccess())
+         if((login?.data?.data?.email || login?.data?.data?.firstName || login?.data?.data?.lastName)){
+          dispatch(setAuthSuccess())
+        }else{
+          navigation.navigate("CompleteProfile")
+        }
       }
-
-      if(login?.data?.data?.email && login?.data?.data?.phoneNumber){
-        dispatch(setAuthSuccess())
-      }else{
-        navigation.navigate("CompleteProfile")
-      }
-
+     
     }
   }
+
 
 
   return (
@@ -41,7 +44,7 @@ const OtpInputScreen = ({ route, navigation }) => {
       </Text>
       <Button
         title="Edit Phone Number"
-        onPress={() => navigation.goBack()}
+        onPress={() => navigateAuth()}
       />
       <OTPInputView
         style={{ width: "80%", height: 200 }}
@@ -55,6 +58,8 @@ const OtpInputScreen = ({ route, navigation }) => {
       />
       {invalidCode && <Text style={styles.error}>Incorrect code.</Text>}
     </SafeAreaView>
+
+
   );
 };
 

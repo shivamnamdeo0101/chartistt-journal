@@ -13,34 +13,42 @@ import { OTP_API } from "../../service/OtpService";
 import Loading from "../../components/Loading";
 import { ActivityIndicator } from "react-native-paper";
 
-const PhoneAuthComp = ({navigation}) => {
+const PhoneAuthScreen = ({ navigation }) => {
   const [value, setValue] = useState("");
   const [formattedValue, setFormattedValue] = useState("");
   const phoneInput = useRef(null);
   const [loading, setloading] = useState(false)
 
-  const sendOtp = async ()=>{
+  const sendOtp = async () => {
 
     setloading(true)
 
-    const res = await OTP_API.sendOtp({"to":formattedValue})
-    if(res?.status === 200){
+    const res = await OTP_API.sendOtp({ "to": formattedValue })
+    if (res?.status === 200) {
       setloading(false)
-      navigation.navigate("OtpInput",{"to":formattedValue})
-    }else{
+      navigation.navigate("OtpInput", { "to": formattedValue })
+    } else {
       Alert.alert("Can not send otp")
     }
-   
+
   }
 
- 
+
 
   return (
     <>
       <View style={styles.container}>
         <SafeAreaView>
 
+          <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
+            <View style={{ flexDirection: "row", alignItems: "center",justifyContent:"center" }}>
+              <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>CHARTISTT</Text>
+              <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 ,textAlign:"center"}}>JOURNAL</Text>
+            </View>
+          </View>
+
           <View style={styles.wrapper}>
+
             <PhoneInput
 
               placeholderTextColor="#888"
@@ -66,7 +74,7 @@ const PhoneAuthComp = ({navigation}) => {
               sendOtp()
             }}
           >
-            <Text style={styles.buttonText}> {loading ? <ActivityIndicator size={"small"} color="#fff"/> : "Continue with Phone Number"}</Text>
+            <Text style={styles.buttonText}> {loading ? <ActivityIndicator size={"small"} color="#fff" /> : "Continue with Phone Number"}</Text>
           </TouchableOpacity>
         </SafeAreaView>
       </View>
@@ -76,6 +84,11 @@ const PhoneAuthComp = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: "#1e294f",
+    justifyContent: "center",
+    padding: 20,
+
   },
 
   wrapper: {
@@ -108,6 +121,6 @@ const styles = StyleSheet.create({
   }
 });
 
-export default PhoneAuthComp;
+export default PhoneAuthScreen;
 
 
