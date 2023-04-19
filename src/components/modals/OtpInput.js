@@ -4,13 +4,13 @@ import PhoneInput from "react-native-phone-number-input";
 import OTPInputView from '@twotalltotems/react-native-otp-input'
 const {width, height} = Dimensions.get("window")
 const OtpInput = (props) => {
-    const [value, setValue] = useState("");
+    const [code, setCode] = useState("");
     const [formattedValue, setFormattedValue] = useState("");
     const [valid, setValid] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
     const phoneInput = useRef(null);
 
-    handleCodeFilled = () => {
+    handleCodeFilled = (code) => {
 
     }
   return (
@@ -31,13 +31,14 @@ const OtpInput = (props) => {
                         <OTPInputView
                             style={{width: '90%', height: 100, alignSelf:"center"}}
                             pinCount={6}
-                            // code={this.state.code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
-                            // onCodeChanged = {code => { this.setState({code})}}
+                            code={code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
+                            onCodeChanged = {code => { setCode(code)}}
                             autoFocusOnLoad
                             codeInputFieldStyle={styles.underlineStyleBase}
                             codeInputHighlightStyle={styles.underlineStyleHighLighted}
                             onCodeFilled = {(code => {
                                 console.log(`Code is ${code}, you are good to go!`)
+                                props.onOtpConfirm(code)
                             })}
                         />
                         
@@ -51,10 +52,10 @@ const OtpInput = (props) => {
                     <View>
                         <TouchableOpacity 
                         onPress={() => {
-                            if(phoneInput.current?.isValidNumber(value)) {
-                                props.onSendOtp(formattedValue)
+                            if(code.length==6) {
+                                props.onOtpConfirm(code)
                             } else {
-                                Alert.alert("Please provide valid phone number")
+                                Alert.alert("Please fill your otp")
                             }
                         }}
                         style={styles.ctaBtn}>
