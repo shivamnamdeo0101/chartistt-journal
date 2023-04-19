@@ -69,7 +69,7 @@ export default function PhoneAuthComp() {
     <>
       <Button
         title="Phone Number Sign In"
-        onPress={() => setOtpModal(true)}
+        onPress={() => setPhoneModal(true)}
       />
     <InputPhone 
     onSendOtp={(phone) => signInWithPhoneNumber(phone)}
