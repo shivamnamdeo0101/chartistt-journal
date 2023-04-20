@@ -23,32 +23,50 @@ const PhoneAuthScreen = ({ navigation }) => {
 
   const [confirm, setConfirm] = useState(null);
 
+  const validateString = (input) => {
+    const stringRegex = /^[0-9+-]{13}$/;
+    // Regex pattern for string with only digits and symbols, and length of 13
+    
+    if (stringRegex.test(input)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+  
 
   const sendOtp = async () => {
 
-    setloading(true)
+    if (!validateString(formattedValue)) {
+     Alert.alert("Enter the correct phone number");
+     return
+    }
 
-    const res = await OTP_API.sendOtp({ "to": formattedValue })
-    if (res?.status === 200) {
-      setloading(false)
-      navigation.navigate("OtpInput", { "to": formattedValue })
-    } else {
-      Alert.alert("Can not send otp")
+    try {
+      console.log(formattedValue)
+      const res = await OTP_API.sendOtp({ "to": formattedValue })
+      if (res?.status === 200) {
+        navigation.navigate("OtpInput", { "to": formattedValue })
+      } else {
+        Alert.alert("Can not send otp")
+      }
+    } catch (error) {
+      Alert.alert(JSON.stringify(error));
     }
 
   }
 
-  
-  async function signInWithPhoneNumber(){
+
+  async function signInWithPhoneNumber() {
 
     // const user =await auth().currentUser()
 
     // if(user){
     //  await auth().signOut()
     // }
-    
-4
-    if(!formattedValue){
+
+
+    if (!formattedValue) {
       return
     }
 
@@ -57,8 +75,8 @@ const PhoneAuthScreen = ({ navigation }) => {
 
       console.log(confirmation)
 
-      if(confirmation){
-        navigation.navigate("OtpInput",{"confirm":confirmation,"to": formattedValue })
+      if (confirmation) {
+        navigation.navigate("OtpInput", { "confirm": confirmation, "to": formattedValue })
       }
 
     } catch (error) {
@@ -73,9 +91,9 @@ const PhoneAuthScreen = ({ navigation }) => {
         <SafeAreaView>
 
           <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-            <View style={{ flexDirection: "row", alignItems: "center",justifyContent:"center" }}>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
               <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>CHARTISTT</Text>
-              <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 ,textAlign:"center"}}>JOURNAL</Text>
+              <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16, textAlign: "center" }}>JOURNAL</Text>
             </View>
           </View>
 
@@ -102,8 +120,8 @@ const PhoneAuthScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => 
-              signInWithPhoneNumber()
+            onPress={() =>
+              sendOtp()
             }
           >
             <Text style={styles.buttonText}> {loading ? <ActivityIndicator size={"small"} color="#fff" /> : "Continue with Phone Number"}</Text>

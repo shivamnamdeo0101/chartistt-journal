@@ -33,20 +33,8 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const user = useSelector(state => state?.userAuth?.user)
-
-
-
-
   const data = useSelector(state => state?.data)
-
-
-
   const auth = useSelector(state => state?.userAuth)
-
-
-  console.log(auth)
-
-
 
   const [loading, setloading] = useState(true)
   const [tradeList, settradeList] = useState([])
@@ -76,6 +64,26 @@ const HomeScreen = ({ navigation }) => {
 
   }, [filterObj])
 
+  useEffect(() => {
+      if(auth?.user?.email === null){
+        Alert.alert(
+          'Message',
+          'Update your profile',
+          [
+              {
+                  text: 'Cancel',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel'
+              },
+              {
+                  text: 'OK',
+                  onPress: () => navigation.navigate("Profile")
+              }
+          ]
+      );
+      }
+  }, [])
+  
 
 
   useEffect(() => {

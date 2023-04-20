@@ -74,9 +74,6 @@ const LoginScreen = ({ navigation }) => {
       if (login?.status === 200) {
         dispatch(setUserDetails(login?.data?.data))
         dispatch(setAuthSuccess())
-
-        
-  
       }
 
       

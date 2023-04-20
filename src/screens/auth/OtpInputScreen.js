@@ -13,34 +13,47 @@ const OtpInputScreen = ({ route, navigation }) => {
   const [invalidCode, setInvalidCode] = useState(false);
   const dispatch = useDispatch()
 
-  // const checkOtp = async (otp) => {
+  const checkOtp = async (otp) => {
 
-  //   const res = await OTP_API.checkOtp({ code: otp, to })
+    const res = await OTP_API.checkOtp({ code: otp, to })
 
-  //   if (res?.data?.data?.status === "approved") {
-  //     if (login?.data?.data?.email && login?.data?.data?.email && login?.data?.data?.firstName && login?.data?.data?.lastName) {
-  //       dispatch(setAuthSuccess())
-  //     } else {
-  //       navigation.navigate("CompleteProfile")
-  //     }
+    if (res?.data?.data?.status === "approved") {
 
-  //   }
-  // }
+      const user = await USER_API.userLogin({
+        // firstName: 'Your First Name',
+        // lastName: 'Your Last Name',
+        // email: 'email@email.com',
+        phoneNumber: to
+      })
 
-  const confirmVerificationCode = async (code)=> {
-    try {
-      const res = await confirm.confirm(code);
-
-      if(res){
-        const user = await USER_API.userLogin({"phoneNumber":to})
-        dispatch(setUserDetails(res?.data?.data))
+      if(user?.status  === 200){
+        dispatch(setUserDetails(user?.data?.data))
         dispatch(setAuthSuccess())
+        // if(user?.data?.data?.email === "email@email.com"){
+        //   navigation.navigate("CompleteProfile")
+        // }else{
+          
+        // }
+
       }
 
-    } catch (error) {
-      Alert.alert('Invalid code');
     }
   }
+
+  // const confirmVerificationCode = async (code)=> {
+  //   try {
+  //     const res = await confirm.confirm(code);
+
+  //     if(res){
+  //       const user = await USER_API.userLogin({"phoneNumber":to})
+  //       dispatch(setUserDetails({"phoneNumber":to,"userId":user?.data?.data?._id}))
+  //       dispatch(setAuthSuccess())
+  //     }
+
+  //   } catch (error) {
+  //     Alert.alert('Invalid code');
+  //   }
+  // }
 
   const verifyOtp = async (otp)=>{
     console.log("Confirm",confirm)
@@ -60,7 +73,7 @@ const OtpInputScreen = ({ route, navigation }) => {
       </Text>
       <Button
         title="Edit Phone Number"
-        onPress={() => verifyOtp("194479")}
+        onPress={() => navigation.goBack()}
       />
       <OTPInputView
         style={{ width: "80%", height: 200 }}
@@ -69,7 +82,7 @@ const OtpInputScreen = ({ route, navigation }) => {
         codeInputFieldStyle={styles.underlineStyleBase}
         codeInputHighlightStyle={styles.underlineStyleHighLighted}
         onCodeFilled={(code) => {
-          verifyOtp(code)
+          checkOtp(code)
         }}
       />
       {invalidCode && <Text style={styles.error}>Incorrect code.</Text>}

@@ -33,80 +33,86 @@ const AddEmailFormComp = ({ navigation, setModal, modal }) => {
     function compareObjects(obj, previousObj) {
         // Check if the objects are null or undefined
         if (obj == null || previousObj == null) {
-          return false;
+            return false;
         }
-      
+
         // Get the keys of both objects
         const objKeys = Object.keys(obj);
         const previousObjKeys = Object.keys(previousObj);
-      
+
         // Check if the objects have the same number of keys
         if (objKeys.length !== previousObjKeys.length) {
-          return false;
+            return false;
         }
-      
+
         // Check if the objects have the same keys
         if (!objKeys.every(key => previousObjKeys.includes(key))) {
-          return false;
+            return false;
         }
-      
+
         // Check if the values of each key in the objects are equal
         for (let key of objKeys) {
-          if (obj[key] !== previousObj[key]) {
-            return false;
-          }
+            if (obj[key] !== previousObj[key]) {
+                return false;
+            }
         }
-      
+
         // The objects are equal
         return true;
-      }
+    }
 
 
 
     const onSubmit = async (data) => {
-
-
-        
-
         try {
 
             const prevObj = {
-                "firstName":user?.firstName,
-                "lastName":user?.lastName,
-                "email":user?.email,
-                "phoneNumber":user?.phoneNumber
+                "firstName": user?.firstName,
+                "lastName": user?.lastName,
+                "email": user?.email,
+                "phoneNumber": user?.phoneNumber
             }
-    
-            if(compareObjects(data,prevObj)){
+
+            console.log(compareObjects(data, prevObj))
+
+            if (compareObjects(data, prevObj)) {
                 modal && setModal(false)
                 return
             }
 
-            
-            
+            let userExists = await USER_API.checkUserExists({...data,userId:auth?.user?._id});
 
-            const res = await USER_API.userLogin(prevObj)
+            userExists = userExists?.data
 
-            if(res?.success === false){
-                Alert.alert(res?.message)
-                return
+            if(userExists.emailExists && userExists.phoneExists){
+                throw new Error('Email and phone already exists try with new ones');
+                
+            }else if(userExists.emailExists){
+                throw new Error('Email already exists try with new one');
+                
+            }else if (userExists.phoneExists) {
+                throw new Error('Phone already exists try with new one');
+                
             }
-            console.log(payload,"Payload")
-            console.log(auth)
 
+          
+            const payload = {
+                "userId": auth?.user?._id,
+                "user": data
+            }
 
-            console.log(res?.data?.data,"RES")
+            const res = await USER_API.userUpdate(payload)
+
+            console.log(res?.data?.data, "Data")
 
             if (res?.status === 200) {
                 dispatch(setUserDetails(res?.data?.data))
-                // dispatch(setAuthSuccess())
-                // modal && setModal(false)
-
+                !modal && dispatch(setAuthSuccess())
+                modal && setModal(false)
             }
 
-
         } catch (e) {
-            console.log(e)
+            Alert.alert(JSON.stringify(e?.message))
         }
     };
 
