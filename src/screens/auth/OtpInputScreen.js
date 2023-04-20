@@ -14,8 +14,8 @@ const OtpInputScreen = ({ route, navigation }) => {
   const dispatch = useDispatch()
 
   const checkOtp = async (otp) => {
-
-    const res = await OTP_API.checkOtp({ code: otp, to })
+    try{
+      const res = await OTP_API.checkOtp({ code: otp, to })
 
     if (res?.data?.data?.status === "approved") {
 
@@ -37,6 +37,9 @@ const OtpInputScreen = ({ route, navigation }) => {
 
       }
 
+    }
+    }catch(e){
+      Alert.alert(JSON.stringify(e?.message))
     }
   }
 
