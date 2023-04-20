@@ -12,12 +12,17 @@ import PhoneInput from "react-native-phone-number-input";
 import { OTP_API } from "../../service/OtpService";
 import Loading from "../../components/Loading";
 import { ActivityIndicator } from "react-native-paper";
+import auth from '@react-native-firebase/auth';
 
 const PhoneAuthScreen = ({ navigation }) => {
   const [value, setValue] = useState("");
   const [formattedValue, setFormattedValue] = useState("");
   const phoneInput = useRef(null);
   const [loading, setloading] = useState(false)
+
+
+  const [confirm, setConfirm] = useState(null);
+
 
   const sendOtp = async () => {
 
@@ -33,6 +38,33 @@ const PhoneAuthScreen = ({ navigation }) => {
 
   }
 
+  
+  async function signInWithPhoneNumber(){
+
+    // const user =await auth().currentUser()
+
+    // if(user){
+    //  await auth().signOut()
+    // }
+    
+4
+    if(!formattedValue){
+      return
+    }
+
+    try {
+      const confirmation = await auth().signInWithPhoneNumber(formattedValue)
+
+      console.log(confirmation)
+
+      if(confirmation){
+        navigation.navigate("OtpInput",{"confirm":confirmation,"to": formattedValue })
+      }
+
+    } catch (error) {
+      Alert.alert(JSON.stringify(error));
+    }
+  }
 
 
   return (
@@ -70,9 +102,9 @@ const PhoneAuthScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => {
-              sendOtp()
-            }}
+            onPress={() => 
+              signInWithPhoneNumber()
+            }
           >
             <Text style={styles.buttonText}> {loading ? <ActivityIndicator size={"small"} color="#fff" /> : "Continue with Phone Number"}</Text>
           </TouchableOpacity>

@@ -60,7 +60,9 @@ const AddEmailFormComp = ({ navigation, setModal, modal }) => {
         // The objects are equal
         return true;
       }
-      
+
+
+
     const onSubmit = async (data) => {
 
 
@@ -81,24 +83,24 @@ const AddEmailFormComp = ({ navigation, setModal, modal }) => {
             }
 
             
-            const payload = {
-                "userId": auth?.user?._id,
-                "user": data
-            }
+            
 
-            console.log(payload)
-
-            const res = await USER_API.userUpdate(payload)
+            const res = await USER_API.userLogin(prevObj)
 
             if(res?.success === false){
                 Alert.alert(res?.message)
                 return
             }
+            console.log(payload,"Payload")
+            console.log(auth)
+
+
+            console.log(res?.data?.data,"RES")
 
             if (res?.status === 200) {
                 dispatch(setUserDetails(res?.data?.data))
-                dispatch(setAuthSuccess())
-                modal && setModal(false)
+                // dispatch(setAuthSuccess())
+                // modal && setModal(false)
 
             }
 

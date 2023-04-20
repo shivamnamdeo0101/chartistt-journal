@@ -56,7 +56,6 @@ export const BrokerProvider = ({ children }) => {
 
     }
     const updateBrokerFun = async (brokerPayload) => {
-        console.log(brokerPayload, "Update")
         const updateBroker = await BROKER_API.updateBroker(brokerPayload, user?.token)
 
         if (updateBroker?.status === 200) {

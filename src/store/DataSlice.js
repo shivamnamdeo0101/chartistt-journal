@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const initialState = {
+
+    confirm:null,
     actionList: [],
     emotionList: [],
     tradeTypeList: [],
@@ -60,6 +62,12 @@ export const DataSlice = createSlice({
             state.brokerUpdateObj = action.payload;
         },
 
+
+        setConfirm:(state, action) => {
+            state.confirm = action.payload;
+        },
+
+
         
 
         
@@ -68,6 +76,7 @@ export const DataSlice = createSlice({
 
 
         flushAuthData: (state) => {
+            state.confirm = null;
             state.defaultbrokerObj = [];
             state.brokerList = [];
             state.tradeList = [];
@@ -86,6 +95,6 @@ export const DataSlice = createSlice({
 
     },
 });
-export const { setActionList,setBrokerList,setTradeList,setBrokerUpdateObj, setAllBrokerListRedux,setDefaultBrokerObj, setBrokerListRedux, setChartTimeFrameList,setSegmentList,setSessionList,setTradeTypeList,setEmotionList, flushAuthData, } = DataSlice.actions;
+export const { setActionList,setBrokerList, setConfirm,setTradeList,setBrokerUpdateObj, setAllBrokerListRedux,setDefaultBrokerObj, setBrokerListRedux, setChartTimeFrameList,setSegmentList,setSessionList,setTradeTypeList,setEmotionList, flushAuthData, } = DataSlice.actions;
 
 export default DataSlice.reducer;

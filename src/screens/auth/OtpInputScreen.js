@@ -6,32 +6,48 @@ import { OTP_API } from "../../service/OtpService";
 import { USER_API } from "../../service/UserService";
 import { useDispatch } from "react-redux";
 import { setAuthSuccess, setUserDetails } from "../../store/UserSlice";
+import auth from '@react-native-firebase/auth';
 
 const OtpInputScreen = ({ route, navigation }) => {
-  const { to } = route.params;
+  const { to,confirm } = route.params;
   const [invalidCode, setInvalidCode] = useState(false);
   const dispatch = useDispatch()
-  
-  const checkOtp = async (otp) => {
-    
-    const res = await OTP_API.checkOtp({ code: otp, to })
 
-    if (res?.data?.data?.status === "approved") {
-      const login = await USER_API.userPhoneLogin({ phoneNumber: to })
+  // const checkOtp = async (otp) => {
 
-      console.log(login?.data?.data)
+  //   const res = await OTP_API.checkOtp({ code: otp, to })
 
-      if (login?.status === 200) {
-        dispatch(setUserDetails(login?.data?.data))
-         if((login?.data?.data?.email || login?.data?.data?.firstName || login?.data?.data?.lastName)){
-          dispatch(setAuthSuccess())
-        }else{
-          navigation.navigate("CompleteProfile")
-        }
+  //   if (res?.data?.data?.status === "approved") {
+  //     if (login?.data?.data?.email && login?.data?.data?.email && login?.data?.data?.firstName && login?.data?.data?.lastName) {
+  //       dispatch(setAuthSuccess())
+  //     } else {
+  //       navigation.navigate("CompleteProfile")
+  //     }
+
+  //   }
+  // }
+
+  const confirmVerificationCode = async (code)=> {
+    try {
+      const res = await confirm.confirm(code);
+
+      if(res){
+        const user = await USER_API.userLogin({"phoneNumber":to})
+        dispatch(setUserDetails(res?.data?.data))
+        dispatch(setAuthSuccess())
       }
-     
+
+    } catch (error) {
+      Alert.alert('Invalid code');
     }
   }
+
+  const verifyOtp = async (otp)=>{
+    console.log("Confirm",confirm)
+    confirmVerificationCode(otp)
+  }
+
+  
 
 
 
@@ -44,7 +60,7 @@ const OtpInputScreen = ({ route, navigation }) => {
       </Text>
       <Button
         title="Edit Phone Number"
-        onPress={() => navigateAuth()}
+        onPress={() => verifyOtp("194479")}
       />
       <OTPInputView
         style={{ width: "80%", height: 200 }}
@@ -53,7 +69,7 @@ const OtpInputScreen = ({ route, navigation }) => {
         codeInputFieldStyle={styles.underlineStyleBase}
         codeInputHighlightStyle={styles.underlineStyleHighLighted}
         onCodeFilled={(code) => {
-          checkOtp(code)
+          verifyOtp(code)
         }}
       />
       {invalidCode && <Text style={styles.error}>Incorrect code.</Text>}
