@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, Image, Alert, PermissionsAndroid } from 'react-native'
 import React, { useEffect ,useContext} from 'react'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { setAuthSuccess, setUserDetails } from '../../store/UserSlice';
@@ -28,6 +28,16 @@ const LoginScreen = ({ navigation }) => {
     });
   }, [])
 
+  checkAndroidPermission = async () => {
+    try {
+      const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+      await PermissionsAndroid.request(permission);
+      Promise.resolve();
+    } catch (error) {
+      Promise.reject(error);
+    }
+};
+
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission();
     const enabled =
@@ -38,6 +48,13 @@ const LoginScreen = ({ navigation }) => {
       console.log('Authorization status:', authStatus);
     }
   }
+
+  useEffect(() => {
+    checkAndroidPermission()
+    subscribe()
+  }, [])
+  
+
   const subscribe = async () => {
     await requestUserPermission()
     await messaging()
@@ -76,8 +93,9 @@ const LoginScreen = ({ navigation }) => {
         dispatch(setAuthSuccess())
       }
 
+
+     
       
-      subscribe()
 
       // Alert.alert(JSON.stringify("User", user))
 
@@ -115,10 +133,10 @@ const LoginScreen = ({ navigation }) => {
       </View> */}
       <View>
 
-        {/* <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
+        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => googleLogin()}>
           <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
           <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with google</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
 
 

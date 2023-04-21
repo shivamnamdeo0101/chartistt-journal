@@ -100,7 +100,7 @@ const ProfileScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <View>
+        <View style={{flex:1}}>
 
 
 

@@ -44,13 +44,17 @@ const PhoneAuthScreen = ({ navigation }) => {
 
     try {
       console.log(formattedValue)
+      setloading(true)
       const res = await OTP_API.sendOtp({ "to": formattedValue })
       if (res?.status === 200) {
+        setloading(false)
         navigation.navigate("OtpInput", { "to": formattedValue })
       } else {
+        setloading(false)
         Alert.alert("Can not send otp")
       }
     } catch (error) {
+      setloading(false)
       Alert.alert(JSON.stringify(error));
     }
 

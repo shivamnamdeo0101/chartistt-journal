@@ -7,38 +7,65 @@ import { USER_API } from "../../service/UserService";
 import { useDispatch } from "react-redux";
 import { setAuthSuccess, setUserDetails } from "../../store/UserSlice";
 import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const OtpInputScreen = ({ route, navigation }) => {
-  const { to,confirm } = route.params;
+  const { to, confirm } = route.params;
   const [invalidCode, setInvalidCode] = useState(false);
   const dispatch = useDispatch()
 
+  async function requestUserPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+    }
+  }
+  const subscribe = async () => {
+    await requestUserPermission()
+    await messaging()
+      .subscribeToTopic('app')
+      .then(() => {
+        console.log('Subscribed to topic');
+      })
+      .catch(error => {
+        console.log('Error subscribing to topic:', error);
+      });
+  }
+
+
   const checkOtp = async (otp) => {
-    try{
+    try {
+
+
       const res = await OTP_API.checkOtp({ code: otp, to })
 
-    if (res?.data?.data?.status === "approved") {
+      if (res?.data?.data?.status === "approved") {
 
-      const user = await USER_API.userLogin({
-        // firstName: 'Your First Name',
-        // lastName: 'Your Last Name',
-        // email: 'email@email.com',
-        phoneNumber: to
-      })
+        const user = await USER_API.userLogin({
+          // firstName: 'Your First Name',
+          // lastName: 'Your Last Name',
+          // email: 'email@email.com',
+          phoneNumber: to
+        })
 
-      if(user?.status  === 200){
-        dispatch(setUserDetails(user?.data?.data))
-        dispatch(setAuthSuccess())
-        // if(user?.data?.data?.email === "email@email.com"){
-        //   navigation.navigate("CompleteProfile")
-        // }else{
-          
-        // }
+        if (user?.status === 200) {
+          dispatch(setUserDetails(user?.data?.data))
+          subscribe()
+          dispatch(setAuthSuccess())
+          // if(user?.data?.data?.email === "email@email.com"){
+          //   navigation.navigate("CompleteProfile")
+          // }else{
+
+          // }
+
+        }
 
       }
-
-    }
-    }catch(e){
+    } catch (e) {
       Alert.alert(JSON.stringify(e?.message))
     }
   }
@@ -58,12 +85,12 @@ const OtpInputScreen = ({ route, navigation }) => {
   //   }
   // }
 
-  const verifyOtp = async (otp)=>{
-    console.log("Confirm",confirm)
+  const verifyOtp = async (otp) => {
+    console.log("Confirm", confirm)
     confirmVerificationCode(otp)
   }
 
-  
+
 
 
 
