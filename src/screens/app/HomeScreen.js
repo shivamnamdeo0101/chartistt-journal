@@ -65,10 +65,10 @@ const HomeScreen = ({ navigation }) => {
   }, [filterObj])
 
   useEffect(() => {
-      if(auth?.user?.email === null){
+      if(auth?.user?.phoneNumber === null){
         Alert.alert(
           'Message',
-          'Update your profile',
+          'Update mobile number in profile',
           [
               {
                   text: 'Cancel',
