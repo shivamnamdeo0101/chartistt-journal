@@ -9,7 +9,7 @@ const AuthStack = createNativeStackNavigator()
 const AuthNavigator = ({ navigation }) => {
 
     return (
-        <AuthStack.Navigator initialRouteName="PhoneAuth">
+        <AuthStack.Navigator initialRouteName="Login">
             <AuthStack.Screen name="Login" component={LoginScreen} options={{headerShown:false}}  />
             <AuthStack.Screen name="OtpInput" component={OtpInputScreen} options={{headerShown:false}}  />
             <AuthStack.Screen name="CompleteProfile" component={CompleteProfileScreen} options={{headerShown:false}}  />

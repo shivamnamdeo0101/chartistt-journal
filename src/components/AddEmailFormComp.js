@@ -13,7 +13,7 @@ const schema = yup.object().shape({
     firstName: yup.string().required(),
     lastName: yup.string().required(),
     phoneNumber: yup.string().required(),
-    email: yup.string().email().required(),
+    // email: yup.string().email().required(),
 });
 
 
@@ -69,7 +69,7 @@ const AddEmailFormComp = ({ navigation, setModal, modal }) => {
             const prevObj = {
                 "firstName": user?.firstName,
                 "lastName": user?.lastName,
-                "email": user?.email,
+                // "email": user?.email,
                 "phoneNumber": user?.phoneNumber
             }
 
@@ -148,7 +148,7 @@ const AddEmailFormComp = ({ navigation, setModal, modal }) => {
                         />
                         {errors.lastName && <Text style={{ color: "#f03" }}>{errors.lastName.message}</Text>}
                     </View>
-                    <View style={{ backgroundColor: "#070f4a", padding: 10, borderRadius: 10, marginBottom: 10 }}>
+                    {/* <View style={{ backgroundColor: "#070f4a", padding: 10, borderRadius: 10, marginBottom: 10 }}>
                         <Text style={{ color: "#ccc", fontWeight: "bold" }}>Email</Text>
                         <Controller
                             name="email"
@@ -162,7 +162,7 @@ const AddEmailFormComp = ({ navigation, setModal, modal }) => {
                                 {...field} />}
                         />
                         {errors.email && <Text style={{ color: "#f03" }}>{errors.email.message}</Text>}
-                    </View>
+                    </View> */}
                     <View style={{ backgroundColor: "#070f4a", padding: 10, borderRadius: 10, marginBottom: 10 }}>
                         <Text style={{ color: "#ccc", fontWeight: "bold" }}>Phone Number</Text>
                         <Controller
