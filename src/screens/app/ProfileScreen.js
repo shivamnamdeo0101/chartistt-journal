@@ -26,12 +26,13 @@ const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch()
   const logoutUser = async () => {
 
-    dispatch(flushAuthData())
-
     if (GoogleSignin.isSignedIn) {
       await GoogleSignin.revokeAccess();
       await GoogleSignin.signOut();
     }
+    dispatch(flushAuthData())
+
+   
   }
 
   const onShare = async () => {
@@ -100,7 +101,7 @@ const ProfileScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <View style={{flex:1}}>
+        <View>
 
 
 

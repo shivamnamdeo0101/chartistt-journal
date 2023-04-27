@@ -28,7 +28,8 @@ const LoginScreen = ({ navigation }) => {
     });
   }, [])
 
-  checkAndroidPermission = async () => {
+
+  const checkAndroidPermission = async () => {
     try {
       const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
       await PermissionsAndroid.request(permission);
@@ -77,6 +78,9 @@ const LoginScreen = ({ navigation }) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
+
+      console.log(userInfo?.user,"User")
+
       const payload = {
         "email": userInfo?.user?.email,
         "firstName": userInfo?.user?.givenName,
@@ -95,8 +99,7 @@ const LoginScreen = ({ navigation }) => {
 
 
      
-      
-
+    
       // Alert.alert(JSON.stringify("User", user))
 
     } catch (error) {
