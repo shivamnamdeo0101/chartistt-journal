@@ -61,10 +61,17 @@ const AddEmailFormComp = ({ navigation, setModal, modal }) => {
         return true;
     }
 
-
+    const isValidPhoneNumber = (value) => {
+        return /^\d{10}$/.test(value);
+      }
+      
 
     const onSubmit = async (data) => {
         try {
+
+            if(!isValidPhoneNumber(data?.phoneNumber)){
+                throw new Error('Please enter the valid phone number');
+            }
 
             const prevObj = {
                 "firstName": user?.firstName,
@@ -169,8 +176,10 @@ const AddEmailFormComp = ({ navigation, setModal, modal }) => {
                             name="phoneNumber"
                             control={control}
                             defaultValue={user?.phoneNumber}
-
-                            render={({ field, }) => <TextInput placeholder='Enter your phoneNumber' value={field.value}
+                            render={({ field, }) => <TextInput 
+                            
+                               keyboardType={"phone-pad"}
+                                placeholder='Enter your phoneNumber'  value={field.value}
                                 onChangeText={field.onChange}
                                 style={{ color: "#fff" }}
                                 {...field} />}
