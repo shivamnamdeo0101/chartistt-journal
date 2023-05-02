@@ -212,7 +212,7 @@ export const BrokerProvider = ({ children }) => {
                                     }
                                 </View>
 
-                                {getValues("amtWithdraw") && <View>
+                                {forUpdate() === true ? <View>
                                     <Controller
                                         control={control}
                                         name="amtWithdraw"
@@ -227,13 +227,12 @@ export const BrokerProvider = ({ children }) => {
                                                     value={value?.toString()}
                                                     placeholder={"Withdrawn Amount"}
                                                     keyboardType="number-pad"
-
                                                 />
                                             </View>
                                         )}
                                     />
-                                    {errors.amtWithdraw && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
-                                </View>}
+                                    {errors.amtWithdraw ? <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>: null}
+                                </View>: null}
 
 
                                 <Controller
