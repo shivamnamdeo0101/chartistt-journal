@@ -73,7 +73,7 @@ const ProfileScreen = ({ navigation }) => {
 
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#1e294f", padding: 10, }}>
+    <View style={{ flex: 1, backgroundColor: "#1e294f", padding: 10,paddingBottom:50 }}>
 
 
       <Modal
