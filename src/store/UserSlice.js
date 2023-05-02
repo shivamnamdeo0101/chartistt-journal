@@ -7,6 +7,7 @@ const initialState = {
   defaultRange:"",
 
   filterObj:{},
+  
 
   startDate:"",
   endDate:"",

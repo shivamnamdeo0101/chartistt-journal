@@ -12,6 +12,21 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SelectInput from "../components/SelectInput";
 import TradeForm from "../components/TradeForm";
 
+
+const optionTypeList = [
+   
+    {
+        "label": "Put",
+        "value": "put"
+    },
+    {
+        "label": "Call",
+        "value": "call"
+    }
+   
+]
+
+
 export const TradeContext = createContext(false, () => { }, {});
 
 export const TradeProvider = ({ children }) => {
@@ -30,6 +45,12 @@ export const TradeProvider = ({ children }) => {
     const [mindSetBeforeTrade, setmindSetBeforeTrade] = useState("Angry")
     const [mindSetAfterTrade, setmindSetAfterTrade] = useState("Angry")
     const [session, setsession] = useState("morning")
+    const [optionType, setoptionType] = useState("call")
+
+
+
+
+
 
     const addDefaultObj = {
         "tradeName": "",
@@ -39,14 +60,15 @@ export const TradeProvider = ({ children }) => {
         "chartTimeFrame": "1 min",
         "mindSetBeforeTrade": "Angry",
         "mindSetAfterTrade": "Angry",
-        "session": "morning"
+        "session": "morning",
+        "optionType": "call"
     }
 
     const data = useSelector(state => state?.data)
 
     const auth = useSelector(state => state?.userAuth)
 
-    const { control, reset, watch, setValue, validate, handleSubmit, formState: { errors } } = useForm({ defaultValues: Object.keys(auth?.tradeObj).length > 0 ? auth?.tradeObj : addDefaultObj });
+    const { control, reset, watch, setValue, validate, getValues, handleSubmit, formState: { errors } } = useForm({ defaultValues: Object.keys(auth?.tradeObj).length > 0 ? auth?.tradeObj : addDefaultObj });
 
 
 
@@ -59,7 +81,7 @@ export const TradeProvider = ({ children }) => {
         let targetWatch = parseFloat(e?.targetPoint);
         let stopLossWatch = parseFloat(e?.stopLoss);
 
-        console.log(action, "entryPrice",typeof entryWatch,"Target Point",targetWatch,"Stop Loss",stopLossWatch)
+        console.log(action, "entryPrice", typeof entryWatch, "Target Point", targetWatch, "Stop Loss", stopLossWatch)
 
         if (action === "buy") {
 
@@ -128,41 +150,42 @@ export const TradeProvider = ({ children }) => {
         "mindSetBeforeTrade": mindSetBeforeTrade,
         "mindSetAfterTrade": mindSetAfterTrade,
         "session": session,
+        "optionType": optionType
 
     }
 
 
     const onSubmit = async (data) => {
         if (validateFun(data)) {
-        if (!brokerId) {
-            Alert.alert("Please select default broker")
-        } else {
-        setloading(true)
-        try {
-            if (forUpdate()) {
-                const tradePayload = {
-                    "userId": user?._id,
-                    "tradeId": auth?.tradeObj?._id,
-                    "trade": { ...data, ...selectionData, "updateOn": Date.now(), "date": date }
-                }
-                await updateTradeFun(tradePayload)
+            if (!brokerId) {
+                Alert.alert("Please select default broker")
             } else {
-                const tradePayload = {
-                    "userId": user?._id,
-                    "trade": {
-                        "brokerId": brokerId,
-                        "addOn": Date.now(),
-                        ...data, ...selectionData,
-                        "date": date
+                setloading(true)
+                try {
+                    if (forUpdate()) {
+                        const tradePayload = {
+                            "userId": user?._id,
+                            "tradeId": auth?.tradeObj?._id,
+                            "trade": { ...data, ...selectionData, "updateOn": Date.now(), "date": date }
+                        }
+                        await updateTradeFun(tradePayload)
+                    } else {
+                        const tradePayload = {
+                            "userId": user?._id,
+                            "trade": {
+                                "brokerId": brokerId,
+                                "addOn": Date.now(),
+                                ...data, ...selectionData,
+                                "date": date
+                            }
+                        }
+                        await addTradeFun(tradePayload)
                     }
+                } catch (e) {
+                    console.log(e)
                 }
-                await addTradeFun(tradePayload)
+                setloading(false)
             }
-        } catch (e) {
-            console.log(e)
-        }
-        setloading(false)
-        }
         }
     };
 
@@ -287,7 +310,6 @@ export const TradeProvider = ({ children }) => {
                                             <View>
                                                 {selectDate &&
                                                     <DateTimePicker
-
                                                         value={date}
                                                         mode='date'
                                                         display='calendar'
@@ -398,23 +420,89 @@ export const TradeProvider = ({ children }) => {
                                 />
                                 {errors.segment && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
 
-                                <Controller
-                                    control={control}
-                                    name="tradeType"
-                                    rules={{ required: true }}
+                                <View>
+                                    <Controller
+                                        control={control}
+                                        name="tradeType"
+                                        rules={{ required: true }}
 
-                                    render={({ field: { onChange, value } }) => (
-                                        <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Trade Type</Text>
-                                            <SelectInput
-                                                options={data?.tradeTypeList}
-                                                value={tradeType}
-                                                setValue={settradeType}
-                                            />
-                                        </View>
-                                    )}
-                                />
-                                {errors.tradeType && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                        render={({ field: { onChange, value } }) => (
+                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Trade Type</Text>
+                                                <SelectInput
+                                                    options={data?.tradeTypeList}
+                                                    value={tradeType}
+                                                    setValue={settradeType}
+                                                />
+                                            </View>
+                                        )}
+                                    />
+                                    {errors.tradeType && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+
+                                </View>
+
+                                {segment === "option" && <View>
+
+                                    <Controller
+                                        control={control}
+                                        name="strikePrice"
+                                        rules={{ required: true }}
+
+                                        render={({ field: { onChange, value } }) => (
+                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Entry Strike Price</Text>
+                                                <TextInput
+                                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
+                                                    onChangeText={onChange}
+                                                    keyboardType={"number-pad"}
+                                                    placeholderTextColor={"#ccd3db"}
+                                                    value={value?.toString()}
+                                                    placeholder="Entry Strike Price"
+                                                />
+                                            </View>
+                                        )}
+                                    />
+                                    {errors.strikePrice && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+
+                                    <Controller
+                                        control={control}
+                                        name="optionType"
+                                        rules={{ required: true }}
+                                        value={optionType}
+                                        render={({ field: { onChange, value } }) => (
+                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Option Type</Text>
+                                                <SelectInput
+                                                    options={optionTypeList}
+                                                    value={optionType}
+                                                    setValue={setoptionType}
+                                                />
+                                            </View>
+                                        )}
+                                    />
+                                    {errors.optionType && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                    <Controller
+                                        control={control}
+                                        name="tradeType"
+                                        rules={{ required: true }}
+
+                                        render={({ field: { onChange, value } }) => (
+                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Trade Type</Text>
+                                                <SelectInput
+                                                    options={data?.tradeTypeList}
+                                                    value={tradeType}
+                                                    setValue={settradeType}
+                                                />
+                                            </View>
+                                        )}
+                                    />
+                                    {errors.tradeType && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+
+                                </View>}
+
+
+
 
                                 <Controller
                                     control={control}
@@ -650,7 +738,7 @@ export const TradeProvider = ({ children }) => {
                                 filled={true}
                                 title={forUpdate() ? "Update" : "Submit"}
                                 onPress={handleSubmit(onSubmit)}
-                                
+
                             />
                         </View>
 

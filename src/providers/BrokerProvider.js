@@ -22,9 +22,9 @@ export const BrokerProvider = ({ children }) => {
     const [loading, setloading] = useState(true)
 
     const dispatch = useDispatch()
-    const { control, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: auth?.brokerObj });
-    
-    
+    const { control, handleSubmit, reset, getValues, formState: { errors } } = useForm({ defaultValues: auth?.brokerObj });
+
+
     const [brokerName, setbrokerName] = useState({
         "userId": user?._id,
         "id": "0",
@@ -56,7 +56,6 @@ export const BrokerProvider = ({ children }) => {
 
     }
     const updateBrokerFun = async (brokerPayload) => {
-        console.log(brokerPayload, "Update")
         const updateBroker = await BROKER_API.updateBroker(brokerPayload, user?.token)
 
         if (updateBroker?.status === 200) {
@@ -71,7 +70,6 @@ export const BrokerProvider = ({ children }) => {
 
         setloading(true)
         try {
-
 
             if (forUpdate()) {
                 const brokerPayload = {
@@ -190,7 +188,6 @@ export const BrokerProvider = ({ children }) => {
                                             </View>
                                         </View>
                                             :
-
                                             <View>
                                                 <Controller
                                                     control={control}
@@ -201,7 +198,6 @@ export const BrokerProvider = ({ children }) => {
                                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Broker  </Text>
                                                             <SelectObjInput
-
                                                                 options={data?.allBrokerList}
                                                                 label="Select broker"
                                                                 value={brokerName}
@@ -216,35 +212,34 @@ export const BrokerProvider = ({ children }) => {
                                     }
                                 </View>
 
+                                {getValues("amtWithdraw") && <View>
+                                    <Controller
+                                        control={control}
+                                        name="amtWithdraw"
+                                        rules={{ required: true }}
+                                        render={({ field: { onChange, value } }) => (
+                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}> Enter Withdrawn Amount</Text>
+                                                <TextInput
+                                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
+                                                    onChangeText={onChange}
+                                                    placeholderTextColor={"#636b75"}
+                                                    value={value?.toString()}
+                                                    placeholder={"Withdrawn Amount"}
+                                                    keyboardType="number-pad"
 
-                                <Controller
-                                    control={control}
-                                    name="amtWithdraw"
+                                                />
+                                            </View>
+                                        )}
+                                    />
+                                    {errors.amtWithdraw && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                </View>}
 
-                                    rules={{ required: true }}
-
-                                    render={({ field: { onChange, value } }) => (
-                                        <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}> Enter Withdrawn Amount</Text>
-
-                                            <TextInput
-                                                style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                                onChangeText={onChange}
-                                                placeholderTextColor={"#636b75"}
-                                                value={value?.toString()}
-                                                placeholder={"Withdrawn Amount"}
-                                                keyboardType="number-pad"
-
-                                            />
-                                        </View>
-                                    )}
-                                />
-                                {errors.amtWithdraw && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
 
                                 <Controller
                                     control={control}
                                     name="amtDeposit"
-                                    rules={{ required: true }}
+                                    rules={{ required: false }}
 
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>

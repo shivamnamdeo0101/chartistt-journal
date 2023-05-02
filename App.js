@@ -19,6 +19,7 @@ import { setActionList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux
 import { BROKER_API } from './src/service/BrokerService';
 import Loading from './src/components/Loading';
 import { setFilterObj } from './src/store/UserSlice';
+import notifee from '@notifee/react-native';
 
 const Container = () => {
 
@@ -26,25 +27,7 @@ const Container = () => {
   const userAuth = useSelector(state => state?.userAuth?.user)
   const data = useSelector(state => state?.data)
   const dispatch = useDispatch()
-
-
   const [brokerList, setbrokerList] = useState([])
-
-  // useEffect(() => {
-  //   if(data?.allBrokerList.length > 0){
-  //       dispatch(setDefaultBrokerObj(data?.allBrokerList[0]))
-
-
-  //       dispatch(setBrokerUpdateObj(data?.allBrokerList[0]))
-  //       dispatch(setFilterObj({
-  //         "userId": userAuth?._id,
-  //         "filterType": "a",
-  //       }))
-  //   }
-  // }, [])
-
-
-  
   const user = useSelector(state => state?.userAuth)
 
 
@@ -52,10 +35,7 @@ const Container = () => {
   useEffect(() => {
     const fetchData = async () => {
 
-      // await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
-      //   dispatch(setBrokerList(res?.data?.data))
-      // })
-
+     
       await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
         dispatch(setBrokerList(res?.data?.data))
       })
@@ -81,31 +61,12 @@ const Container = () => {
       await USER_API.getData("brokers").then((res) => {
         dispatch(setAllBrokerListRedux(res?.data?.data))
       })
-
-
-
-
-
-      // await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
-      //   let arr = res?.data?.data;
-      //   arr = arr.map(item => {
-      //     return {
-      //       _id: item._id,
-      //       label: item?.brokerName,
-      //       value: item?.brokerName
-      //     };
-
-      //   });
-      //   dispatch(setBrokerListRedux(arr))
-      // })
-
+   
 
     }
 
     fetchData()
   }, [user])
-
-
 
 
   return (
@@ -124,15 +85,74 @@ export const store = configureStore({
     }),
 })
 
+async function onDisplayNotification(e) {
+
+  // Request permissions (required for iOS)
+  await notifee.requestPermission()
+
+  // Create a channel (required for Android)
+  const channelId = await notifee.createChannel({
+    id: 'default',
+    name: 'Default Channel',
+  });
+
+  // Display a notification
+  await notifee.displayNotification({
+    title: e?.notification?.title,
+    body: e?.notification?.body,
+    android: {
+      channelId,
+      smallIcon: 'ic_launcher', // optional, defaults to 'ic_launcher'.
+      // pressAction is needed if you want the notification to open the app when pressed
+      pressAction: {
+        id: 'default',
+      },
+    },
+  });
+}
 
 function App() {
 
+
+
+  const getFCMToken = async () => {
+    try {
+      const token = await messaging().getToken();
+      console.log(token);
+    } catch (e) {
+      console.log(error);
+    }
+  };
+
+ 
   useEffect(() => {
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      //console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    getFCMToken();
+
+    messaging().onMessage(async remoteMessage => {
+      onDisplayNotification(remoteMessage)
+      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
     });
 
-    return unsubscribe;
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      onDisplayNotification(remoteMessage)
+      console.log('onNotificationOpenedApp: ', JSON.stringify(remoteMessage));
+    });
+
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          onDisplayNotification(remoteMessage)
+          console.log(
+            'Notification caused app to open from quit state:',
+            JSON.stringify(remoteMessage),
+          );
+        }
+      });
+    messaging().setBackgroundMessageHandler(async remoteMessage => {
+      onDisplayNotification(remoteMessage)
+      console.log('Message handled in the background!', remoteMessage);
+    });
   }, []);
 
   return (

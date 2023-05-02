@@ -14,6 +14,55 @@ export const USER_API = {
         data: payload,
       })
     },
+
+    userGetProfile:async function(userId,token){
+      const headers = {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+      return axios.request({
+        method: 'get',
+        url: `${EndPoint}private/profile/`+userId,
+        headers:headers
+      })
+    },
+
+    checkUserExists:async function(payload){
+      
+      return axios.request({
+        method: 'post',
+        url: `${EndPoint}private/user`,
+        headers:headers,
+        data:payload
+      })
+    },
+    
+
+    userUpdate:async function(payload){
+      var data = JSON.stringify(payload);
+      const headers = {
+        'Authorization': 'Bearer ' + payload?.token,
+        'Content-Type': 'application/json'
+      }
+      return axios.request({
+        method: 'post',
+        
+        url: `${EndPoint}auth/update-profile`,
+        data: payload,
+        headers: headers
+      })
+    },
+
+    userPhoneLogin:async function(payload){
+      
+      var data = JSON.stringify(payload);
+      return axios.request({
+        method: 'post',
+        url: `${EndPoint}auth/phone-auth`,
+        data: payload,
+       
+      })
+    },
     
   getAllNotifications: async function (token) {
     const headers = {

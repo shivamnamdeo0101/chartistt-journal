@@ -33,14 +33,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const user = useSelector(state => state?.userAuth?.user)
-
-
-
-
   const data = useSelector(state => state?.data)
-
-
-
   const auth = useSelector(state => state?.userAuth)
 
   const [loading, setloading] = useState(true)
@@ -71,6 +64,26 @@ const HomeScreen = ({ navigation }) => {
 
   }, [filterObj])
 
+  useEffect(() => {
+      if(auth?.user?.phoneNumber === null){
+        Alert.alert(
+          'Message',
+          'Update mobile number in profile',
+          [
+              {
+                  text: 'Cancel',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel'
+              },
+              {
+                  text: 'OK',
+                  onPress: () => navigation.navigate("Profile")
+              }
+          ]
+      );
+      }
+  }, [])
+  
 
 
   useEffect(() => {
