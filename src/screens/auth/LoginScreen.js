@@ -119,12 +119,21 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#1e294f", justifyContent: "center", alignItems: "center" }}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
+     
+
+     <View style={{alignItems:"center"}}>
+     <Image source={require("../../assets/clogo.png")} style={{ width: 300, height: 100,marginBottom:10 }} />
+     <Text style={{fontSize:18,color:"#ccc",fontWeight:"300",marginBottom:20}}>Say Hi to your trading journal</Text>
+     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
+        <View style={{ flexDirection: "row", alignItems: "center",marginBottom:10 }}>
           <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>CHARTISTT</Text>
           <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
         </View>
       </View>
+       
+     </View>
+     
+     
       {/* <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => navigation.navigate("PhoneAuth")}>
           <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
           <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with phone</Text>
