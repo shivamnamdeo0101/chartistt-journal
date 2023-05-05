@@ -10,6 +10,7 @@ import { setBrokerObj } from "../store/UserSlice";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SelectInput from "../components/SelectInput";
 import SelectObjInput from "../components/SelectObjInput";
+import { setBrokerList } from "../store/DataSlice";
 export const BrokerContext = createContext(false, () => { }, {});
 
 export const BrokerProvider = ({ children }) => {
@@ -31,6 +32,8 @@ export const BrokerProvider = ({ children }) => {
         "brokerName": "All",
         "iconLink": "https://ik.imagekit.io/lajz2ta7n/Brokers/ALL.png"
     })
+
+    const [otherBrokerName, setotherBrokerName] = useState("")
 
 
     useEffect(() => {
@@ -79,15 +82,35 @@ export const BrokerProvider = ({ children }) => {
                 }
                 await updateBrokerFun(brokerPayload)
             } else {
-                const brokerPayload = {
-                    "userId": user?._id,
-                    ...e, id: brokerName?.id,
-                    brokerName: brokerName?.label,
-                    iconLink: brokerName?.iconLink
+
+               console.log(brokerName)
+
+                let brokerPayload;
+                if (e?.otherBrokerName) {
+                    brokerPayload = {
+                        "userId": user?._id,
+                        id:Date.now(),
+                        brokerName: e?.otherBrokerName,
+                        iconLink:"null"
+                    }
+
+                    console.log(brokerPayload)
+
+                } else {
+                    brokerPayload = {
+                        "userId": user?._id,
+                        ...e, id: Date.now(),
+                        brokerName: brokerName?.label,
+                        iconLink: brokerName?.iconLink
+                    }
                 }
                 await addBrokerFun(brokerPayload)
             }
 
+
+            const brokerTempList = await BROKER_API.getAllBrokers(user?._id,user?.token)
+            dispatch(setBrokerList(brokerTempList?.data?.data))
+        
 
 
         } catch (e) {
@@ -189,30 +212,60 @@ export const BrokerProvider = ({ children }) => {
                                         </View>
                                             :
                                             <View>
-                                                <Controller
-                                                    control={control}
-                                                    name="brokerName"
+                                                <View>
+                                                    <Controller
+                                                        control={control}
+                                                        name="brokerName"
+                                                        value={brokerName}
+                                                        render={({ field: { onChange, value } }) => (
+                                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Broker  </Text>
+                                                                <SelectObjInput
+                                                                    options={data?.allBrokerList}
+                                                                    label="Select broker"
+                                                                    value={brokerName}
+                                                                    setValue={setbrokerName}
+                                                                />
+                                                            </View>
+                                                        )}
+                                                    />
+                                                    {errors.brokerName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
 
-                                                    value={brokerName}
-                                                    render={({ field: { onChange, value } }) => (
-                                                        <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                                            <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Broker  </Text>
-                                                            <SelectObjInput
-                                                                options={data?.allBrokerList}
-                                                                label="Select broker"
-                                                                value={brokerName}
-                                                                setValue={setbrokerName}
-                                                            />
-                                                        </View>
-                                                    )}
-                                                />
-                                                {errors.brokerName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+                                                </View>
+                                                
+
+                                                {
+                                                    brokerName?.value === "others" && <View>
+                                                        <Controller
+                                                            control={control}
+                                                            name="otherBrokerName"
+                                                            value={otherBrokerName}
+                                                            render={({ field: { onChange, value } }) => (
+                                                                <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                                    <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Enter Broker Name  </Text>
+                                                                    <TextInput
+                                                                        style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
+                                                                        onChangeText={onChange}
+                                                                        placeholderTextColor={"#636b75"}
+                                                                        value={value?.toString()}
+                                                                        placeholder={"Enter Other Broker Name"}
+                                                                    />
+                                                                </View>
+                                                            )}
+                                                        />
+                                                        {errors.otherBrokerName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+
+                                                    </View>
+                                                }
+
+
 
                                             </View>
                                     }
                                 </View>
 
-                                {forUpdate() === true ? <View>
+
+                                {forUpdate() && <View>
                                     <Controller
                                         control={control}
                                         name="amtWithdraw"

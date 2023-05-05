@@ -11,10 +11,11 @@ import { setTradeObj } from "../store/UserSlice";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SelectInput from "../components/SelectInput";
 import TradeForm from "../components/TradeForm";
+import SelectButton from "../components/SelectButton";
 
 
 const optionTypeList = [
-   
+
     {
         "label": "Put",
         "value": "put"
@@ -23,7 +24,7 @@ const optionTypeList = [
         "label": "Call",
         "value": "call"
     }
-   
+
 ]
 
 
@@ -354,6 +355,26 @@ export const TradeProvider = ({ children }) => {
                                 />
                                 {errors.tradeName && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
 
+                                <View>
+                                    <Controller
+                                        control={control}
+                                        name="tradeType"
+                                        rules={{ required: true }}
+
+                                        render={({ field: { onChange, value } }) => (
+                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Trade Type</Text>
+                                                <SelectInput
+                                                    options={data?.tradeTypeList}
+                                                    value={tradeType}
+                                                    setValue={settradeType}
+                                                />
+                                            </View>
+                                        )}
+                                    />
+                                    {errors.tradeType && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
+
+                                </View>
 
 
                                 <Controller
@@ -364,7 +385,7 @@ export const TradeProvider = ({ children }) => {
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Action</Text>
-                                            <SelectInput
+                                            <SelectButton
                                                 options={data?.actionList}
                                                 label="Select an option"
                                                 value={action}
@@ -420,26 +441,7 @@ export const TradeProvider = ({ children }) => {
                                 />
                                 {errors.segment && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
 
-                                <View>
-                                    <Controller
-                                        control={control}
-                                        name="tradeType"
-                                        rules={{ required: true }}
 
-                                        render={({ field: { onChange, value } }) => (
-                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Trade Type</Text>
-                                                <SelectInput
-                                                    options={data?.tradeTypeList}
-                                                    value={tradeType}
-                                                    setValue={settradeType}
-                                                />
-                                            </View>
-                                        )}
-                                    />
-                                    {errors.tradeType && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
-
-                                </View>
 
                                 {segment === "option" && <View>
 
@@ -472,7 +474,7 @@ export const TradeProvider = ({ children }) => {
                                         render={({ field: { onChange, value } }) => (
                                             <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                                 <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Option Type</Text>
-                                                <SelectInput
+                                                <SelectButton
                                                     options={optionTypeList}
                                                     value={optionType}
                                                     setValue={setoptionType}
@@ -481,23 +483,6 @@ export const TradeProvider = ({ children }) => {
                                         )}
                                     />
                                     {errors.optionType && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
-                                    <Controller
-                                        control={control}
-                                        name="tradeType"
-                                        rules={{ required: true }}
-
-                                        render={({ field: { onChange, value } }) => (
-                                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Trade Type</Text>
-                                                <SelectInput
-                                                    options={data?.tradeTypeList}
-                                                    value={tradeType}
-                                                    setValue={settradeType}
-                                                />
-                                            </View>
-                                        )}
-                                    />
-                                    {errors.tradeType && <Text style={{ paddingLeft: 16, color: "#975bd9" }}>This field is required</Text>}
 
                                 </View>}
 
@@ -667,7 +652,6 @@ export const TradeProvider = ({ children }) => {
                                     control={control}
                                     name="targetPoint"
                                     rules={{ required: true }}
-
                                     render={({ field: { onChange, value } }) => (
                                         <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
                                             <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Target Point</Text>
