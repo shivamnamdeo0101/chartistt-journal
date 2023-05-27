@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image, Alert, PermissionsAndroid } from 'react-native'
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect ,useContext} from 'react'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { setAuthSuccess, setUserDetails } from '../../store/UserSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,7 +37,7 @@ const LoginScreen = ({ navigation }) => {
     } catch (error) {
       Promise.reject(error);
     }
-  };
+};
 
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission();
@@ -54,7 +54,7 @@ const LoginScreen = ({ navigation }) => {
     checkAndroidPermission()
     subscribe()
   }, [])
-
+  
 
   const subscribe = async () => {
     await requestUserPermission()
@@ -79,8 +79,6 @@ const LoginScreen = ({ navigation }) => {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
 
-      console.log(userInfo?.user, "User")
-
       const payload = {
         "email": userInfo?.user?.email,
         "firstName": userInfo?.user?.givenName,
@@ -91,15 +89,15 @@ const LoginScreen = ({ navigation }) => {
       const login = await USER_API.userLogin(payload)
 
       console.log(login?.data?.data)
-
+      
       if (login?.status === 200) {
         dispatch(setUserDetails(login?.data?.data))
         dispatch(setAuthSuccess())
       }
 
 
-
-
+     
+    
       // Alert.alert(JSON.stringify("User", user))
 
     } catch (error) {
@@ -119,19 +117,21 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#1e294f", justifyContent: "center", alignItems: "center" }}>
-      <View style={{ alignItems: "center" }}>
-        <Image source={require("../../assets/clogo.png")} style={{ width: 300, height: 100, marginBottom: 10 }} />
-        <Text style={{ fontSize: 18, color: "#ccc", fontWeight: "300", marginBottom: 20 }}>Say Hi to your trading journal</Text>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-            <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>CHARTISTT</Text>
-            <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
-          </View>
+     
+
+     <View style={{alignItems:"center"}}>
+     <Image source={require("../../assets/clogo.png")} style={{ width: 300, height: 100,marginBottom:10 }} />
+     <Text style={{fontSize:18,color:"#ccc",fontWeight:"300",marginBottom:20}}>Say Hi to your trading journal</Text>
+     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
+        <View style={{ flexDirection: "row", alignItems: "center",marginBottom:10 }}>
+          <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>CHARTISTT</Text>
+          <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>JOURNAL</Text>
         </View>
-
       </View>
-
-
+       
+     </View>
+     
+     
       {/* <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#070f4a", padding: 10, borderRadius: 10 }} onPress={() => navigation.navigate("PhoneAuth")}>
           <Image source={require("../../assets/google.png")} style={{ width: 30, height: 30 }} />
           <Text style={{ color: "#ccc", fontSize: 18, marginLeft: 10, fontWeight: "500" }}>Continue with phone</Text>
