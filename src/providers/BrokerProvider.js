@@ -264,8 +264,7 @@ export const BrokerProvider = ({ children }) => {
                                     }
                                 </View>
 
-
-                                {forUpdate() && <View>
+                                {forUpdate() === true ? <View>
                                     <Controller
                                         control={control}
                                         name="amtWithdraw"
