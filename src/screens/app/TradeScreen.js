@@ -64,7 +64,21 @@ const TradeScreen = ({ navigation }) => {
         }
 
         fetchData()
-    }, [filterObj, refreshing, isOpen])
+    }, [filterObj, isOpen])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setloading(true)
+
+            const res = await TRADE_API.getAllTrades(filterObj, user?.token)
+            if (res?.status === 200) {
+                dispatch(setTradeList(res?.data?.data))
+                setloading(false)
+            }
+        }
+
+        fetchData()
+    }, [refreshing, isOpen])
 
 
 
@@ -75,10 +89,20 @@ const TradeScreen = ({ navigation }) => {
     }
 
 
+    console.log(filterObj)
 
     const toggleModal = () => {
-        if ((brokerObj?.brokerId === "" || brokerObj?.brokerId === null)) {
 
+        console.log(brokerObj?.brokerObj)
+
+        const len = Object.keys(brokerObj?.brokerObj)?.length
+        console.log(len)
+       
+        if (( len > 0)) {
+            setIsOpen(!isOpen);
+           
+        }else{
+            
             Alert.alert(
                 'Message',
                 'You need to add one default broker first ...',
@@ -99,13 +123,12 @@ const TradeScreen = ({ navigation }) => {
 
 
 
-        setIsOpen(!isOpen);
+        
     };
 
+    
 
     const RenderTradeList = ({ list }) => {
-
-
 
         return (
             <View>
@@ -152,7 +175,7 @@ const TradeScreen = ({ navigation }) => {
                     {/* <View style={{ flexDirection: "column", alignItems: "center" }}>
                         <Text style={{ color: "#fff", fontSize: 10 }}>Pull down To refresh...</Text>
                         <Ionicons name="refresh-circle-outline" color={"#fff"} size={10} />
-                    </View> */}
+                    </View> */} 
 
                     <AllBrokerComp value={filterObj} setValue={setfilterObj} />
 

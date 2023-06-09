@@ -34,7 +34,10 @@ export const TradeProvider = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const contextData = [isOpen, setIsOpen];
     const user = useSelector(state => state?.userAuth?.user)
-    const brokerId = useSelector(state => state?.data?.defaultBrokerObj?.id)
+    const brokerId = useSelector(state => state?.userAuth?.brokerObj?.id)
+
+
+
     const defaultBroker = useSelector(state => state?.data?.defaultBrokerObj)
     const [loading, setloading] = useState(true)
     const dispatch = useDispatch()
@@ -142,6 +145,7 @@ export const TradeProvider = ({ children }) => {
     };
 
 
+    console.log("BrokerId",brokerId)
 
     const selectionData = {
         "action": action,

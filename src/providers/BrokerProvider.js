@@ -35,7 +35,6 @@ export const BrokerProvider = ({ children }) => {
 
     const [otherBrokerName, setotherBrokerName] = useState("")
 
-
     useEffect(() => {
         if (Object.keys(auth?.brokerObj).length > 0) {
             reset(auth?.brokerObj);
@@ -68,9 +67,9 @@ export const BrokerProvider = ({ children }) => {
         }
     }
 
+
+
     const onSubmit = async (e) => {
-
-
         setloading(true)
         try {
 
@@ -83,7 +82,6 @@ export const BrokerProvider = ({ children }) => {
                 await updateBrokerFun(brokerPayload)
             } else {
 
-               console.log(brokerName)
 
                 let brokerPayload;
                 if (e?.otherBrokerName) {
@@ -160,7 +158,9 @@ export const BrokerProvider = ({ children }) => {
             const res = await BROKER_API.remBroker(payload, user?.token)
             if (res?.status === 200) {
                 cancelForm()
+                
                 Alert.alert("Broker Deleted")
+                
             }
         } catch (e) {
             console.log(e)

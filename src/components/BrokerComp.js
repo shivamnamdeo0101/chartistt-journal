@@ -17,10 +17,12 @@ const BrokerComp = ({item}) => {
         dispatch(setBrokerId(item?._id))
         dispatch(setDefaultBrokerObj(item))
     }
-    const makeDeault = ()=>{
+    const makeDeault = (item)=>{
         dispatch(setBrokerObj(item))    
         dispatch(setBrokerId(item?._id))
         dispatch(setDefaultBrokerObj(item))
+
+
     }
 
 

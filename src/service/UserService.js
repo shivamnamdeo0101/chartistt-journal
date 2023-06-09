@@ -7,7 +7,6 @@ const headers = {
 export const USER_API = {
 
     userLogin:async function(payload){
-      console.log(payload,"Payload")
       var data = JSON.stringify(payload);
       return axios.request({
         method: 'post',
