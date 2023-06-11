@@ -35,7 +35,6 @@ const Container = () => {
   useEffect(() => {
     const fetchData = async () => {
 
-     
       await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
         dispatch(setBrokerList(res?.data?.data))
       })
