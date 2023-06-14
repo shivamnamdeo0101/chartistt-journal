@@ -78,11 +78,11 @@ const TradeScreen = ({ navigation }) => {
         }
 
         fetchData()
-    }, [refreshing, isOpen])
+    }, [refreshing])
 
 
 
-    if (loading) {
+    if (refreshing) {
         return (
             <Loading />
         )

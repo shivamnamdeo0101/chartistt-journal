@@ -2,21 +2,23 @@ import { createSlice } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const initialState = {
 
-    confirm:null,
+    confirm: null,
     actionList: [],
     emotionList: [],
     tradeTypeList: [],
     segmentList: [],
     sessionList: [],
-    tradeList:[],
-    defaultBrokerObj:[],
-    brokerEdit:false,
-    brokerUpdateObj:{},
+    tradeList: [],
+    defaultBrokerObj: [],
+    brokerEdit: false,
+    brokerUpdateObj: {},
 
-    brokerList:[],
+    filterObjRedux: {},
+
+    brokerList: [],
     chartTimeFrameList: [],
-    allBrokerList:[],
-    brokerListRedux:[]
+    allBrokerList: [],
+    brokerListRedux: []
 };
 export const DataSlice = createSlice({
     name: 'data',
@@ -63,29 +65,34 @@ export const DataSlice = createSlice({
         },
 
 
-        setConfirm:(state, action) => {
+        setConfirm: (state, action) => {
             state.confirm = action.payload;
         },
 
-        setBrokerEdit:(state, action) => {
+        setBrokerEdit: (state, action) => {
             state.brokerEdit = action.payload;
         },
 
-        
+        setFilterObjRedux: (state, action) => {
+            state.filterObjRedux = action.payload;
+        },
 
-        
 
-        
+
+
+
+
 
 
         flushAuthData: (state) => {
             state.confirm = null;
+            state.filterObjRedux = {};
             state.defaultbrokerObj = [];
             state.brokerList = [];
             state.tradeList = [];
             state.actionList = [];
             state.allBrokerList = [];
-            state.brokerUpdateObj ={};
+            state.brokerUpdateObj = {};
             state.emotionList = [];
             state.tradeTypeList = [];
             state.segmentList = [];
@@ -99,6 +106,6 @@ export const DataSlice = createSlice({
 
     },
 });
-export const { setActionList,setBrokerList,setBrokerEdit, setConfirm,setTradeList,setBrokerUpdateObj, setAllBrokerListRedux,setDefaultBrokerObj, setBrokerListRedux, setChartTimeFrameList,setSegmentList,setSessionList,setTradeTypeList,setEmotionList, flushAuthData, } = DataSlice.actions;
+export const { setActionList, setFilterObjRedux, setBrokerList, setBrokerEdit, setConfirm, setTradeList, setBrokerUpdateObj, setAllBrokerListRedux, setDefaultBrokerObj, setBrokerListRedux, setChartTimeFrameList, setSegmentList, setSessionList, setTradeTypeList, setEmotionList, flushAuthData, } = DataSlice.actions;
 
 export default DataSlice.reducer;

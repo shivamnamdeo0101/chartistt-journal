@@ -15,7 +15,7 @@ import { BrokerProvider } from './src/providers/BrokerProvider';
 import messaging from '@react-native-firebase/messaging';
 import { DateModalProvider } from './src/providers/DateModalProvider';
 import { USER_API } from './src/service/UserService';
-import { setActionList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setSegmentList, setSessionList, setTradeTypeList } from './src/store/DataSlice';
+import { setActionList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setFilterObjRedux, setSegmentList, setSessionList, setTradeTypeList } from './src/store/DataSlice';
 import { BROKER_API } from './src/service/BrokerService';
 import Loading from './src/components/Loading';
 import { setFilterObj } from './src/store/UserSlice';
@@ -25,11 +25,22 @@ const Container = () => {
 
 
   const userAuth = useSelector(state => state?.userAuth?.user)
+
   const data = useSelector(state => state?.data)
   const dispatch = useDispatch()
   const [brokerList, setbrokerList] = useState([])
   const user = useSelector(state => state?.userAuth)
 
+  // useEffect(() => {
+   
+  //   dispatch(setFilterObjRedux({
+  //     "userId": userAuth?._id,
+  //     "filterType": "a",
+  //     "brokerId": "0"
+  //    }))
+
+  // }, [])
+  
 
 
   useEffect(() => {
@@ -57,6 +68,7 @@ const Container = () => {
       await USER_API.getData("charttimeframe").then((res) => {
         dispatch(setChartTimeFrameList(res?.data?.data))
       })
+
       await USER_API.getData("brokers").then((res) => {
         dispatch(setAllBrokerListRedux(res?.data?.data))
       })

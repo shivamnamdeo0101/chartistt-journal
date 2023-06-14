@@ -122,7 +122,7 @@ export const BrokerProvider = ({ children }) => {
         setBrokerModal(!isOpen)
         reset()
         dispatch(setBrokerEdit(false))
-        dispatch(setBrokerObj({}))
+        //dispatch(setBrokerObj({}))
 
     }
 

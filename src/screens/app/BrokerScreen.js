@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView ,RefreshControl} from 'react-native'
 import React, { useContext ,useState,useEffect} from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { BrokerContext } from '../../providers/BrokerProvider';
@@ -18,6 +18,14 @@ const BrokerScreen = ({ navigation }) => {
         setBrokerModal(!isOpen);
     };
 
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+    }, []);
     
     useEffect(() => {
       const fetchData = async ()=>{
@@ -30,9 +38,9 @@ const BrokerScreen = ({ navigation }) => {
 
       fetchData()
 
-    }, [brokerList])
+    }, [brokerList,refreshing])
 
-    if(loading){
+    if(loading || refreshing){
         return(
             <Loading />
         )
@@ -53,7 +61,11 @@ const BrokerScreen = ({ navigation }) => {
                         <Ionicons name="add-circle-sharp" color={"#717da8"} size={26} />
                     </TouchableOpacity>
                 </View>
-                <ScrollView>
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
+                >
                     <View style={{flex:1,marginBottom:100}}>
 
                    
