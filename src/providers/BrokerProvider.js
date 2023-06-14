@@ -10,12 +10,12 @@ import { setBrokerObj } from "../store/UserSlice";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SelectInput from "../components/SelectInput";
 import SelectObjInput from "../components/SelectObjInput";
-import { setBrokerList } from "../store/DataSlice";
+import { setBrokerEdit, setBrokerList } from "../store/DataSlice";
 export const BrokerContext = createContext(false, () => { }, {});
 
 export const BrokerProvider = ({ children }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const contextData = [isOpen, setIsOpen];
+    const [isOpen, setBrokerModal] = useState(false);
+    const contextData = [isOpen, setBrokerModal];
     const user = useSelector(state => state?.userAuth?.user)
     const auth = useSelector(state => state?.userAuth)
     const data = useSelector(state => state?.data)
@@ -32,6 +32,8 @@ export const BrokerProvider = ({ children }) => {
         "brokerName": "All",
         "iconLink": "https://ik.imagekit.io/lajz2ta7n/Brokers/ALL.png"
     })
+
+
 
     const [otherBrokerName, setotherBrokerName] = useState("")
 
@@ -50,7 +52,7 @@ export const BrokerProvider = ({ children }) => {
         const addBroker = await BROKER_API.addBroker(brokerPayload, user?.token)
 
         if (addBroker?.status === 200) {
-            setIsOpen(!isOpen);
+            setBrokerModal(!isOpen);
             reset()
             Alert.alert("Broker Added")
         }
@@ -61,7 +63,7 @@ export const BrokerProvider = ({ children }) => {
         const updateBroker = await BROKER_API.updateBroker(brokerPayload, user?.token)
 
         if (updateBroker?.status === 200) {
-            setIsOpen(!isOpen);
+            setBrokerModal(!isOpen);
             reset()
             Alert.alert("Broker Updated")
         }
@@ -80,9 +82,8 @@ export const BrokerProvider = ({ children }) => {
                     "broker": { ...e, brokerName: auth?.brokerObj?.brokerName, id: auth?.brokerObj?.id, iconLink: auth?.brokerObj?.iconLink }
                 }
                 await updateBrokerFun(brokerPayload)
+                dispatch(setBrokerEdit(false))
             } else {
-
-
                 let brokerPayload;
                 if (e?.otherBrokerName) {
                     brokerPayload = {
@@ -118,13 +119,15 @@ export const BrokerProvider = ({ children }) => {
     };
 
     const cancelForm = () => {
-        setIsOpen(!isOpen)
+        setBrokerModal(!isOpen)
         reset()
+        dispatch(setBrokerEdit(false))
         dispatch(setBrokerObj({}))
+
     }
 
     const forUpdate = () => {
-        if (Object.keys(auth?.brokerObj).length > 0) {
+        if (data?.brokerEdit) {
             return true
         } else {
             return false
@@ -169,7 +172,7 @@ export const BrokerProvider = ({ children }) => {
     }
 
 
-
+    console.log(forUpdate())
 
     return (
         <BrokerContext.Provider value={contextData}>
@@ -264,7 +267,6 @@ export const BrokerProvider = ({ children }) => {
                                     }
                                 </View>
 
-
                                 {forUpdate() && <View>
                                     <Controller
                                         control={control}
@@ -320,6 +322,7 @@ export const BrokerProvider = ({ children }) => {
                             <CustomButton
                                 filled={false}
                                 title={"Cancel"}
+
                                 onPress={() => cancelForm()}
                             />
                             <CustomButton

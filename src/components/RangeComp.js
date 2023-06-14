@@ -20,9 +20,6 @@ const RangeComp = ({ item }) => {
     const [isOpen, setIsOpen] = useContext(DateModalContext)
 
     const setDefault = async (item) => {
-       
-
-
         dispatch(setDefaultRange(item?.value))
         try {
             if (item?.value === "r") {
@@ -48,9 +45,6 @@ const RangeComp = ({ item }) => {
                 }))
             }
 
-           
-
-            
             const res = await TRADE_API.getAllTrades(auth?.filterObj, user?.token)
             if (res?.status === 200) {
                 setlist(res?.data?.data)

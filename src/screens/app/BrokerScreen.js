@@ -9,13 +9,13 @@ import { useSelector } from 'react-redux';
 import Loading from '../../components/Loading';
 
 const BrokerScreen = ({ navigation }) => {
-    const [isOpen, setIsOpen] = useContext(BrokerContext)
+    const [isOpen, setBrokerModal] = useContext(BrokerContext)
     const user = useSelector(state=>state?.userAuth?.user)
     const [brokerList, setbrokerList] = useState([])
     const [loading, setloading] = useState(true)
 
     const toggleModal = () => {
-        setIsOpen(!isOpen);
+        setBrokerModal(!isOpen);
     };
 
     

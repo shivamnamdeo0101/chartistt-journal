@@ -48,7 +48,6 @@ const HomeScreen = ({ navigation }) => {
     "brokerId": "0"
   })
 
-
   useEffect(() => {
 
     const fetchData = async () => {
@@ -65,25 +64,25 @@ const HomeScreen = ({ navigation }) => {
   }, [filterObj])
 
   useEffect(() => {
-      if(auth?.user?.phoneNumber === null){
-        Alert.alert(
-          'Message',
-          'Update mobile number in profile',
-          [
-              {
-                  text: 'Cancel',
-                  onPress: () => console.log('Cancel Pressed'),
-                  style: 'cancel'
-              },
-              {
-                  text: 'OK',
-                  onPress: () => navigation.navigate("Profile")
-              }
-          ]
+    if (auth?.user?.phoneNumber === null) {
+      Alert.alert(
+        'Message',
+        'Update mobile number in profile',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel'
+          },
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate("Profile")
+          }
+        ]
       );
-      }
+    }
   }, [])
-  
+
 
 
   useEffect(() => {
@@ -108,18 +107,18 @@ const HomeScreen = ({ navigation }) => {
   }
 
   const cnfmDownload = () =>
-  Alert.alert('Download PDF File', 'File will be saved in download folder in pdf format.', [
-    {
-      text: 'Cancel',
-      onPress: () => console.log('Cancel Pressed'),
-      style: 'cancel',
-    },
-    {text: 'OK', onPress: () => convertAndSaveDataToCSV()},
-  ]);
+    Alert.alert('Download PDF File', 'File will be saved in download folder in pdf format.', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      { text: 'OK', onPress: () => convertAndSaveDataToCSV() },
+    ]);
 
   function convertAndSaveDataToCSV() {
-   
-    if(data?.tradeList?.length === 0){
+
+    if (data?.tradeList?.length === 0) {
       Alert.alert("You need to add one trade...")
       return
     }
@@ -167,7 +166,7 @@ const HomeScreen = ({ navigation }) => {
     fetchData()
 
 
-  }, [brokerList,isOpen])
+  }, [brokerList, isOpen])
 
 
 
@@ -200,6 +199,36 @@ const HomeScreen = ({ navigation }) => {
 
     return parseFloat(riskAndReward).toFixed(2);
   }
+
+
+
+  ///Total Fund
+
+  const getSumOfArrayOfAmtDeposit = (e) => {
+    const sum = e.reduce((accumulator, item) => accumulator + item?.amtDeposit, 0);
+    return sum
+  }
+
+  
+  const getTotalFund = () => {
+    if (filterObj?.brokerId == "0") {
+      return parseFloat(getSumOfArrayOfAmtDeposit(brokerList)).toFixed(2)
+    } else {
+      const index = filterObj?.brokerId;
+      const temp = brokerList.find(item => item?.id === filterObj?.brokerId);
+      
+      return parseFloat(getSumOfArrayOfAmtDeposit([temp])).toFixed(2);
+    }
+  }
+
+  //Total Return
+  const getTotalReturn = () => {
+    const totalFund = parseFloat(getTotalFund());
+    const pAndL = parseFloat(getData()["pAndL"]);
+    const sum = (totalFund + pAndL).toFixed(2);
+    return sum
+  }
+
 
   const getData = () => {
 
@@ -248,7 +277,7 @@ const HomeScreen = ({ navigation }) => {
 
 
       if (temp < 0) {
-        l++;
+        l++
         lAmt += temp;
       } else {
         p++;
@@ -277,12 +306,14 @@ const HomeScreen = ({ navigation }) => {
     let avgL = lAmt / l;
 
     if (avgL === 0) {
-      avgL = 1
+      avgL = 0
     }
     if (avgP === 0) {
-      avgP = 1
+      avgP = 0
     }
 
+    const tfAmtVal = getTotalFund()
+    const trAmtVal = parseFloat(tfAmtVal) + parseFloat(pAndL);
 
 
     pAndL = parseFloat(pAmt + lAmt).toFixed(2)
@@ -294,9 +325,9 @@ const HomeScreen = ({ navigation }) => {
 
     riskAndReward = parseFloat(riskRewardAll / list?.length).toFixed(2)
 
-    rateOfreturn = tr === 0 ? 0 : (parseFloat((tr - tf) / (tr)) * 100).toFixed(2);
+    rateOfreturn = !(tfAmtVal > 0) ? 0 : (parseFloat((trAmtVal - tfAmtVal) / (tfAmtVal)) * 100).toFixed(2);
 
-
+    console.log(trAmtVal)
 
     return {
       "pAndL": checkNum(pAndL),
@@ -304,15 +335,14 @@ const HomeScreen = ({ navigation }) => {
       "avgL": checkNum(avgL),
       "winLoss": checkNumber(winLoss),
       "riskReward": checkNum(riskAndReward),
-      "tf": checkNumber(tf),
-      "tr": checkNumber(tr),
+      "tf": checkNumber(tfAmtVal),
+      "tr": checkNumber(trAmtVal),
       "rateOfreturn": rateOfreturn
     }
   }
 
   function checkNum(num) {
     if (!Number.isFinite(num)) {
-
       return num;
     } else {
       return 0;
@@ -389,7 +419,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={{ flex: 1, backgroundColor: "#1e294f" }}>
 
-     
+
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
         <Image source={{ uri: "https://ik.imagekit.io/lajz2ta7n/LOGO/chartistt.png" }} style={{ height: 38, width: 38, borderRadius: 19 }} />
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -404,63 +434,63 @@ const HomeScreen = ({ navigation }) => {
       </View>
 
 
-    <ScrollView>
+      <ScrollView>
 
-      <View style={{ backgroundColor: "#070f4a", flexDirection: "row", alignItems: "center", justifyContent: "space-around", padding: 14, margin: 14, borderRadius: 14 }}>
+        <View style={{ backgroundColor: "#070f4a", flexDirection: "row", alignItems: "center", justifyContent: "space-around", padding: 14, margin: 14, borderRadius: 14 }}>
 
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <Entypo name="wallet" color={"#717da8"} size={26} />
-          <View style={{ marginLeft: 10 }}>
-            <Text style={{ color: "#fff" }}>Total Fund</Text>
-            <Text style={{ color: "#ccc" }}>{getData()["tf"]}</Text>
-          </View>
-        </View>
-
-        <View style={{ borderRightColor: "#ccc", borderRightWidth: 1, height: 20, width: 3 }}>
-
-        </View>
-
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <FontAwesome5 name="money-check-alt" color={"#717da8"} size={26} />
-          <View style={{ marginLeft: 10 }}>
-            <Text style={{ color: "#fff" }}>Total Return</Text>
-            <Text style={{ color: "#ccc" }}>{getData()["tr"]}</Text>
-          </View>
-        </View>
-
-      </View>
-
-
-
-
-      <View style={{margin: 10, padding: 10, marginTop: 0 }}>
-        <ScrollView>
-
-          <AllBrokerComp value={filterObj} setValue={setfilterObj} />
-          <FilterComp value={filterObj} setValue={setfilterObj} />
-
-
-
-
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-              <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>OVERVIEW</Text>
-              {/* <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>TRADES</Text> */}
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <Entypo name="wallet" color={"#717da8"} size={26} />
+            <View style={{ marginLeft: 10 }}>
+              <Text style={{ color: "#fff" }}>Total Fund</Text>
+              <Text style={{ color: "#ccc" }}>{getTotalFund()}</Text>
             </View>
-            {/* <Text style={{ color: "#717da8" }}>View More</Text> */}
           </View>
 
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            {
-              overView?.map((item, index) => {
-                return (
-                  <DashComp key={index} item={item} />
-                )
-              })
-            }
+          <View style={{ borderRightColor: "#ccc", borderRightWidth: 1, height: 20, width: 3 }}>
+
           </View>
-        </ScrollView>
-      </View>
+
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <FontAwesome5 name="money-check-alt" color={"#717da8"} size={26} />
+            <View style={{ marginLeft: 10 }}>
+              <Text style={{ color: "#fff" }}>Total Return</Text>
+              <Text style={{ color: "#ccc" }}>{getTotalReturn()}</Text>
+            </View>
+          </View>
+
+        </View>
+
+
+
+
+        <View style={{ margin: 10, padding: 10, marginTop: 0 }}>
+          <ScrollView>
+
+            <AllBrokerComp value={filterObj} setValue={setfilterObj} />
+            <FilterComp value={filterObj} setValue={setfilterObj} />
+
+
+
+
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+                <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>OVERVIEW</Text>
+                {/* <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>TRADES</Text> */}
+              </View>
+              {/* <Text style={{ color: "#717da8" }}>View More</Text> */}
+            </View>
+
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              {
+                overView?.map((item, index) => {
+                  return (
+                    <DashComp key={index} item={item} />
+                  )
+                })
+              }
+            </View>
+          </ScrollView>
+        </View>
 
       </ScrollView>
 

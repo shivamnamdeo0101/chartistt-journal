@@ -25,6 +25,7 @@ const AllBrokerComp = ({ value, setValue }) => {
 
     return (
         <View style={{ margin: 5 }}>
+            <Text style={{ margin: 4, fontWeight: "500", color: "#fff", fontSize: 16 }}>FILTER BY</Text>
             <ScrollView horizontal={true}>
 
                 <TouchableOpacity onPress={() => setDeafult({

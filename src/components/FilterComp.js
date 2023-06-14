@@ -51,7 +51,9 @@ const FilterComp = ({ value, setValue }) => {
   }
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" ,marginLeft:4}}>
+      <View>
+      
       <ScrollView horizontal={true}>
         {
           rangeList?.map((item, index) => {
@@ -63,6 +65,8 @@ const FilterComp = ({ value, setValue }) => {
           })
         }
       </ScrollView>
+      </View>
+    
     </View>
   )
 }

@@ -3,7 +3,7 @@ import React ,{useContext}from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setBrokerId, setBrokerObj } from '../store/UserSlice'
 import { BrokerContext } from '../providers/BrokerProvider'
-import { setDefaultBrokerObj } from '../store/DataSlice'
+import { setBrokerEdit, setDefaultBrokerObj } from '../store/DataSlice'
 
 const BrokerComp = ({item}) => {
     const dispatch = useDispatch()
@@ -12,6 +12,7 @@ const BrokerComp = ({item}) => {
     const setBrokerIdFun = (item)=>{
         
         setIsOpen(!isOpen)
+        dispatch(setBrokerEdit(true))
         //Alert.alert("Default Broker Selected")
         dispatch(setBrokerObj(item))    
         dispatch(setBrokerId(item?._id))
@@ -21,8 +22,6 @@ const BrokerComp = ({item}) => {
         dispatch(setBrokerObj(item))    
         dispatch(setBrokerId(item?._id))
         dispatch(setDefaultBrokerObj(item))
-
-
     }
 
 

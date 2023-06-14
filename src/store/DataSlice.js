@@ -10,7 +10,7 @@ const initialState = {
     sessionList: [],
     tradeList:[],
     defaultBrokerObj:[],
-
+    brokerEdit:false,
     brokerUpdateObj:{},
 
     brokerList:[],
@@ -67,6 +67,9 @@ export const DataSlice = createSlice({
             state.confirm = action.payload;
         },
 
+        setBrokerEdit:(state, action) => {
+            state.brokerEdit = action.payload;
+        },
 
         
 
@@ -89,12 +92,13 @@ export const DataSlice = createSlice({
             state.sessionList = [];
             state.chartTimeFrameList = [];
             state.brokerListRedux = [];
+            state.brokerEdit = false;
             AsyncStorage.clear();
 
         }
 
     },
 });
-export const { setActionList,setBrokerList, setConfirm,setTradeList,setBrokerUpdateObj, setAllBrokerListRedux,setDefaultBrokerObj, setBrokerListRedux, setChartTimeFrameList,setSegmentList,setSessionList,setTradeTypeList,setEmotionList, flushAuthData, } = DataSlice.actions;
+export const { setActionList,setBrokerList,setBrokerEdit, setConfirm,setTradeList,setBrokerUpdateObj, setAllBrokerListRedux,setDefaultBrokerObj, setBrokerListRedux, setChartTimeFrameList,setSegmentList,setSessionList,setTradeTypeList,setEmotionList, flushAuthData, } = DataSlice.actions;
 
 export default DataSlice.reducer;
