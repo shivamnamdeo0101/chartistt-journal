@@ -14,13 +14,15 @@ import { setBrokerEdit, setBrokerList } from "../store/DataSlice";
 export const BrokerContext = createContext(false, () => { }, {});
 
 export const BrokerProvider = ({ children }) => {
-    const [isOpen, setBrokerModal] = useState(false);
-    const contextData = [isOpen, setBrokerModal];
+    const [isOpen, setIsOpen] = useState(false);
+    const contextData = [isOpen, setIsOpen];
     const user = useSelector(state => state?.userAuth?.user)
     const auth = useSelector(state => state?.userAuth)
     const data = useSelector(state => state?.data)
 
     const [loading, setloading] = useState(true)
+
+
 
     const dispatch = useDispatch()
     const { control, handleSubmit, reset, getValues, formState: { errors } } = useForm({ defaultValues: auth?.brokerObj });
@@ -32,8 +34,6 @@ export const BrokerProvider = ({ children }) => {
         "brokerName": "All",
         "iconLink": "https://ik.imagekit.io/lajz2ta7n/Brokers/ALL.png"
     })
-
-
 
     const [otherBrokerName, setotherBrokerName] = useState("")
 
@@ -49,11 +49,12 @@ export const BrokerProvider = ({ children }) => {
 
 
     const addBrokerFun = async (brokerPayload) => {
+        
         const addBroker = await BROKER_API.addBroker(brokerPayload, user?.token)
 
         if (addBroker?.status === 200) {
-            setBrokerModal(!isOpen);
-            reset()
+            setIsOpen(!isOpen);
+           
             Alert.alert("Broker Added")
         }
 
@@ -63,53 +64,26 @@ export const BrokerProvider = ({ children }) => {
         const updateBroker = await BROKER_API.updateBroker(brokerPayload, user?.token)
 
         if (updateBroker?.status === 200) {
-            setBrokerModal(!isOpen);
+            setIsOpen(!isOpen);
             reset()
             Alert.alert("Broker Updated")
         }
     }
 
-
-
+ 
     const onSubmit = async (e) => {
+
         setloading(true)
         try {
 
-            if (forUpdate()) {
+                dispatch(setBrokerEdit(true))
                 const brokerPayload = {
                     "userId": user?._id,
                     "brokerId": auth?.brokerObj?._id,
                     "broker": { ...e, brokerName: auth?.brokerObj?.brokerName, id: auth?.brokerObj?.id, iconLink: auth?.brokerObj?.iconLink }
                 }
                 await updateBrokerFun(brokerPayload)
-                dispatch(setBrokerEdit(false))
-            } else {
-                let brokerPayload;
-                if (e?.otherBrokerName) {
-                    brokerPayload = {
-                        "userId": user?._id,
-                        id:Date.now(),
-                        brokerName: e?.otherBrokerName,
-                        iconLink:"null"
-                    }
-
-                    console.log(brokerPayload)
-
-                } else {
-                    brokerPayload = {
-                        "userId": user?._id,
-                        ...e, id: Date.now(),
-                        brokerName: brokerName?.label,
-                        iconLink: brokerName?.iconLink
-                    }
-                }
-                await addBrokerFun(brokerPayload)
-            }
-
-
-            const brokerTempList = await BROKER_API.getAllBrokers(user?._id,user?.token)
-            dispatch(setBrokerList(brokerTempList?.data?.data))
-        
+            
 
 
         } catch (e) {
@@ -119,11 +93,10 @@ export const BrokerProvider = ({ children }) => {
     };
 
     const cancelForm = () => {
-        setBrokerModal(!isOpen)
+        setIsOpen(!isOpen)
         reset()
-        dispatch(setBrokerEdit(false))
         //dispatch(setBrokerObj({}))
-
+        dispatch(setBrokerEdit(false))
     }
 
     const forUpdate = () => {
@@ -159,12 +132,18 @@ export const BrokerProvider = ({ children }) => {
         }
         try {
             const res = await BROKER_API.remBroker(payload, user?.token)
+
+            console.log(res?.data)
+
             if (res?.status === 200) {
                 cancelForm()
-                
+
+                // const res = await BROKER_API.getAllBrokers(user?._id, user?.token)
+                // dispatch(setBrokerList(res?.data?.data))
                 Alert.alert("Broker Deleted")
-                
             }
+
+
         } catch (e) {
             console.log(e)
         }
@@ -172,7 +151,7 @@ export const BrokerProvider = ({ children }) => {
     }
 
 
-    console.log(forUpdate())
+
 
     return (
         <BrokerContext.Provider value={contextData}>
@@ -267,6 +246,7 @@ export const BrokerProvider = ({ children }) => {
                                     }
                                 </View>
 
+
                                 {forUpdate() && <View>
                                     <Controller
                                         control={control}
@@ -322,7 +302,6 @@ export const BrokerProvider = ({ children }) => {
                             <CustomButton
                                 filled={false}
                                 title={"Cancel"}
-
                                 onPress={() => cancelForm()}
                             />
                             <CustomButton

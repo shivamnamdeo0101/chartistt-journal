@@ -145,8 +145,6 @@ export const TradeProvider = ({ children }) => {
     };
 
 
-    console.log("BrokerId",brokerId)
-
     const selectionData = {
         "action": action,
         "segment": segment,

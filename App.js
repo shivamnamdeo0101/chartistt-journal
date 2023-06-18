@@ -20,6 +20,7 @@ import { BROKER_API } from './src/service/BrokerService';
 import Loading from './src/components/Loading';
 import { setFilterObj } from './src/store/UserSlice';
 import notifee from '@notifee/react-native';
+import { AddBrokerProvider } from './src/providers/AddBrokerProvider';
 
 const Container = () => {
 
@@ -169,6 +170,7 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistStore(store)}>
+        <AddBrokerProvider>
         <BrokerProvider>
           <DateModalProvider>
             <TradeProvider>
@@ -178,7 +180,7 @@ function App() {
             </TradeProvider>
           </DateModalProvider>
         </BrokerProvider>
-
+        </AddBrokerProvider>
       </PersistGate>
     </Provider >
   )

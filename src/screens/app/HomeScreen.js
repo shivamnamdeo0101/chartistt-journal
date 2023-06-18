@@ -166,7 +166,7 @@ const HomeScreen = ({ navigation }) => {
     fetchData()
 
 
-  }, [brokerList, isOpen])
+  }, [brokerList, isOpen,loading])
 
 
 
@@ -299,7 +299,7 @@ const HomeScreen = ({ navigation }) => {
       p = 1
     }
     if (pAmt === 0) {
-      pAmt = 1
+      pAmt = 0
     }
 
     let avgP = pAmt / p;
@@ -327,7 +327,6 @@ const HomeScreen = ({ navigation }) => {
 
     rateOfreturn = !(tfAmtVal > 0) ? 0 : (parseFloat((trAmtVal - tfAmtVal) / (tfAmtVal)) * 100).toFixed(2);
 
-    console.log(trAmtVal)
 
     return {
       "pAndL": checkNum(pAndL),
@@ -466,7 +465,7 @@ const HomeScreen = ({ navigation }) => {
         <View style={{ margin: 10, padding: 10, marginTop: 0 }}>
           <ScrollView>
 
-            <AllBrokerComp value={filterObj} setValue={setfilterObj} />
+          <AllBrokerComp value={filterObj} setValue={setfilterObj} />
             <FilterComp value={filterObj} setValue={setfilterObj} />
 
 

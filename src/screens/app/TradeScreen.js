@@ -87,17 +87,10 @@ const TradeScreen = ({ navigation }) => {
             <Loading />
         )
     }
-
-
-    console.log(filterObj)
-
+    
     const toggleModal = () => {
 
-        console.log(brokerObj?.brokerObj)
-
         const len = Object.keys(brokerObj?.brokerObj)?.length
-        console.log(len)
-       
         if (( len > 0)) {
             setIsOpen(!isOpen);
            

@@ -5,17 +5,24 @@ import { BrokerContext } from '../../providers/BrokerProvider';
 import TradeComp from '../../components/TradeComp';
 import BrokerComp from '../../components/BrokerComp';
 import { BROKER_API } from '../../service/BrokerService';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../../components/Loading';
+import { AddBrokerContext } from '../../providers/AddBrokerProvider';
+import { setBrokerEdit } from '../../store/DataSlice';
 
 const BrokerScreen = ({ navigation }) => {
     const [isOpen, setBrokerModal] = useContext(BrokerContext)
+    const [addBrokerOpen, setAddBrokerOpen] = useContext(AddBrokerContext)
+    const dispatch = useDispatch()
     const user = useSelector(state=>state?.userAuth?.user)
+    const data = useSelector(state=>state?.data)
+
     const [brokerList, setbrokerList] = useState([])
-    const [loading, setloading] = useState(true)
+    const [loading, setloading] = useState(false)
 
     const toggleModal = () => {
-        setBrokerModal(!isOpen);
+        dispatch(setBrokerEdit(false))
+        setAddBrokerOpen(!addBrokerOpen);
     };
 
     const [refreshing, setRefreshing] = React.useState(false);
@@ -38,7 +45,7 @@ const BrokerScreen = ({ navigation }) => {
 
       fetchData()
 
-    }, [brokerList,refreshing])
+    }, [brokerList,refreshing,loading])
 
     if(loading || refreshing){
         return(
