@@ -7,15 +7,16 @@ import BrokerComp from '../../components/BrokerComp';
 import { BROKER_API } from '../../service/BrokerService';
 import { useSelector } from 'react-redux';
 import Loading from '../../components/Loading';
+import { AddBrokerContext } from '../../providers/AddBrokerProvider';
 
 const BrokerScreen = ({ navigation }) => {
-    const [isOpen, setBrokerModal] = useContext(BrokerContext)
+    const [addBrokerModal, setAddBrokerModal] = useContext(AddBrokerContext)
     const user = useSelector(state=>state?.userAuth?.user)
     const [brokerList, setbrokerList] = useState([])
     const [loading, setloading] = useState(true)
 
     const toggleModal = () => {
-        setBrokerModal(!isOpen);
+        setAddBrokerModal(!addBrokerModal);
     };
 
     const [refreshing, setRefreshing] = React.useState(false);

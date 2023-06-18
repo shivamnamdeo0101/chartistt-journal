@@ -93,12 +93,10 @@ const TradeScreen = ({ navigation }) => {
 
     const toggleModal = () => {
 
-        console.log(brokerObj?.brokerObj)
-
-        const len = Object.keys(brokerObj?.brokerObj)?.length
-        console.log(len)
+        // const len = Object.keys(brokerObj?.brokerObj)?.length
+        // console.log(len)
        
-        if (( len > 0)) {
+        if (auth?.brokerId) {
             setIsOpen(!isOpen);
            
         }else{

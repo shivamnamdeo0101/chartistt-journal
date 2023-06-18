@@ -6,7 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Picker } from '@react-native-picker/picker';
 import CustomButton from "../components/CustomButton";
 import { BROKER_API } from "../service/BrokerService";
-import { setBrokerObj } from "../store/UserSlice";
+import { setBrokerId, setBrokerObj } from "../store/UserSlice";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SelectInput from "../components/SelectInput";
 import SelectObjInput from "../components/SelectObjInput";
@@ -23,7 +23,7 @@ export const BrokerProvider = ({ children }) => {
     const [loading, setloading] = useState(true)
 
     const dispatch = useDispatch()
-    const { control, handleSubmit, reset, getValues, formState: { errors } } = useForm({ defaultValues: auth?.brokerObj });
+    const { control, handleSubmit, reset, getValues, formState: { errors } } = useForm({ defaultValues: data?.defaultBrokerObj });
 
 
     const [brokerName, setbrokerName] = useState({
@@ -161,7 +161,8 @@ export const BrokerProvider = ({ children }) => {
             const res = await BROKER_API.remBroker(payload, user?.token)
             if (res?.status === 200) {
                 cancelForm()
-                
+                dispatch(setBrokerObj({}))
+                dispatch(setBrokerId(""))
                 Alert.alert("Broker Deleted")
                 
             }

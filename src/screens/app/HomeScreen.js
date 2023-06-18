@@ -1,5 +1,7 @@
-import { View, Text, Image, StyleSheet, ScrollView, Alert } from 'react-native'
+import { View, Text, Image, StyleSheet, ScrollView, Alert ,Linking} from 'react-native'
 import React, { useEffect, useContext, useState } from 'react'
+import NetInfo from '@react-native-community/netinfo';
+
 import { TouchableOpacity } from 'react-native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +18,6 @@ import RangeComp from '../../components/RangeComp';
 import FilterComp from '../../components/FilterComp';
 import { setTradeList } from '../../store/DataSlice';
 import { setFilterObj } from '../../store/UserSlice';
-
 import RNFS from 'react-native-fs';
 import { PermissionsAndroid } from 'react-native';
 import moment from 'moment';
@@ -47,7 +48,24 @@ const HomeScreen = ({ navigation }) => {
     "filterType": "a",
     "brokerId": "0"
   })
-
+ 
+  const [conn, setConn] = useState(true)
+    useEffect(() => {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+        if (!state.isConnected) {
+          setConn(true)
+         
+        }else{
+          setConn(false)
+        }
+      });
+    
+      return () => {
+        unsubscribe();
+      };
+    }, [conn]);
+    
+  
   useEffect(() => {
 
     const fetchData = async () => {
@@ -61,7 +79,7 @@ const HomeScreen = ({ navigation }) => {
     }
     fetchData()
 
-  }, [filterObj])
+  }, [filterObj,conn])
 
   useEffect(() => {
     if (auth?.user?.phoneNumber === null) {

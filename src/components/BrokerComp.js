@@ -9,13 +9,15 @@ const BrokerComp = ({item}) => {
     const dispatch = useDispatch()
     const [isOpen, setIsOpen] = useContext(BrokerContext)
     const brokerId = useSelector(state=>state?.userAuth?.brokerId)
+    const brokerObj = useSelector(state=>state?.userAuth?.brokerObj)
+
     const setBrokerIdFun = (item)=>{
         
         setIsOpen(!isOpen)
         dispatch(setBrokerEdit(true))
         //Alert.alert("Default Broker Selected")
         dispatch(setBrokerObj(item))    
-        dispatch(setBrokerId(item?._id))
+        // dispatch(setBrokerId(item?._id))
         dispatch(setDefaultBrokerObj(item))
     }
     const makeDeault = (item)=>{
@@ -29,7 +31,7 @@ const BrokerComp = ({item}) => {
         <View  >
             
             
-            <TouchableOpacity  style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between" , backgroundColor: "#070f4a", padding: 16, margin: 10,marginBottom:0, borderTopLeftRadius:10,borderTopRightRadius:10, borderWidth: 2, borderColor: brokerId === item?._id ? "#975bd9" : "#070f4a" }} >
+            <TouchableOpacity  style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between" , backgroundColor: "#070f4a", padding: 16, margin: 10,marginBottom:0, borderTopLeftRadius:10,borderTopRightRadius:10, borderWidth: 2, borderColor:brokerId === item?._id ? "#975bd9" : "#070f4a" }} >
                 <View>
                     <Text style={styles.title}>Broker</Text>
                     <Text style={styles.text}>{item?.brokerName}</Text>
