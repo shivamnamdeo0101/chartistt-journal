@@ -317,7 +317,7 @@ const HomeScreen = ({ navigation }) => {
       p = 1
     }
     if (pAmt === 0) {
-      pAmt = 1
+      pAmt = 0
     }
 
     let avgP = pAmt / p;
