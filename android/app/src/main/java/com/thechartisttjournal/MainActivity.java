@@ -1,4 +1,4 @@
-package com.chartistt_journal;
+package com.thechartisttjournal;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -13,7 +13,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "chartistt_journal";
+    return "Chartistt Journal";
   }
 
   /**

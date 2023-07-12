@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "chartistt_journal.app"
-               BlueprintName = "chartistt_journal"
-               ReferencedContainer = "container:chartistt_journal.xcodeproj">
+               BuildableName = "ChartisttJournal.app"
+               BlueprintName = "ChartisttJournal"
+               ReferencedContainer = "container:ChartisttJournal.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "chartistt_journalTests.xctest"
-               BlueprintName = "chartistt_journalTests"
-               ReferencedContainer = "container:chartistt_journal.xcodeproj">
+               BuildableName = "ChartisttJournalTests.xctest"
+               BlueprintName = "ChartisttJournalTests"
+               ReferencedContainer = "container:ChartisttJournal.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "chartistt_journal.app"
-            BlueprintName = "chartistt_journal"
-            ReferencedContainer = "container:chartistt_journal.xcodeproj">
+            BuildableName = "ChartisttJournal.app"
+            BlueprintName = "ChartisttJournal"
+            ReferencedContainer = "container:ChartisttJournal.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "chartistt_journal.app"
-            BlueprintName = "chartistt_journal"
-            ReferencedContainer = "container:chartistt_journal.xcodeproj">
+            BuildableName = "ChartisttJournal.app"
+            BlueprintName = "ChartisttJournal"
+            ReferencedContainer = "container:ChartisttJournal.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
