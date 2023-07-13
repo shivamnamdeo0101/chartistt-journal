@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "102910788936-bhk1ufhpstmg12h52660cnset9inip0p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "b9f4bf183ebe3abb3dcd587a51fd2cfa8a4c8c84"
+          }
+        },
+        {
           "client_id": "102910788936-q2pmcni88msj25p85j9h47hf4086p79i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -22,7 +30,15 @@
           }
         },
         {
-          "client_id": "102910788936-pbn3gh17nfhghc3c33la09221ca29f12.apps.googleusercontent.com",
+          "client_id": "102910788936-s230mgmtd58r4ep6o1mo9367ip5lvr8k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "5c6df4f12fc851709091aa024d5ee93263ce8925"
+          }
+        },
+        {
+          "client_id": "102910788936-mmsc8n09o9o8b5kllp6vuiqqe4o74hjt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -35,7 +51,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "102910788936-pbn3gh17nfhghc3c33la09221ca29f12.apps.googleusercontent.com",
+              "client_id": "102910788936-mmsc8n09o9o8b5kllp6vuiqqe4o74hjt.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
