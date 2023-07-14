@@ -21,6 +21,7 @@ import Loading from './src/components/Loading';
 import { setFilterObj } from './src/store/UserSlice';
 import notifee from '@notifee/react-native';
 import { AddBrokerProvider } from './src/providers/AddBrokerProvider';
+import VersionCheck from 'react-native-version-check';
 
 const Container = () => {
 
@@ -32,8 +33,23 @@ const Container = () => {
   const [brokerList, setbrokerList] = useState([])
   const user = useSelector(state => state?.userAuth)
 
+  useEffect(() => {
+    const checkpdate = () => {
+      VersionCheck.needUpdate()
+        .then(async res => {
+          console.log(res?.isNeeded);    // true
+          if (res?.isNeeded) {
+            Linking.openURL(res.storeUrl);  // open store if update is needed.
+          }
+        });
+    }
+
+    checkpdate()
+  }, [])
+
+
   // useEffect(() => {
-   
+
   //   dispatch(setFilterObjRedux({
   //     "userId": userAuth?._id,
   //     "filterType": "a",
@@ -41,7 +57,7 @@ const Container = () => {
   //    }))
 
   // }, [])
-  
+
 
 
   useEffect(() => {
@@ -73,7 +89,7 @@ const Container = () => {
       await USER_API.getData("brokers").then((res) => {
         dispatch(setAllBrokerListRedux(res?.data?.data))
       })
-   
+
 
     }
 
@@ -82,9 +98,9 @@ const Container = () => {
 
 
   return (
-      <NavigationContainer>
-        {user?.isSuccess ? <BottomTabNavigator /> : <AuthNavigator />}
-      </NavigationContainer>
+    <NavigationContainer>
+      {user?.isSuccess ? <BottomTabNavigator /> : <AuthNavigator />}
+    </NavigationContainer>
   )
 }
 
@@ -136,7 +152,7 @@ function App() {
     }
   };
 
- 
+
   useEffect(() => {
     getFCMToken();
 
@@ -171,15 +187,15 @@ function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistStore(store)}>
         <AddBrokerProvider>
-        <BrokerProvider>
-          <DateModalProvider>
-            <TradeProvider>
-              <React.Fragment>
-                <Container />
-              </React.Fragment>
-            </TradeProvider>
-          </DateModalProvider>
-        </BrokerProvider>
+          <BrokerProvider>
+            <DateModalProvider>
+              <TradeProvider>
+                <React.Fragment>
+                  <Container />
+                </React.Fragment>
+              </TradeProvider>
+            </DateModalProvider>
+          </BrokerProvider>
         </AddBrokerProvider>
       </PersistGate>
     </Provider >
