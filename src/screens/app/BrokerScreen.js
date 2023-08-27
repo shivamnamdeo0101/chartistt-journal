@@ -46,6 +46,7 @@ const BrokerScreen = ({ navigation }) => {
       fetchData()
 
     }, [brokerList,refreshing,loading])
+    
 
     if(loading || refreshing){
         return(

@@ -91,7 +91,7 @@ const TradeScreen = ({ navigation }) => {
     const toggleModal = () => {
 
         const len = Object.keys(brokerObj?.brokerObj)?.length
-        if (( len > 0)) {
+        if (( len >0)) {
             setIsOpen(!isOpen);
            
         }else{

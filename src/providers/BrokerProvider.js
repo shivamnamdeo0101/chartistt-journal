@@ -25,7 +25,7 @@ export const BrokerProvider = ({ children }) => {
 
 
     const dispatch = useDispatch()
-    const { control, handleSubmit, reset, getValues, formState: { errors } } = useForm({ defaultValues: auth?.brokerObj });
+    const { control, handleSubmit, reset, getValues, formState: { errors } } = useForm({ defaultValues: data?.defaultBrokerObj });
 
 
     const [brokerName, setbrokerName] = useState({
@@ -70,18 +70,24 @@ export const BrokerProvider = ({ children }) => {
         }
     }
 
- 
-    const onSubmit = async (e) => {
+   
 
+    const onSubmit = async (e) => {
+        console.log(auth?.brokerId,"Broker Id")
         setloading(true)
         try {
 
                 dispatch(setBrokerEdit(true))
+
+                
                 const brokerPayload = {
                     "userId": user?._id,
-                    "brokerId": auth?.brokerObj?._id,
+                    "brokerId":auth?.brokerObj?._id,
                     "broker": { ...e, brokerName: auth?.brokerObj?.brokerName, id: auth?.brokerObj?.id, iconLink: auth?.brokerObj?.iconLink }
                 }
+                console.log("Bye",brokerPayload)
+                
+
                 await updateBrokerFun(brokerPayload)
             
 
@@ -130,10 +136,14 @@ export const BrokerProvider = ({ children }) => {
             userId: user?._id,
             brokerId: auth?.brokerObj?.id
         }
-        try {
+
+        
+
+        try
+         {
             const res = await BROKER_API.remBroker(payload, user?.token)
 
-            console.log(res?.data)
+            console.log(payload,"Deleted")
 
             if (res?.status === 200) {
                 cancelForm()

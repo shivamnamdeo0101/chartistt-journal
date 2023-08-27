@@ -9,7 +9,7 @@ const initialState = {
     segmentList: [],
     sessionList: [],
     tradeList: [],
-    defaultBrokerObj: [],
+    defaultBrokerObj:{},
     brokerEdit: false,
     brokerUpdateObj: {},
 
