@@ -12,9 +12,7 @@ const initialState = {
     defaultBrokerObj:{},
     brokerEdit: false,
     brokerUpdateObj: {},
-
     filterObjRedux: {},
-
     brokerList: [],
     chartTimeFrameList: [],
     allBrokerList: [],
@@ -24,8 +22,6 @@ export const DataSlice = createSlice({
     name: 'data',
     initialState: initialState,
     reducers: {
-
-
 
         setActionList: (state, action) => {
             state.actionList = action.payload;
@@ -63,12 +59,9 @@ export const DataSlice = createSlice({
         setBrokerUpdateObj: (state, action) => {
             state.brokerUpdateObj = action.payload;
         },
-
-
         setConfirm: (state, action) => {
             state.confirm = action.payload;
         },
-
         setBrokerEdit: (state, action) => {
             state.brokerEdit = action.payload;
         },
@@ -76,12 +69,6 @@ export const DataSlice = createSlice({
         setFilterObjRedux: (state, action) => {
             state.filterObjRedux = action.payload;
         },
-
-
-
-
-
-
 
 
         flushAuthData: (state) => {

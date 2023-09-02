@@ -1,7 +1,9 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import HomeScreen from "../screens/app/HomeScreen"
+import AddTradeScreen from "../screens/app/AddTradeScreen"
+import { NavigationContainer } from "@react-navigation/native"
 import BottomTabNavigator from "./BottomTabNavigator"
-import EditProfileScreen from "../screens/app/EditProfileScreen"
+import EditTradeScreen from "../screens/app/EditTradeScreen"
 
 const AppStack = createNativeStackNavigator()
 
@@ -9,9 +11,13 @@ const AppNavigator = ({ navigation }) => {
 
     return (
         <AppStack.Navigator initialRouteName="Home">
-            <AppStack.Screen name="HomeScreen" component={HomeScreen} options={{headerShown:false}}  />
-            <AppStack.Screen name="EditProfile" component={EditProfileScreen} options={{headerShown:false}}  />
+            <AppStack.Screen name="Home" component={BottomTabNavigator} options={{headerShown:false}}  />
+            <AppStack.Screen name="AddTrade" component={AddTradeScreen} options={{headerShown:false}}  />
+            <AppStack.Screen name="EditTrade" component={EditTradeScreen} options={{headerShown:false}}  />
+
+
         </AppStack.Navigator>
+    
     )
 }
 

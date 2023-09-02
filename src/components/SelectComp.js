@@ -1,7 +1,7 @@
 import React ,{useState}from 'react';
 import { View, Text, TouchableOpacity,ScrollView } from 'react-native';
 
-const SelectInput = ({ label, value, setValue, options }) => {
+const SelectComp = ({ label, value, setValue, options }) => {
 
 
     const [view, setview] = useState(false)
@@ -29,4 +29,4 @@ const SelectInput = ({ label, value, setValue, options }) => {
     );
 };
 
-export default SelectInput;
+export default SelectComp;

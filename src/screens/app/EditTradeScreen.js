@@ -13,7 +13,7 @@ import { useForm, Controller } from 'react-hook-form';
 import CustomButton from '../../components/CustomButton';
 
 
-const AddTradeScreen = ({ navigation }) => {
+const EditTradeScreen = ({ navigation }) => {
 
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -47,7 +47,7 @@ const AddTradeScreen = ({ navigation }) => {
                         onPress={() => navigation.goBack()}
                     />
                 </TouchableOpacity>
-                <Text style={{ color: "#001AFF", fontFamily: "Intro-Semi-Bold", fontSize: 20, }}>ADD TRADE</Text>
+                <Text style={{ color: "#001AFF", fontFamily: "Intro-Semi-Bold", fontSize: 20, }}>EDIT TRADE</Text>
             </View>
 
 
@@ -188,7 +188,7 @@ const AddTradeScreen = ({ navigation }) => {
                 </ScrollView>
                 <View>
                     <CustomButton
-                        text={"Submit"}
+                        text={"Update"}
                         filled={true}
                         onPress={handleSubmit(onSubmit)}
                     />
@@ -197,7 +197,7 @@ const AddTradeScreen = ({ navigation }) => {
                         
                         <Text style={{ color: "#000", textAlign: "justify", fontSize: 12, fontFamily: "Intro-Bold", width: "90%",textAlign:"center" }}>
                         <Text style={{ color: "#001AFF", marginRight: 10, fontFamily: "Intro-Bold", textAlign:"center" }}>Note :- </Text>
-                            YOU'RE ADDING THIS ACCOUNT ONLY FOR
+                            YOU'RE UPDATING THIS ACCOUNT ONLY FOR
                             CALCULATION PURPOSE</Text>
                     </View>
                 </View>
@@ -207,7 +207,7 @@ const AddTradeScreen = ({ navigation }) => {
     )
 }
 
-export default AddTradeScreen
+export default EditTradeScreen
 
 
 const styles = StyleSheet.create({
@@ -245,3 +245,4 @@ const styles = StyleSheet.create({
     textInput: { color: "#000", flex: 1, fontFamily: "Intro-Bold" },
     textView: { borderColor: "#f0f3f5", paddingLeft: 10, paddingRight: 10, borderWidth: 2, borderRadius: 8, flexDirection: 'row', alignItems: 'center' }
 });
+

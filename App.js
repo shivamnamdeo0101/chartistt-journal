@@ -1,36 +1,27 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistedReducer } from './src/store/RootReducer';
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import AppNavigator from './src/navigation/AppNavigator';
+import { configureStore, } from '@reduxjs/toolkit';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
-import { TradeProvider } from './src/providers/TradeProvider';
-import { BrokerProvider } from './src/providers/BrokerProvider';
+
 import messaging from '@react-native-firebase/messaging';
-import { DateModalProvider } from './src/providers/DateModalProvider';
 import { USER_API } from './src/service/UserService';
 import { setActionList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setFilterObjRedux, setSegmentList, setSessionList, setTradeTypeList } from './src/store/DataSlice';
 import { BROKER_API } from './src/service/BrokerService';
-import Loading from './src/components/Loading';
-import { setFilterObj } from './src/store/UserSlice';
 import notifee from '@notifee/react-native';
-import { AddBrokerProvider } from './src/providers/AddBrokerProvider';
 import VersionCheck from 'react-native-version-check';
+import { NativeBaseProvider, Box } from "native-base";
+import AppNavigator from './src/navigation/AppNavigator';
+
 
 const Container = () => {
 
-
   const userAuth = useSelector(state => state?.userAuth?.user)
-
-  const data = useSelector(state => state?.data)
   const dispatch = useDispatch()
-  const [brokerList, setbrokerList] = useState([])
   const user = useSelector(state => state?.userAuth)
 
   useEffect(() => {
@@ -46,19 +37,6 @@ const Container = () => {
 
     checkpdate()
   }, [])
-
-
-  // useEffect(() => {
-
-  //   dispatch(setFilterObjRedux({
-  //     "userId": userAuth?._id,
-  //     "filterType": "a",
-  //     "brokerId": "0"
-  //    }))
-
-  // }, [])
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,7 +77,7 @@ const Container = () => {
 
   return (
     <NavigationContainer>
-      {user?.isSuccess ? <BottomTabNavigator /> : <AuthNavigator />}
+      {user?.isSuccess ? <AppNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   )
 }
@@ -184,21 +162,15 @@ function App() {
   }, []);
 
   return (
+    <NativeBaseProvider>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistStore(store)}>
-        <AddBrokerProvider>
-          <BrokerProvider>
-            <DateModalProvider>
-              <TradeProvider>
-                <React.Fragment>
-                  <Container />
-                </React.Fragment>
-              </TradeProvider>
-            </DateModalProvider>
-          </BrokerProvider>
-        </AddBrokerProvider>
+        <React.Fragment>
+          <Container />
+        </React.Fragment>
       </PersistGate>
     </Provider >
+    </NativeBaseProvider>
   )
 }
 
