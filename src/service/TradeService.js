@@ -1,63 +1,86 @@
-import moment from 'moment';
-import axios from 'react-native-axios';
 import { EndPoint } from '../utils/Endpoint';
 
-
 export const TRADE_API = {
+  addTrade: async function (payload, token) {
+    const headers = {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    };
 
-    addTrade: async function (payload,token) {
-        const  headers = { 
-            'Authorization': 'Bearer '+token, 
-            'Content-Type': 'application/json'
+    return fetch(`${EndPoint}private/trades`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          return data.data;
+        } else {
+          throw new Error(data.msg);
         }
-        return axios.request({          
-            method: 'post',
-            url: `${EndPoint}private/trades`,
-            data: payload,
-            headers:headers
-        })
-    },
-    getAllTrades: async function (payload,token) {
+      });
+  },
 
-        console.log(payload,"NW Payload")
+  getAllTrades: async function (payload, token) {
+    const headers = {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    };
 
-        const  headers = { 
-            'Authorization': 'Bearer '+token, 
-            'Content-Type': 'application/json'
+    return fetch(`${EndPoint}private/trades-filter/a/d`, {
+      method: 'GET',
+      headers: headers,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          return data.data;
+        } else {
+          throw new Error(data.msg);
         }
-        return axios.request({
-            method: 'post',
-            url: `${EndPoint}private/trades-filter`,
-            data: payload,
-            headers:headers
-        })
-    },
-    
-    remTrade: async function (payload,token) {
-        const  headers = { 
-            'Authorization': 'Bearer '+token, 
-            'Content-Type': 'application/json'
+      });
+  },
+
+  remTrade: async function (payload, token) {
+    const headers = {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    };
+
+    return fetch(`${EndPoint}private/trades`, {
+      method: 'DELETE',
+      headers: headers,
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          return data.data;
+        } else {
+          throw new Error(data.msg);
         }
-        return axios.request({
-            method: 'delete',
-            url: `${EndPoint}private/trades`,
-            data: payload,
-            headers:headers
-        })
-    },
-    updateTrade: async function (payload,token) {
-        const  headers = { 
-            'Authorization': 'Bearer '+token, 
-            'Content-Type': 'application/json'
+      });
+  },
+
+  updateTrade: async function (payload, token) {
+    const headers = {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    };
+
+    return fetch(`${EndPoint}private/trades`, {
+      method: 'PUT',
+      headers: headers,
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          return data.data;
+        } else {
+          throw new Error(data.msg);
         }
-        return axios.request({
-            method: 'put',
-            url: `${EndPoint}private/trades`,
-            data: payload,
-            headers:headers
-        })
-    },
-
-
-
+      });
+  },
 };

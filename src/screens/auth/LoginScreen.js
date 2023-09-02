@@ -6,7 +6,7 @@ import {
   StatusBar, Image,
   StyleSheet,
   Text, Alert,
-  View, Dimensions, TextInput, TouchableOpacity, ScrollView,BackHandler
+  View, Dimensions, TextInput, TouchableOpacity, ScrollView, BackHandler
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -15,13 +15,16 @@ import CustomButton from '../../components/CustomButton';
 
 import ForgotPass from '../../components/ForgotPass';
 import { useDispatch } from 'react-redux';
-import { setAuthSuccess } from '../../store/UserSlice';
+import { setAuthSuccess, setUserDetails } from '../../store/UserSlice';
+import { USER_API } from '../../service/UserService';
+import LoadingComp from '../../components/LoadingComp';
 const { height } = Dimensions.get('window');
 const halfHeight = height / 3;
 
 const LoginScreen = ({ navigation }) => {
-  const { control, handleSubmit, formState: { errors } } = useForm();
+  const { control, handleSubmit, setError, formState: { errors } } = useForm();
 
+  const [loading, setloading] = useState(false)
   const dispatch = useDispatch()
 
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -30,20 +33,46 @@ const LoginScreen = ({ navigation }) => {
     setPasswordVisible(!passwordVisible);
   };
 
-  const onSubmit = (data) => {
-    // Replace this with your login logic
-    console.log('Login Data:', data);
 
-    try{
+  const onSubmit = async (data) => {
+
+    setloading(true)
+
+    try {
+
+      const res = await USER_API.userEmailLogin(data)
+      dispatch(setUserDetails(res))
       dispatch(setAuthSuccess())
-    }catch(e){
-      console.log(e)
-    }
 
-    Alert.alert('Login Successful');
+    } catch (e) {
+      if (e?.message?.includes("User not found")) {
+        setError('email', {
+          type: 'manual',
+          message: e?.message, // Set the error message from the API response
+        });
+      } else if (e?.message?.includes("password is not correct")) {
+        setError('password', {
+          type: 'manual',
+          message: e?.message, // Set the error message from the API response
+        });
+      } else if (e?.message?.includes("Unauthorized User")) {
+        setError('email', {
+          type: 'manual',
+          message: e?.message, // Set the error message from the API response
+        });
+      } else {
+        Alert.alert(e?.message)
+      }
+    }
+    setloading(false)
   };
 
 
+  if(loading){
+    return(
+      <LoadingComp />
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -63,8 +92,8 @@ const LoginScreen = ({ navigation }) => {
         <View style={[styles.half, { backgroundColor: '#001AFF', height: "35%", alignItems: "center", justifyContent: "center" }]}>
           <Image source={require("../../assets/clogo.png")} style={{ width: 250, height: 160, }} />
 
-          <Text style={{ color: "#fff", fontSize: 30 ,fontFamily:"Intro-Bold"}}>Welcome Back</Text>
-          <Text style={{ color: "#fff", fontWeight: "400" ,fontFamily:"Intro-Bold"}}>Sign in to continue</Text>
+          <Text style={{ color: "#fff", fontSize: 30, fontFamily: "Intro-Bold" }}>Welcome Back</Text>
+          <Text style={{ color: "#fff", fontWeight: "400", fontFamily: "Intro-Bold" }}>Sign in to continue</Text>
         </View>
 
 
@@ -73,7 +102,7 @@ const LoginScreen = ({ navigation }) => {
 
           <View style={{ marginLeft: 10, marginRight: 10, padding: 20 }}>
 
-            <Text style={{ fontSize: 20, color: "#000", marginBottom: 10, fontFamily:"Intro-Bold" }}>LOGIN</Text>
+            <Text style={{ fontSize: 20, color: "#000", marginBottom: 10, fontFamily: "Intro-Bold" }}>LOGIN</Text>
 
             <View style={styles.textInputContainer}>
               <Text style={styles.textInputLabel}>Email</Text>
@@ -158,13 +187,13 @@ const LoginScreen = ({ navigation }) => {
               {errors.password && <Text style={styles.errors}>{errors.password.message}</Text>}
 
               <TouchableOpacity style={{ flexDirection: "column", alignItems: "flex-end" }}
-                
+
               >
                 <ForgotPass />
                 {/* <Text  style={{ color: "#001AFF", textAlign: "right", textDecorationLine: "underline", fontWeight: "bold", marginTop: 10, marginBottom: 10 }}>
                   Forgot Password
                 </Text> */}
-                </TouchableOpacity>
+              </TouchableOpacity>
 
             </View>
 
@@ -181,10 +210,10 @@ const LoginScreen = ({ navigation }) => {
             />
             <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "center" }}>
               <TouchableOpacity>
-                <Text style={{ color: "#000", fontFamily:"Intro-Bold", marginRight: 5 }}>Don't have account?</Text>
+                <Text style={{ color: "#000", fontFamily: "Intro-Bold", marginRight: 5 }}>Don't have account?</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={()=>navigation.navigate("Register")}>
-                <Text style={{ color: "#001AFF", fontFamily:"Intro-Bold", textDecorationLine: "underline" }}>Create a new account</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+                <Text style={{ color: "#001AFF", fontFamily: "Intro-Bold", textDecorationLine: "underline" }}>Create a new account</Text>
               </TouchableOpacity>
             </View>
 
@@ -207,10 +236,10 @@ const styles = StyleSheet.create({
   half: {
 
   },
-  errors:{ color: 'red',fontFamily:"Intro-Semi-Bold",fontSize:14 },
+  errors: { color: 'red', fontFamily: "Intro-Semi-Bold", fontSize: 14 },
   textInputContainer: { marginBottom: 10, },
-  textInputLabel: { color: "#000", fontFamily:"Intro-Bold"  },
-  textInput: { color: "#000", flex: 1,fontFamily:"Intro-Bold" },
+  textInputLabel: { color: "#000", fontFamily: "Intro-Bold" },
+  textInput: { color: "#000", flex: 1, fontFamily: "Intro-Bold" },
   textView: { borderColor: "#f0f3f5", paddingLeft: 10, paddingRight: 10, borderWidth: 2, borderRadius: 8, flexDirection: 'row', alignItems: 'center' }
 });
 

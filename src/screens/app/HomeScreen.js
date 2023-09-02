@@ -5,8 +5,14 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import ChartisttHeader from '../../components/ChartisttHeader';
 import HomeChildMain from '../../components/HomeChildComp/HomeChildMain';
 import { FAB } from 'react-native-paper';
+import { useSelector } from 'react-redux';
 
 const HomeScreen = ({navigation}) => {
+
+  const user = useSelector((state)=>state?.userAuth?.user)
+
+  console.log(user)
+
   return (
     <SafeAreaView>
 

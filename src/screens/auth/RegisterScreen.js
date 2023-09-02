@@ -18,6 +18,9 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 import CustomButton from '../../components/CustomButton';
 import { useDispatch } from 'react-redux';
+import { USER_API } from '../../service/UserService';
+import { setAuthSuccess, setUserDetails } from '../../store/UserSlice';
+import LoadingComp from '../../components/LoadingComp';
 
 const { height } = Dimensions.get('window');
 const halfHeight = height / 3;
@@ -25,8 +28,8 @@ const halfHeight = height / 3;
 
 const RegisterScreen = ({ navigation }) => {
 
-    const { control, handleSubmit, formState: { errors }, watch, getValues } = useForm();
-
+    const { control, handleSubmit,setError, formState: { errors }, watch, getValues } = useForm();
+    const [loading, setloading] = useState(false)
     const [passwordVisible, setPasswordVisible] = useState(false);
 
     const togglePasswordVisibility = () => {
@@ -39,20 +42,51 @@ const RegisterScreen = ({ navigation }) => {
         setconfirmPassVisible(!confirmPassVisible);
     };
 
-    
+
     const dispatch = useDispatch()
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         // Replace this with your login logic
+        setloading(true)
+        const temp = {
+            "fullName": data?.fullName,
+            "email": data?.email,
+            "contact": data?.contact,
+            "password": data?.password
+        }
 
-        try{
+        try {
+            const res = await USER_API.userEmailReg(data)
+            dispatch(setUserDetails(res))
             dispatch(setAuthSuccess())
-          }catch(e){
-            console.log(e)
-          }
-        console.log('Login Data:', data);
-        Alert.alert('Login Successful');
+
+        } catch (e) {
+
+            if(e?.message?.includes("Email ID already")){
+                setError('email', {
+                    type: 'manual',
+                    message: e?.message, // Set the error message from the API response
+                });
+            }else if(e?.message?.includes("Contact number already")){
+                setError('contact', {
+                    type: 'manual',
+                    message: e?.message, // Set the error message from the API response
+                });
+            }else{
+                Alert.alert(e?.message)
+            }
+
+            
+        }
+        setloading(false)
     };
+
+
+    if(loading){
+        return(
+            <LoadingComp />
+        )
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -82,14 +116,14 @@ const RegisterScreen = ({ navigation }) => {
 
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
 
-                       
+
                     </View>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
 
                         <Image
                             style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
                             source={{ uri: "https://assets.website-files.com/62d80c12020f3f06727964a0/62de47019e2173b2491b1e5e_The%20Chartistt%20Logo-p-500.jpg" }} />
-                        <Text style={{ fontSize: 20, color: "#000",fontFamily: "Intro-Semi-Bold" }}>CHARTISTT JOURNAL</Text>
+                        <Text style={{ fontSize: 20, color: "#000", fontFamily: "Intro-Semi-Bold" }}>CHARTISTT JOURNAL</Text>
                     </View>
 
 
@@ -103,7 +137,7 @@ const RegisterScreen = ({ navigation }) => {
 
                             />
                             <Controller
-                                name="name"
+                                name="fullName"
                                 control={control}
                                 defaultValue=""
                                 rules={{ required: 'Your Name is required' }}
@@ -118,7 +152,7 @@ const RegisterScreen = ({ navigation }) => {
                                 )}
                             />
                         </View>
-                        {errors.name && <Text style={styles.errors}>{errors.name.message}</Text>}
+                        {errors.fullName && <Text style={styles.errors}>{errors.fullName.message}</Text>}
                     </View>
 
                     <View style={styles.textInputContainer}>
@@ -166,7 +200,7 @@ const RegisterScreen = ({ navigation }) => {
                             />
                             <Controller
                                 control={control}
-                                name="contactNumber"
+                                name="contact"
                                 rules={{
                                     required: 'Your Contact Number is required',
                                     pattern: {
@@ -185,8 +219,8 @@ const RegisterScreen = ({ navigation }) => {
                                 )}
                             />
                         </View>
-                        {errors.contactNumber && (
-                            <Text style={styles.errors}>{errors.contactNumber.message}</Text>
+                        {errors.contact && (
+                            <Text style={styles.errors}>{errors.contact.message}</Text>
                         )}
                     </View>
 

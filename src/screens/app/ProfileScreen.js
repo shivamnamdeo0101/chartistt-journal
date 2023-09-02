@@ -6,11 +6,13 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import UpdateProfileModal from '../../components/BrokerChildComp/UpdateProfileModal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { flushAuthUser } from '../../store/UserSlice';
 
 
 const ProfileScreen = () => {
+
+  const user = useSelector((state)=>state?.userAuth?.user)
 
   const dispatch = useDispatch()
 
@@ -27,7 +29,7 @@ const ProfileScreen = () => {
       <ScrollView>
         <ChartisttHeader title={"PROFILE"} />
         <Image source={require("../../assets/cclogo.jpg")} style={{ width: 80, height: 80, alignSelf: "center", margin: 10, borderRadius: 99 }} />
-        <Text style={{ color: "#000", fontSize: 20, fontFamily: "Intro-Bold", textAlign: "center" }}>SHIVAM NAMDEO</Text>
+        <Text style={{ color: "#000", fontSize: 20, fontFamily: "Intro-Bold", textAlign: "center" }}>{user?.fullName}</Text>
        
 
 
