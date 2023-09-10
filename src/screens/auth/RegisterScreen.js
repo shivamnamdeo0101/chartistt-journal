@@ -30,13 +30,13 @@ const RegisterScreen = ({ navigation }) => {
 
     const { control, handleSubmit,setError, formState: { errors }, watch, getValues } = useForm();
     const [loading, setloading] = useState(false)
-    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [passwordVisible, setPasswordVisible] = useState(true);
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
     };
 
-    const [confirmPassVisible, setconfirmPassVisible] = useState(false);
+    const [confirmPassVisible, setconfirmPassVisible] = useState(true);
 
     const toggleconfirmPassVisible = () => {
         setconfirmPassVisible(!confirmPassVisible);
@@ -49,14 +49,14 @@ const RegisterScreen = ({ navigation }) => {
         // Replace this with your login logic
         setloading(true)
         const temp = {
-            "fullName": data?.fullName,
-            "email": data?.email,
-            "contact": data?.contact,
-            "password": data?.password
+            "fullName":data?.fullName,
+            "email":data?.email,
+            "contact":data?.contact,
+            "password":data?.password
         }
-
+       
         try {
-            const res = await USER_API.userEmailReg(data)
+            const res = await USER_API.userEmailReg(temp)
             dispatch(setUserDetails(res))
             dispatch(setAuthSuccess())
 
@@ -179,7 +179,7 @@ const RegisterScreen = ({ navigation }) => {
                                     <TextInput
                                         placeholder="Enter your email"
                                         onChangeText={field.onChange}
-                                        value={field.value}
+                                        value={field?.value}
                                         placeholderTextColor={"#ccc"}
                                         style={styles.textInput}
                                     />
@@ -215,6 +215,7 @@ const RegisterScreen = ({ navigation }) => {
                                         onChangeText={field.onChange}
                                         placeholderTextColor={"#ccc"}
                                         style={styles.textInput}
+                                        value={field?.value?.toString()}
                                     />
                                 )}
                             />

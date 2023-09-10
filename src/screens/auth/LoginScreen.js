@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
 
   Platform,
@@ -6,12 +6,14 @@ import {
   StatusBar, Image,
   StyleSheet,
   Text, Alert,
-  View, Dimensions, TextInput, TouchableOpacity, ScrollView, BackHandler
+  View, Dimensions, TextInput, TouchableOpacity, ScrollView, BackHandler,PermissionsAndroid,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomButton from '../../components/CustomButton';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import messaging from '@react-native-firebase/messaging';
 
 import ForgotPass from '../../components/ForgotPass';
 import { useDispatch } from 'react-redux';
@@ -65,6 +67,81 @@ const LoginScreen = ({ navigation }) => {
       }
     }
     setloading(false)
+  };
+
+  
+
+
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      scopes: ['https://www.googleapis.com/auth/userinfo.profile'], // what API you want to access on behalf of the user, default is email and profile
+      webClientId: '1070846552778-6fefn05h8q6q7eeuac0b9agv2b48rrb3.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
+      offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+      forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
+      profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
+    });
+  }, [])
+
+
+  const checkAndroidPermission = async () => {
+    try {
+      const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+      await PermissionsAndroid.request(permission);
+      Promise.resolve();
+    } catch (error) {
+      Promise.reject(error);
+    }
+};
+
+  async function requestUserPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+    }
+  }
+
+  useEffect(() => {
+    checkAndroidPermission()
+    subscribe()
+  }, [])
+  
+
+  const subscribe = async () => {
+    await requestUserPermission()
+    await messaging()
+      .subscribeToTopic('app')
+      .then(() => {
+        console.log('Subscribed to topic');
+      })
+      .catch(error => {
+        console.log('Error subscribing to topic:', error);
+      });
+  }
+
+  const googleLogin = async () => {
+
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const payload = {
+        "email": userInfo?.user?.email,
+        "fullName": userInfo?.user?.givenName + userInfo?.user?.familyName,
+      }
+      const login = await USER_API.userGoogleLogin(payload)
+      console.log(login)
+      if (login) {
+        dispatch(setUserDetails(login))
+        dispatch(setAuthSuccess())
+      }
+
+    } catch (err) {
+      Alert.alert(err?.message)
+    }
   };
 
 
@@ -206,7 +283,7 @@ const LoginScreen = ({ navigation }) => {
             <CustomButton
               text={"Continue With Google"}
               filled={false}
-              onPress={handleSubmit(onSubmit)}
+              onPress={()=>googleLogin()}
             />
             <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "center" }}>
               <TouchableOpacity>

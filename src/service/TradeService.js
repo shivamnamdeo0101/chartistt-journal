@@ -23,19 +23,41 @@ export const TRADE_API = {
   },
 
   getAllTrades: async function (payload, token) {
+    const { sortBy, start, end,userId ,brokerId} = payload;
     const headers = {
       'Authorization': 'Bearer ' + token,
       'Content-Type': 'application/json',
     };
 
-    return fetch(`${EndPoint}private/trades-filter/a/d`, {
+    return fetch(`${EndPoint}private/trades-filter/${userId}/${brokerId}/${sortBy}/${start}/${end}`, {
       method: 'GET',
       headers: headers,
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.success) {
-          return data.data;
+        if (data?.success) {
+          return data?.data;
+        } else {
+          throw new Error(data.msg);
+        }
+      });
+  },
+
+  getAllCalenderTrades: async function (payload, token) {
+    const { start, end,userId } = payload;
+    const headers = {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    };
+
+    return fetch(`${EndPoint}private/trades/${userId}/${start}/${end}`, {
+      method: 'GET',
+      headers: headers,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data?.success) {
+          return data?.data;
         } else {
           throw new Error(data.msg);
         }

@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView, Alert } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Button, Actionsheet, useDisclose, Box, Center } from "native-base";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 
 
 import { useForm, Controller } from 'react-hook-form';
@@ -12,23 +12,76 @@ import CustomButton from '../CustomButton';
 import Modal from "react-native-modal";
 import { PanGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { FAB } from 'react-native-paper';
+import { useDispatch, useSelector } from 'react-redux';
+import LoadingComp from '../LoadingComp';
+import { BROKER_API } from '../../service/BrokerService';
+import { toggleRefresh } from '../../store/DataSlice';
 
 function AddBrokerModal() {
 
+  
     const [isModalVisible, setModalVisible] = useState(false);
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
-   
 
-    const { control, handleSubmit, formState: { errors } } = useForm();
+    const dispatch = useDispatch()
 
-    const onSubmit = (data) => {
-        // Replace this with your login logic
-        console.log('Login Data:', data);
-        Alert.alert('Login Successful');
+    const user = useSelector((state)=>state?.userAuth?.user)
+    const refresh = useSelector((state)=>state?.data?.refresh)
+
+
+
+    const { control, handleSubmit,setError,reset, formState: { errors } } = useForm();
+    const [loading, setloading] = useState(false)
+    const onSubmit = async (data) => {
+
+        setloading(true)
+
+        try {
+            const payload = {
+                "userId":user?._id,
+                "updateOn":Date.now(),
+                ...data
+            }
+            const res = await BROKER_API.addBroker(payload,user?.token)
+            if(res){
+                toggleModal()
+                reset()
+                dispatch(toggleRefresh(true))
+                setTimeout(() => {
+                    // After the data fetching is complete, set refreshing to false
+                    dispatch(toggleRefresh(false))
+                  }, 2000); // Simulated delay (2 seconds)
+                Alert.alert("Broker Added")
+            }
+            
+
+        } catch (e) {
+            if (e?.message?.includes("Broker Already Added")) {
+                setError('brokerName', {
+                    type: 'manual',
+                    message: e?.message, // Set the error message from the API response
+                });
+            } else if (e?.message?.includes("Missing")) {
+                setError('brokerName', {
+                    type: 'manual',
+                    message: e?.message, // Set the error message from the API response
+                });
+            }else {
+                Alert.alert(e?.message)
+            }
+        }
+        setloading(false)
     };
+
+
+    if (loading) {
+        return (
+            <LoadingComp />
+        )
+    }
 
 
     return (
@@ -108,11 +161,21 @@ function AddBrokerModal() {
 
                                             />
                                             <Controller
-                                                name="depositAmt"
+                                                name="amtDeposit"
                                                 control={control}
                                                 defaultValue=""
                                                 rules={{
                                                     required: 'Deposit Amount is required',
+                                                    validate: (value) => {
+                                                        const numericValue = parseFloat(value);
+                                                        if (isNaN(numericValue)) {
+                                                          return 'Deposit Amount must be a number';
+                                                        }
+                                                        if (numericValue < 1) {
+                                                          return 'Deposit Amount must be at least 1';
+                                                        }
+                                                        return true; // Validation passed
+                                                      },
                                                 }}
                                                 render={({ field }) => (
                                                     <TextInput
@@ -126,7 +189,7 @@ function AddBrokerModal() {
                                                 )}
                                             />
                                         </View>
-                                        {errors.depositAmt && <Text style={styles.errors}>{errors.depositAmt.message}</Text>}
+                                        {errors.amtDeposit && <Text style={styles.errors}>{errors.amtDeposit.message}</Text>}
                                     </View>
                                 </View>
                             </ScrollView>
@@ -139,7 +202,7 @@ function AddBrokerModal() {
 
                                 <View style={{ flexDirection: "row", alignItems: "flex-start", alignSelf: "center", margin: 10, }}>
                                     <Text style={{ color: "#001AFF", marginRight: 10, fontFamily: "Intro-Bold", }}>Note :- </Text>
-                                    <Text style={{ color: "#000", textAlign: "justify", fontSize: 12, fontFamily: "Intro-Bold",width:"90%" }}>
+                                    <Text style={{ color: "#000", textAlign: "justify", fontSize: 12, fontFamily: "Intro-Bold", width: "90%" }}>
                                         YOU'RE ADDING THIS ACCOUNT ONLY FOR
                                         CALCULATION PURPOSE</Text>
                                 </View>

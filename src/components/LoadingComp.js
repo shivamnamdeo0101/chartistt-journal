@@ -5,6 +5,7 @@ const LoadingComp = ({ visible }) => {
   return (
     <Modal
       transparent={true}
+      style={{width:300,height:300,elevation:4}}
       animationType="fade"
       visible={visible}
       onRequestClose={() => {}}>

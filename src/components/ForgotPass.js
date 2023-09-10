@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView, Alert } from 'react-native'
 import React, { useState ,useEffect} from 'react'
 import { Button, Actionsheet, useDisclose, Box, Center } from "native-base";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -6,6 +6,8 @@ import { useForm, Controller } from 'react-hook-form';
 import CustomButton from './CustomButton';
 import Modal from "react-native-modal";
 import { PanGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
+import LoadingComp from './LoadingComp';
+import { USER_API } from '../service/UserService';
 
 function ForgotPass() {
     
@@ -14,19 +16,45 @@ function ForgotPass() {
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
-    const onGestureEvent = ({ nativeEvent }) => {
-        if (nativeEvent.state === State.END && nativeEvent.translationY > 50) {
-            toggleModal();
+    const { control, handleSubmit,setError,reset, formState: { errors } } = useForm();
+    const [loading, setloading] = useState(false)
+    const onSubmit = async (data) => {
+
+        setloading(true)
+
+        try {
+            const payload = {
+                "email":data?.email
+            }
+            const res = await USER_API.sendTempPass(payload)
+            if(res){
+                toggleModal()
+                reset()
+                setloading(false)
+                Alert.alert("Temprary password has been sent to your email")
+            }
+            
+
+        } catch (e) {
+            if (e?.message?.includes("User not found")) {
+                setError('email', {
+                    type: 'manual',
+                    message: e?.message, // Set the error message from the API response
+                });
+            }else {
+                Alert.alert(e?.message)
+            }
         }
+        setloading(false)
     };
 
-    const { control, handleSubmit, formState: { errors } } = useForm();
 
-    const onSubmit = (data) => {
-        // Replace this with your login logic
-        console.log('Login Data:', data);
-        Alert.alert('Login Successful');
-    };
+    if (loading) {
+        return (
+            <LoadingComp />
+        )
+    }
+
 
 
     return (

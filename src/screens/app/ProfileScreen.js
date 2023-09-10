@@ -8,6 +8,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import UpdateProfileModal from '../../components/BrokerChildComp/UpdateProfileModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { flushAuthUser } from '../../store/UserSlice';
+import ResetPassModal from '../../components/ResetPassModal';
 
 
 const ProfileScreen = () => {
@@ -29,7 +30,7 @@ const ProfileScreen = () => {
       <ScrollView>
         <ChartisttHeader title={"PROFILE"} />
         <Image source={require("../../assets/cclogo.jpg")} style={{ width: 80, height: 80, alignSelf: "center", margin: 10, borderRadius: 99 }} />
-        <Text style={{ color: "#000", fontSize: 20, fontFamily: "Intro-Bold", textAlign: "center" }}>{user?.fullName}</Text>
+        <Text style={{ color: "#000", fontSize: 20, fontFamily: "Intro-Bold", textAlign: "center" }}>{user?.fullName }</Text>
        
 
 
@@ -55,23 +56,9 @@ const ProfileScreen = () => {
 
             />
           </TouchableOpacity>
-          <TouchableOpacity style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-            <View style={{flexDirection:"row",alignItems:"center"}}>
-              <SimpleLineIcons
-                name={"lock-open"}
-                size={20}
-                color="#888"
-                style={{backgroundColor:"#fff",padding:10,borderRadius:99}}
-              />
-              <Text style={{fontFamily:"Intro-Semi-Bold",color:"#000",fontSize:16,marginLeft:10}}>Reset Password</Text>
-            </View>
-            <SimpleLineIcons
-              name={"arrow-right"}
-              size={16}
-              color="#888"
+          
+          <ResetPassModal />
 
-            />
-          </TouchableOpacity>
           <TouchableOpacity style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
             <View style={{flexDirection:"row",alignItems:"center"}}>
               <MaterialCommunityIcons

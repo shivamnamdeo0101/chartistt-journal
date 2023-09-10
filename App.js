@@ -10,12 +10,13 @@ import BottomTabNavigator from './src/navigation/BottomTabNavigator';
 
 import messaging from '@react-native-firebase/messaging';
 import { USER_API } from './src/service/UserService';
-import { setActionList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setFilterObjRedux, setSegmentList, setSessionList, setTradeTypeList } from './src/store/DataSlice';
+import { setActionList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setFilterObjRedux, setSegmentList, setSessionList, setTradeTypeList, setUserBrokerList } from './src/store/DataSlice';
 import { BROKER_API } from './src/service/BrokerService';
 import notifee from '@notifee/react-native';
 import VersionCheck from 'react-native-version-check';
 import { NativeBaseProvider, Box } from "native-base";
 import AppNavigator from './src/navigation/AppNavigator';
+import { Alert, Linking } from 'react-native';
 
 
 const Container = () => {
@@ -30,7 +31,7 @@ const Container = () => {
         .then(async res => {
           console.log(res?.isNeeded);    // true
           if (res?.isNeeded) {
-            Linking.openURL(res.storeUrl);  // open store if update is needed.
+            handleVersionCheck(res.storeUrl);  // open store if update is needed.
           }
         });
     }
@@ -38,34 +39,57 @@ const Container = () => {
     checkpdate()
   }, [])
 
+
+  const handleVersionCheck = (link) => {
+    // Display a confirmation dialog
+    Alert.alert(
+        'Download Update',
+        'You can download the new version of the application',
+        [
+            {
+                text: 'Cancel',
+                style: 'cancel',
+            },
+            {
+                text: 'Download',
+                onPress: () => {
+                  Linking.openURL(link);
+                },
+            },
+        ],
+        { cancelable: false }
+    );
+};
+
   useEffect(() => {
     const fetchData = async () => {
 
+    
       await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
-        dispatch(setBrokerList(res?.data?.data))
+        dispatch(setUserBrokerList(res))
       })
 
       await USER_API.getData("action").then((res) => {
-        dispatch(setActionList(res?.data?.data))
+        dispatch(setActionList(res))
       })
       await USER_API.getData("segment").then((res) => {
-        dispatch(setSegmentList(res?.data?.data))
+        dispatch(setSegmentList(res))
       })
       await USER_API.getData("session").then((res) => {
-        dispatch(setSessionList(res?.data?.data))
+        dispatch(setSessionList(res))
       })
       await USER_API.getData("emotions").then((res) => {
-        dispatch(setEmotionList(res?.data?.data))
+        dispatch(setEmotionList(res))
       })
       await USER_API.getData("tradetype").then((res) => {
-        dispatch(setTradeTypeList(res?.data?.data))
+        dispatch(setTradeTypeList(res))
       })
       await USER_API.getData("charttimeframe").then((res) => {
-        dispatch(setChartTimeFrameList(res?.data?.data))
+        dispatch(setChartTimeFrameList(res))
       })
 
       await USER_API.getData("brokers").then((res) => {
-        dispatch(setAllBrokerListRedux(res?.data?.data))
+        dispatch(setAllBrokerListRedux(res))
       })
 
 

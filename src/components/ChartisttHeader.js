@@ -1,30 +1,34 @@
 import { View, Text, StatusBar, SafeAreaView, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DownloadComp from './DownloadComp';
 
-const ChartisttHeader = ({title}) => {
+
+const ChartisttHeader = ({ title }) => {
+
+  
+
   return (
-    <View style={{backgroundColor:"#fff",flexDirection:"row",alignItems:"center",justifyContent:"space-between",padding:14,paddingBottom:8,paddingTop:8}}>
-        <View style={{flexDirection:"row",alignItems:"center",}}>
-          <Image source={require("../assets/cclogo.jpg")} style={{backgroundColor:"#001AFF", marginRight:10, width: 30, height: 30, borderRadius: 15 }} />
-          <Text style={{color:"#001AFF",fontFamily:"Intro-Semi-Bold",fontSize:20,}}>{title}</Text>
-        </View>
-
-
-        <View style={{flexDirection:"row",alignItems:"center",}}>
-          <DownloadComp />
-          <TouchableOpacity style={{marginRight:10,backgroundColor:"#f8f8f8",padding:5,borderRadius:99}} >
-            <MaterialCommunityIcons
-              name={'history'}
-              size={26}
-              color="#888"
-
-            />
-          </TouchableOpacity>
-        </View>
+    <View style={{ backgroundColor: "#fff", flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14, paddingBottom: 8, paddingTop: 8 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", }}>
+        <Image source={require("../assets/cclogo.jpg")} style={{ backgroundColor: "#001AFF", marginRight: 10, width: 30, height: 30, borderRadius: 15 }} />
+        <Text style={{ color: "#001AFF", fontFamily: "Intro-Semi-Bold", fontSize: 16, }}>{title}</Text>
       </View>
+
+
+      <View style={{ flexDirection: "row", alignItems: "center", }}>
+        <DownloadComp />
+        <TouchableOpacity style={{ marginRight: 10, backgroundColor: "#f8f8f8", padding: 5, borderRadius: 99 }} >
+          <MaterialCommunityIcons
+            name={'history'}
+            size={26}
+            color="#888"
+
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
   )
 }
 

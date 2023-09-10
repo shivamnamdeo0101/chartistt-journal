@@ -3,11 +3,11 @@ import React from 'react'
 import LinearGradient from 'react-native-linear-gradient';
 import TradeComp from './TradeComp';
 
-const AllTradesComp = ({navigation}) => {
+const AllTradesComp = ({list,navigation}) => {
   return (
     <View>
       {
-        [1, 2, 3, 4, 5, 6, 7, 8, 9]?.map((item, index) => {
+        list?.map((item, index) => {
           return (
             <TradeComp item={item} key={index} navigation={navigation}/>
           )

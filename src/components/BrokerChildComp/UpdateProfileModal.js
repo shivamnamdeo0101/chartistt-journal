@@ -1,19 +1,15 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView, Alert } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { Button, Actionsheet, useDisclose, Box, Center } from "native-base";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Feather from 'react-native-vector-icons/Feather';
-
-import {Picker} from '@react-native-picker/picker';
-
-
 import { useForm, Controller } from 'react-hook-form';
 import CustomButton from '../CustomButton';
 import Modal from "react-native-modal";
-import { PanGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { FAB } from 'react-native-paper';
+import LoadingComp from '../LoadingComp';
+import { USER_API } from '../../service/UserService';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserDetails } from '../../store/UserSlice';
 
 function UpdateProfileModal() {
 
@@ -23,15 +19,90 @@ function UpdateProfileModal() {
         setModalVisible(!isModalVisible);
     };
    
+    const dispatch = useDispatch()
+    const user = useSelector((state)=>state?.userAuth?.user)
+    const { control, handleSubmit,setError,reset, formState: { errors } } = useForm({ defaultValues: {   
+        "userId":user?._id,
+        "fullName":user?.fullName,
+        "email":user?.fullName,
+        "contact":user?.contact
+    } });
+    const [loading, setloading] = useState(false)
+    useEffect(() => {
+        if (Object.keys(user).length > 0) {
+            reset(user);
+        } else {
+            reset({});
+        }
+    }, [isModalVisible])
 
-    const { control, handleSubmit, formState: { errors } } = useForm();
+    const objectsHaveSameFields = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2);
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         // Replace this with your login logic
-        console.log('Login Data:', data);
-        Alert.alert('Login Successful');
+       
+        const obj1 = {
+            "userId":user?._id,
+            "fullName": data?.fullName,
+            "email": data?.email,
+            "contact": data?.contact,
+        }
+        // const obj2 = {
+        //     "userId":user?._id,
+        //     "fullName": user?.fullName,
+        //     "email": user?.email,
+        //     "contact": user?.contact,
+        // }
+
+        setloading(true)
+
+        try {
+            const res = await USER_API.userUpdate(obj1,user?.token)
+            dispatch(setUserDetails(res))
+            if(res){
+                toggleModal()
+                reset()
+                Alert.alert("Profile Updated")
+            }
+        } catch (e) {
+
+            if(e?.message?.includes("Email ID already")){
+                setError('email', {
+                    type: 'manual',
+                    message: e?.message, // Set the error message from the API response
+                });
+            }else if(e?.message?.includes("Contact number already")){
+                setError('contact', {
+                    type: 'manual',
+                    message: e?.message, // Set the error message from the API response
+                });
+            }else if(e?.message?.includes("Email ID and Phone already")){
+                setError('email', {
+                    type: 'manual',
+                    message: "Email ID already registered with us", // Set the error message from the API response
+                });
+                setError('contact', {
+                    type: 'manual',
+                    message: "Contact number already registered with us", // Set the error message from the API response
+                });
+            }else{
+
+                
+                console.log(e?.message)
+                Alert.alert(e?.message)
+            }
+
+            
+        }
+        setloading(false)
     };
 
+
+    if (loading) {
+        return (
+            <LoadingComp />
+        )
+    }
 
     return (
         <View>
@@ -80,7 +151,7 @@ function UpdateProfileModal() {
 
                             />
                             <Controller
-                                name="name"
+                                name="fullName"
                                 control={control}
                                 defaultValue=""
                                 rules={{ required: 'Your Name is required' }}
@@ -95,7 +166,7 @@ function UpdateProfileModal() {
                                 )}
                             />
                         </View>
-                        {errors.name && <Text style={styles.errors}>{errors.name.message}</Text>}
+                        {errors.fullName && <Text style={styles.errors}>{errors.fullName.message}</Text>}
                     </View>
 
                     <View style={styles.textInputContainer}>
@@ -143,7 +214,7 @@ function UpdateProfileModal() {
                             />
                             <Controller
                                 control={control}
-                                name="contactNumber"
+                                name="contact"
                                 rules={{
                                     required: 'Your Contact Number is required',
                                     pattern: {
@@ -156,14 +227,15 @@ function UpdateProfileModal() {
                                         placeholder="Your Contact Number"
                                         keyboardType="phone-pad"
                                         onChangeText={field.onChange}
+                                        value={field?.value?.toString()}
                                         placeholderTextColor={"#ccc"}
                                         style={styles.textInput}
                                     />
                                 )}
                             />
                         </View>
-                        {errors.contactNumber && (
-                            <Text style={styles.errors}>{errors.contactNumber.message}</Text>
+                        {errors.contact && (
+                            <Text style={styles.errors}>{errors.contact.message}</Text>
                         )}
                     </View>
                                 </View>

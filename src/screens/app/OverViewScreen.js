@@ -25,6 +25,7 @@ const OverViewScreen = ({navigation}) => {
           AllTrades={false}
           OverView={true}
           Stat={true}
+          navigation={navigation}
         />
 
 

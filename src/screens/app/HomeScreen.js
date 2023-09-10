@@ -10,33 +10,10 @@ import { useSelector } from 'react-redux';
 const HomeScreen = ({navigation}) => {
 
   const user = useSelector((state)=>state?.userAuth?.user)
-
-  console.log(user)
-
   return (
-    <SafeAreaView>
-
-      <FAB
-        icon={"plus"}
-        label='Add Trade'
-        animated
-        color="#001AFF"
-        rippleColor="#ccc"
-        mode="elevated"
-        backgroundColor="#fff"
-        style={{
-          position: 'absolute',
-          margin: 16,
-          bottom:0,
-          right:0,
-          zIndex:1
-        }}
-        onPress={() => navigation.navigate("AddTrade")}
-      />
-        
-        
-
-      <ScrollView>
+    <SafeAreaView style={{flex:1}}>
+      
+      
         <StatusBar
           animated={true}
           backgroundColor="#fff"
@@ -59,7 +36,25 @@ const HomeScreen = ({navigation}) => {
 
 
 
-      </ScrollView>
+      
+      <FAB
+        icon={"plus"}
+        label='Add Trade'
+        animated
+        color="#001AFF"
+        rippleColor="#ccc"
+        mode="elevated"
+        backgroundColor="#fff"
+        style={{
+          position: 'absolute',
+          margin: 16,
+          bottom:0,
+          right:0,
+          zIndex:1
+        }}
+        onPress={() => navigation.navigate("AddTrade")}
+      />
+        
     </SafeAreaView>
   )
 }

@@ -80,16 +80,56 @@ export const USER_API = {
     };
 
     return fetch(`${EndPoint}auth/update-profile`, {
+      method: 'PUT',
+      headers: authHeaders,
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data?.success) {
+          return data?.data;
+        } else {
+          throw new Error(data.msg);
+        }
+      });
+  },
+  resetPass: async function (payload, token) {
+    const authHeaders = {
+      'Authorization': 'Bearer ' + token,
+      ...headers,
+    };
+
+    return fetch(`${EndPoint}auth/reset-pass`, {
+      method: 'PUT',
+      headers: authHeaders,
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data?.success) {
+          return data?.data;
+        } else {
+          throw new Error(data?.msg);
+        }
+      });
+  },
+
+  sendTempPass: async function (payload) {
+    const authHeaders = {
+      ...headers,
+    };
+
+    return fetch(`${EndPoint}auth/send-temp-pass`, {
       method: 'POST',
       headers: authHeaders,
       body: JSON.stringify(payload),
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.success) {
-          return data.data;
+        if (data?.success) {
+          return data?.data;
         } else {
-          throw new Error(data.msg);
+          throw new Error(data?.msg);
         }
       });
   },
@@ -106,21 +146,20 @@ export const USER_API = {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.success) {
-          return data.data;
+        if (data?.success) {
+          return data?.data;
         } else {
           throw new Error(data.msg);
         }
       });
   },
 
-  getData: async function (name, token) {
+  getData: async function (name) {
     const authHeaders = {
-      'Authorization': 'Bearer ' + token,
       ...headers,
     };
 
-    return fetch(`${EndPoint}private/data/` + name, {
+    return fetch(`${EndPoint}private/data/tradetype`, {
       method: 'GET',
       headers: authHeaders,
     })

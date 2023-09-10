@@ -15,9 +15,9 @@ export const BROKER_API = {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          return data.data;
+          return data?.data;
         } else {
-          throw new Error(data.msg);
+          throw new Error(data?.msg);
         }
       });
   },
@@ -55,8 +55,8 @@ export const BROKER_API = {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.success) {
-          return data.data;
+        if (data?.success) {
+          return data?.data;
         } else {
           throw new Error(data.msg);
         }
