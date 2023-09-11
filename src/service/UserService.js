@@ -159,14 +159,14 @@ export const USER_API = {
       ...headers,
     };
 
-    return fetch(`${EndPoint}private/data/tradetype`, {
+    return fetch(`${EndPoint}private/data/${name}`, {
       method: 'GET',
       headers: authHeaders,
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.success) {
-          return data.data;
+        if (data?.success) {
+          return data?.data;
         } else {
           throw new Error(data.msg);
         }

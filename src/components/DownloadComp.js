@@ -25,8 +25,6 @@ import DateSelect from './DateSelect';
 
 function DownloadComp() {
 
-
-
     const [startDate, setstartDate] = useState(new Date());
     const [showStart, setshowStart] = useState(false)
     const [startTimestamp, setstartTimestamp] = useState(0)
@@ -50,10 +48,6 @@ function DownloadComp() {
         setendDate(currentDate);
         setendTimestamp(Date.parse(currentDate));
     };
-
-
-
-
 
 
 

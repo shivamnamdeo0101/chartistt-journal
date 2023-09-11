@@ -11,14 +11,19 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useForm, Controller } from 'react-hook-form';
 import CustomButton from '../../components/CustomButton';
 import SelectInput from '../../components/SelectInput';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { USER_API } from '../../service/UserService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import BrokerSelect from '../../components/BrokerSelect';
 import SelectButton from '../../components/SelectButton';
+import { TRADE_API } from '../../service/TradeService';
+import { toggleRefresh } from '../../store/DataSlice';
+import LoadingComp from '../../components/LoadingComp';
 
 
 const AddTradeScreen = ({ navigation }) => {
+
+    const user = useSelector((state) => state?.userAuth?.user)
 
     const optionTypeList = [
 
@@ -36,25 +41,26 @@ const AddTradeScreen = ({ navigation }) => {
     const [action, setaction] = useState("buy")
     const [segment, setsegment] = useState("equity")
     const [tradeType, settradeType] = useState("intraday")
-    const [chartTimeFrame, setchartTimeFrame] = useState("1 min")
-    const [mindSetBeforeTrade, setmindSetBeforeTrade] = useState("Angry")
-    const [mindSetAfterTrade, setmindSetAfterTrade] = useState("Angry")
+    const [chartTimeFrame, setchartTimeFrame] = useState("1min")
+    const [mindSetBeforeTrade, setmindSetBeforeTrade] = useState("angry")
+    const [mindSetAfterTrade, setmindSetAfterTrade] = useState("angry")
     const [session, setsession] = useState("morning")
     const [optionType, setoptionType] = useState("call")
     const [broker, setbroker] = useState(data?.userBrokerList?.length > 0 ? userBrokerList[0] : {})
 
     const data = useSelector((state) => state?.data)
-
+    const dispatch = useDispatch()
+    const [loading, setloading] = useState(false)
 
     const [date, setDate] = useState(new Date());
     const [selectDate, setselectDate] = useState(false)
-    const [dateTimestamp, setdateTimestamp] = useState(0)
+    const [dateTimestamp, setdateTimestamp] = useState(Date.now())
 
     const onDateChange = (event, selectedDate) => {
         setselectDate(!selectDate)
-        const currentDate = selectedDate || date;
+        const currentDate = selectedDate || endDate;
         setDate(currentDate);
-        setdateTimestamp(Math.round(data.getTime() / 1000))
+        setdateTimestamp(Date.parse(currentDate));
     };
 
 
@@ -67,8 +73,8 @@ const AddTradeScreen = ({ navigation }) => {
         let targetWatch = parseFloat(e?.targetPoint);
         let stopLossWatch = parseFloat(e?.stopLoss);
 
-
-        console.log(action, "entryPrice", typeof entryWatch, "Target Point", targetWatch, "Stop Loss", stopLossWatch)
+      
+        // console.log(action, "entryPrice", typeof entryWatch, "Target Point", targetWatch, "Stop Loss", stopLossWatch)
 
         if (action === "buy") {
 
@@ -109,21 +115,70 @@ const AddTradeScreen = ({ navigation }) => {
     };
 
 
-    const { control, reset, watch, setValue, validate, getValues, handleSubmit, formState: { errors } } = useForm();
+    const { control, reset, watch, setValue, validate, setError, getValues, handleSubmit, formState: { errors } } = useForm();
 
-    const onSubmit = (data) => {
 
-        if(validateFun(data)){
-            console.log('Login Data:', data);
-            Alert.alert('Login Successful');
-        }else{
-            return
+    const onSubmitCall = async (e) => {
+
+        if(date === 0){
+            Alert.alert("Please select date")
+            return false
         }
-        // Replace this with your login logic
-       
+
+
+        setloading(true)
+        try {
+            const trade = { ...e,
+                    
+                "action":action,
+                "segment":segment,
+                "tradeType":tradeType,
+                "chartTimeFrame":chartTimeFrame,
+                "mindSetBeforeTrade":mindSetBeforeTrade,
+                "mindSetAfterTrade":mindSetAfterTrade,
+                "session":session,
+                 "brokerId": broker?.broker?._id, "date": dateTimestamp,"addOn":Date.now(),"updateOn":Date.now() }
+            if (validateFun(trade)) {
+                const payload = {
+                    "userId": user?._id,
+                    "trade": trade
+                }
+
+                //console.log(JSON.stringify(payload))
+                const res = await TRADE_API.addTrade(payload, user?.token)
+                if (res) {
+                    toggleModal()
+                    reset()
+                    dispatch(toggleRefresh(true))
+                    setTimeout(() => {
+                        dispatch(toggleRefresh(false))
+                    }, 2000); // Simulated delay (2 seconds)
+                    setloading(false)
+                    navigation.goBack()
+                    Alert.alert("Trade Added")
+
+                }
+            } else {
+                setloading(false)
+                return
+            }
+            setloading(false)
+
+        } catch (e) {
+            Alert.alert(e?.message)
+            setloading(false)
+
+        }
+
+        setloading(false)
+
+
     };
 
 
+    if(loading){
+        return <LoadingComp />
+    }
 
 
 
@@ -150,7 +205,10 @@ const AddTradeScreen = ({ navigation }) => {
 
 
             <View style={{ flexDirection: "column", justifyContent: "space-around", flex: 1, backgroundColor: "#f8f8f8", padding: 10 }}>
+
+
                 <ScrollView>
+
                     <View>
 
                         <View style={styles.textInputContainer}>
@@ -165,7 +223,7 @@ const AddTradeScreen = ({ navigation }) => {
                                 <Controller
                                     name="date"
                                     control={control}
-                                    defaultValue=""
+                                    defaultValue={date}
                                     rules={{
                                         required: 'Date is required',
 
@@ -178,6 +236,7 @@ const AddTradeScreen = ({ navigation }) => {
                                                     mode='date'
                                                     display='calendar'
                                                     onChange={onDateChange}
+                                                    maximumDate={new Date()}
                                                 />}
 
                                             <TouchableOpacity onPress={() => setselectDate(!selectDate)} style={{ borderRadius: 10, overflow: 'hidden' }}>
@@ -194,17 +253,10 @@ const AddTradeScreen = ({ navigation }) => {
                         <View style={styles.textInputContainer}>
                             <Text style={styles.textInputLabel}>BROKER NAME</Text>
                             <View style={styles.textView}>
-                                <FontAwesome
-                                    name={"hashtag"}
-                                    size={20}
-                                    color="#888"
 
-                                />
                                 <Controller
-                                    name="brokerName"
+                                    name="brokerId"
                                     control={control}
-                                    defaultValue=""
-                                   
                                     render={({ field }) => (
                                         <BrokerSelect
                                             label="Broker"
@@ -216,7 +268,7 @@ const AddTradeScreen = ({ navigation }) => {
                                     )}
                                 />
                             </View>
-                            {errors.brokerName && <Text style={styles.errors}>{errors.brokerName.message}</Text>}
+                            {errors.brokerId && <Text style={styles.errors}>{errors.brokerId.message}</Text>}
                         </View>
 
 
@@ -250,22 +302,22 @@ const AddTradeScreen = ({ navigation }) => {
                             <View style={styles.textView}>
 
                                 <Controller
-                                    control={control}
                                     name="action"
-                                    rules={{ required: true }}
+                                    control={control}
+                                    defaultValue={action}
                                     value={action}
-                                    render={({ field: { onChange, value } }) => (
-                                        <View style={{flex:1, borderRadius: 10, overflow: 'hidden', marginBottom: 0 }}>
-                                            <SelectInput
-                                                options={data?.actionList}
-                                                label="Select an option"
-                                                value={action}
-                                                setValue={setaction}
-                                            />
-                                        </View>
+                                    rules={{
+                                        required: 'Action is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <SelectButton
+                                            label={"Action"}
+                                            value={action}
+                                            setValue={setaction}
+                                            options={data?.actionList}
+                                        />
                                     )}
                                 />
-
                             </View>
                             {errors.action && <Text style={styles.errors}>{errors.action.message}</Text>}
                         </View>
@@ -274,9 +326,9 @@ const AddTradeScreen = ({ navigation }) => {
                             <View style={styles.textView}>
 
                                 <Controller
-                                    name="segmentType"
+                                    name="segment"
                                     control={control}
-                                    defaultValue=""
+                                    defaultValue={segment}
                                     rules={{
                                         required: 'Segment Type is required',
                                     }}
@@ -290,11 +342,11 @@ const AddTradeScreen = ({ navigation }) => {
                                     )}
                                 />
                             </View>
-                            {errors.segmentType && <Text style={styles.errors}>{errors.segmentType.message}</Text>}
+                            {errors.segment && <Text style={styles.errors}>{errors.segment.message}</Text>}
                         </View>
 
                         {
-                            segment ==="option" &&
+                            segment === "option" &&
 
                             <View>
                                 <View style={styles.textInputContainer}>
@@ -306,7 +358,7 @@ const AddTradeScreen = ({ navigation }) => {
                                             control={control}
                                             defaultValue=""
                                             rules={{
-                                                required: 'Strike Price is required',
+                                                required: segment === 'option' ? 'Stike price is required' : false,
                                             }}
                                             render={({ field }) => (
                                                 <TextInput
@@ -329,9 +381,9 @@ const AddTradeScreen = ({ navigation }) => {
                                         <Controller
                                             name="optionType"
                                             control={control}
-                                            defaultValue=""
+                                            defaultValue={optionType}
                                             rules={{
-                                                required: 'Option Type is required',
+                                                required: segment === 'option' ? 'Option Type is required' : false,
                                             }}
                                             render={({ field: { onChange, value } }) => (
                                                 <View style={{ borderRadius: 10, overflow: 'hidden', marginBottom: 0 }}>
@@ -357,7 +409,7 @@ const AddTradeScreen = ({ navigation }) => {
                                 <Controller
                                     name="tradeType"
                                     control={control}
-                                    defaultValue=""
+                                    defaultValue={tradeType}
                                     rules={{
                                         required: 'Trade Type is required',
                                     }}
@@ -380,7 +432,7 @@ const AddTradeScreen = ({ navigation }) => {
                                 <Controller
                                     name="chartTimeFrame"
                                     control={control}
-                                    defaultValue=""
+                                    defaultValue={chartTimeFrame}
                                     rules={{
                                         required: 'Chart Time Frame is required',
                                     }}
@@ -404,7 +456,7 @@ const AddTradeScreen = ({ navigation }) => {
                                 <Controller
                                     name="mindSetBeforeTrade"
                                     control={control}
-                                    defaultValue=""
+                                    defaultValue={mindSetBeforeTrade}
                                     rules={{
                                         required: 'Mindset Before Trade is required',
                                     }}
@@ -428,7 +480,7 @@ const AddTradeScreen = ({ navigation }) => {
                                 <Controller
                                     name="mindSetAfterTrade"
                                     control={control}
-                                    defaultValue=""
+                                    defaultValue={mindSetAfterTrade}
                                     rules={{
                                         required: 'Mindset After Trade is required',
                                     }}
@@ -451,12 +503,12 @@ const AddTradeScreen = ({ navigation }) => {
                                 <Controller
                                     name="session"
                                     control={control}
-                                    defaultValue=""
+                                    defaultValue={session}
                                     rules={{
                                         required: 'Session Is required',
                                     }}
                                     render={({ field }) => (
-                                        <View style={{flex:1}}>
+                                        <View style={{ flex: 1 }}>
                                             <SelectInput
                                                 label={"Session"}
                                                 options={data?.sessionList}
@@ -652,7 +704,7 @@ const AddTradeScreen = ({ navigation }) => {
                     <CustomButton
                         text={"Submit"}
                         filled={true}
-                        onPress={handleSubmit(onSubmit)}
+                        onPress={handleSubmit(onSubmitCall)}
                     />
 
                     <View style={{ flexDirection: "row", alignItems: "flex-start", alignSelf: "center", margin: 10, }}>

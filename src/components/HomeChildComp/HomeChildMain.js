@@ -27,13 +27,12 @@ const HomeChildMain = ({TFTR,AccLists,Filter,AllTrades,OverView,Stat,navigation}
     "brokerId":-1,
     "refresh":refresh,
      "userId":user?._id,
+     "duration":{ "name": "ALL TRADES", "value": "a", "start": 0 }
   })
 
   const payload = {
     ...filterObj
   }
-
-  console.log(filterObj,"filterObj")
 
   useEffect(() => {
     //setloading(true)
@@ -75,7 +74,7 @@ const HomeChildMain = ({TFTR,AccLists,Filter,AllTrades,OverView,Stat,navigation}
       {Filter && <FilterComp list={tradeList} filter={filterObj} setFilter={setfilterObj}/>}
       {AllTrades && <AllTradesComp list={tradeList} navigation={navigation} />}
       {OverView && <OverViewComp list={tradeList}/>}
-      {Stat && <StatComp />}
+      {Stat && <StatComp list={tradeList} />}
       </ScrollView>
     </View>
   )

@@ -31,9 +31,7 @@ function AddBrokerModal() {
     const user = useSelector((state)=>state?.userAuth?.user)
     const refresh = useSelector((state)=>state?.data?.refresh)
 
-
-
-    const { control, handleSubmit,setError,reset, formState: { errors } } = useForm();
+    const { control, handleSubmit, setError,reset, formState: { errors } } = useForm();
     const [loading, setloading] = useState(false)
     const onSubmit = async (data) => {
 

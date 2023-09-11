@@ -31,7 +31,7 @@ const Container = () => {
         .then(async res => {
           console.log(res?.isNeeded);    // true
           if (res?.isNeeded) {
-            handleVersionCheck(res.storeUrl);  // open store if update is needed.
+           // handleVersionCheck(res.storeUrl);  // open store if update is needed.
           }
         });
     }
@@ -70,6 +70,7 @@ const Container = () => {
       })
 
       await USER_API.getData("action").then((res) => {
+        console.log(res,"RES")
         dispatch(setActionList(res))
       })
       await USER_API.getData("segment").then((res) => {

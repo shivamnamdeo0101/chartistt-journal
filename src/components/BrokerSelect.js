@@ -28,7 +28,7 @@ const BrokerSelect = ({ label, value, setValue, options }) => {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={{ backgroundColor: "#ccc", borderColor: item?.broker?._id === value?.broker?.brokerId ? "#001AFF" : "#fff", borderWidth: 2, borderRadius: 5, padding: 10, marginBottom: 5 }}
+                                style={{ backgroundColor: "#ccc", borderColor: item?.broker?._id === value?.broker?._id ? "#001AFF" : "#fff", borderWidth: 2, borderRadius: 5, padding: 10, marginBottom: 5 }}
                                 onPress={() => setViewFalse(item)}
                             >
                                 <Text style={{ color: "#000", fontFamily: "Intro-Bold", textTransform: "capitalize" }}>{item?.broker.brokerName}</Text>

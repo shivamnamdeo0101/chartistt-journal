@@ -1,26 +1,36 @@
 import { View, Text, Image, TouchableOpacity, Dimensions, ScrollView, ScrollViewBase } from 'react-native'
 import React from 'react'
 
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
-} from "react-native-chart-kit";
+import { LineChart } from 'react-native-chart-kit';
+
 
 const screenWidth = Dimensions.get("window").width;
 
-const StatComp = () => {
+const StatComp = ({ list }) => {
 
-  const data = {
-    labels: ["January", "February", "March", "April", "May"],
-    datasets: [
-      {
-        data: [-20, -45, 28, 80, 99]
-      }
-    ]
+  console.log(JSON.stringify(list, 2, 2), "list")
+
+  const chartData = list?.map((item) => ({
+    name: item?.trade?.tradeName?.length > 10 ? item?.trade?.tradeName?.substring(0, 10) + "..." : item?.trade?.tradeName,
+    value: item?.trade?.exitPrice - item?.trade?.entryPrice, // Calculate profit or loss here
+  }));
+
+  console.log(chartData)
+  const chartConfig = {
+    backgroundColor: "#e26a00",
+    backgroundGradientFrom: "#fb8c00",
+    backgroundGradientTo: "#ffa726",
+    decimalPlaces: 2, // optional, defaults to 2dp
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    style: {
+      borderRadius: 16
+    },
+    propsForDots: {
+      r: "6",
+      strokeWidth: "2",
+      stroke: "#ffa726"
+    }
   };
 
   return (
@@ -29,40 +39,34 @@ const StatComp = () => {
         <TouchableOpacity>
           <Text style={{ color: "#000", fontFamily: "Intro-Bold" }}>STATTISTICS</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={{ color: "#001AFF", fontFamily: "Intro-Bold", textDecorationLine: "underline" }}>VIEW MORE</Text>
-        </TouchableOpacity>
+      
       </View>
 
-      <View style={{width:"100%",}}>
+      <View style={{ width: "100%", }}>
         <ScrollView horizontal={true}>
-        <BarChart
-  style={{}}
-  data={data}
-  width={screenWidth}
-  height={250}
-  yAxisLabel="$"
-  chartConfig={{
-    padding:10,
-    backgroundColor: "#e26a00",
-    backgroundGradientFrom: "#fb8c00",
-    backgroundGradientTo: "#ffa726",
-    decimalPlaces: 2, // optional, defaults to 2dp
-    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    style: {
-      borderRadius: 16,
-      padding:10
-    },
-    propsForDots: {
-      r: "6",
-      strokeWidth: "2",
-      stroke: "#ffa726"
-    }
-  }}
-  verticalLabelRotation={30}
-/></ScrollView>
-              </View>
+          <LineChart
+            data={{
+
+              datasets: [
+                {
+                  data: chartData.map((data) => data.value),
+                  color: (opacity = 1) => {
+                    // Color the line based on profit (green for profit, red for loss)
+                    return opacity >= 0 ? 'green' : 'red';
+                  },
+                },
+              ],
+            }}
+            width={Dimensions.get("window").width} // Adjust the width as needed
+            height={200} // Adjust the height as needed
+            yAxisSuffix="₹" // You can customize the y-axis label
+            chartConfig={chartConfig}
+            style={{
+              marginTop:8,
+            }}
+          />
+        </ScrollView>
+      </View>
     </View>
   )
 }

@@ -9,7 +9,7 @@ function SelectInput({ label, value, setValue, options }){
         setModalVisible(!isModalVisible);
     };
     const setViewFalse = (option) => {
-        setValue(option.label);
+        setValue(option.value);
         setModalVisible(false);
     };
 
@@ -28,10 +28,10 @@ function SelectInput({ label, value, setValue, options }){
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={{ backgroundColor: "#ccc", borderColor: item?.label === value ? "#001AFF" : "#fff", borderWidth: 2, borderRadius: 5, padding: 10, marginBottom: 5 }}
+                                style={{ backgroundColor: "#ccc", borderColor: item?.value === value ? "#001AFF" : "#fff", borderWidth: 2, borderRadius: 5, padding: 10, marginBottom: 5 }}
                                 onPress={() => setViewFalse(item)}
                             >
-                                <Text style={{ color: "#000", fontFamily: "Intro-Bold", textTransform: "capitalize" }}>{item.label}</Text>
+                                <Text style={{ color: "#000", fontFamily: "Intro-Bold", textTransform: "capitalize" }}>{item.value}</Text>
                             </TouchableOpacity>
                         )
                     })

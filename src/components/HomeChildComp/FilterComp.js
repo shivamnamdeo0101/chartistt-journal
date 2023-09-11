@@ -80,6 +80,15 @@ const FilterComp = ({ list, filter, setFilter }) => {
     //  dispatch(setTradeList(res))
   };
 
+  const setSortBy = (e)=>{
+    setFilter({ ...filter, "sortBy": e })
+  }
+
+  const setDuration = (e)=>{
+    setFilter({ ...filter, "duration": e })
+
+  }
+
   return (
     <View>
 
@@ -107,7 +116,7 @@ const FilterComp = ({ list, filter, setFilter }) => {
             <View style={{ flexDirection: "row", alignItems: "center", width: "100%", padding: 1, margin: 10, marginLeft: 0 }}>
 
               {sortOptions?.map((item, index) => (
-                <TouchableOpacity key={index} style={{ marginRight: 5, width: "30%", borderWidth: 2, borderColor: "#001AFF", borderRadius: 5, padding: 10, backgroundColor: "#fff" }} >
+                <TouchableOpacity onPress={()=>setSortBy(item)} key={index} style={{ marginRight: 5, width: "30%", borderWidth: 2, borderColor:filter?.sortBy === item ? "#001AFF" :"#ccc", borderRadius: 5, padding: 10, backgroundColor: "#fff" }} >
                   <Text style={{ color: "#000", textAlign: "center", textTransform: "uppercase",fontFamily:"Intro-Semi-Bold",fontSize:12 }}>{item}</Text>
                 </TouchableOpacity>
               ))}
@@ -121,7 +130,7 @@ const FilterComp = ({ list, filter, setFilter }) => {
             <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "flex-start", width: "100%", padding: 1, margin: 10, marginLeft: 0 }}>
 
               {timeOptions?.map((item, index) => (
-                <TouchableOpacity key={index} style={{ marginRight: 5, marginBottom: 5, borderWidth: 2, borderColor: "#001AFF", borderRadius: 5, padding: 10, backgroundColor: "#fff" }} >
+                <TouchableOpacity onPress={()=>setDuration(item)} key={index} style={{ marginRight: 5, marginBottom: 5, borderWidth: 2, borderColor:filter?.duration?.value === item?.value ?  "#001AFF" :"#ccc", borderRadius: 5, padding: 10, backgroundColor: "#fff" }} >
                   <Text style={{ textAlign: "center", color: "#000",fontSize:12, fontFamily:"Intro-Semi-Bold", textAlign: "center" }}>{item?.name}</Text>
                 </TouchableOpacity>
               ))}
@@ -132,8 +141,9 @@ const FilterComp = ({ list, filter, setFilter }) => {
           </View>
               
           <CustomButton 
-            text="Apply Filter"
+            text="Close Filter"
             filled={true}
+            onPress={toggleModal}
           />
 
         </View>
@@ -141,10 +151,10 @@ const FilterComp = ({ list, filter, setFilter }) => {
 
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10, marginBottom: 10 }}>
         <TouchableOpacity onPress={() => handleSortClick()}>
-          <Text style={{ color: "#001AFF", fontFamily: "Intro-Bold", textDecorationLine: "underline", textTransform: "uppercase" }}>TRADES SORT - {sortOptions[currSortIndex]}</Text>
+          <Text style={{ color: "#001AFF", fontFamily: "Intro-Bold", textDecorationLine: "underline", textTransform: "uppercase" }}>TRADES SORT - {filter?.sortBy}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleDuartionClick()}>
-          <Text style={{ color: "#001AFF", fontFamily: "Intro-Bold", textDecorationLine: "underline" }}>{timeOptions[timeIndex]?.name}</Text>
+          <Text style={{ color: "#001AFF", fontFamily: "Intro-Bold", textDecorationLine: "underline" }}>{filter?.duration?.name}</Text>
         </TouchableOpacity>
       </View>
       <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", textTransform: "uppercase", marginBottom: 5, fontSize: 12 }}>RESULTS FOUND - {list?.length}</Text>

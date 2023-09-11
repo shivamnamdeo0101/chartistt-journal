@@ -23,13 +23,13 @@ export const TRADE_API = {
   },
 
   getAllTrades: async function (payload, token) {
-    const { sortBy, start, end,userId ,brokerId} = payload;
+    const { sortBy, start, end,userId ,brokerId,duration} = payload;
     const headers = {
       'Authorization': 'Bearer ' + token,
       'Content-Type': 'application/json',
     };
 
-    return fetch(`${EndPoint}private/trades-filter/${userId}/${brokerId}/${sortBy}/${start}/${end}`, {
+    return fetch(`${EndPoint}private/trades-filter/${userId}/${brokerId}/${sortBy}/${duration?.start}/${end}`, {
       method: 'GET',
       headers: headers,
     })
