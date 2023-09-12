@@ -2,17 +2,21 @@ import { View, Text, Image, TouchableOpacity, Dimensions, ScrollView, ScrollView
 import React from 'react'
 
 import { LineChart } from 'react-native-chart-kit';
+import { profitOrLossForOneTrade } from '../../service/CalcService';
 
 
 const screenWidth = Dimensions.get("window").width;
 
 const StatComp = ({ list }) => {
 
+
+  
+
   console.log(JSON.stringify(list, 2, 2), "list")
 
   const chartData = list?.map((item) => ({
     name: item?.trade?.tradeName?.length > 10 ? item?.trade?.tradeName?.substring(0, 10) + "..." : item?.trade?.tradeName,
-    value: item?.trade?.exitPrice - item?.trade?.entryPrice, // Calculate profit or loss here
+    value: profitOrLossForOneTrade(item?.trade), // Calculate profit or loss here
   }));
 
   console.log(chartData)
@@ -43,7 +47,7 @@ const StatComp = ({ list }) => {
       </View>
 
       <View style={{ width: "100%", }}>
-        <ScrollView horizontal={true}>
+        {list?.length > 0 ? <ScrollView horizontal={true}>
           <LineChart
             data={{
 
@@ -66,6 +70,10 @@ const StatComp = ({ list }) => {
             }}
           />
         </ScrollView>
+        
+        :
+            <Text style={{color:"#000",fontFamily:"Intro-Bold",marginTop:10,textAlign:"center"}}>No Result Found</Text>
+        }
       </View>
     </View>
   )
