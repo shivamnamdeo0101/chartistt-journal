@@ -25,7 +25,6 @@ const HomeChildMain = ({TFTR,AccLists,Filter,AllTrades,OverView,Stat,navigation}
     "start":0,
     "end":Date.now(),
     "brokerId":-1,
-    "refresh":refresh,
      "userId":user?._id,
      "duration":{ "name": "ALL TRADES", "value": "a", "start": 0 }
   })

@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, SafeAreaView, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StatusBar, SafeAreaView, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
 import React from 'react'
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -10,6 +10,18 @@ import { useSelector } from 'react-redux';
 const HomeScreen = ({navigation}) => {
 
   const user = useSelector((state)=>state?.userAuth?.user)
+  const brokerList = useSelector((state)=>state?.data?.userBrokerList)
+
+
+  const goToAddTrade = ()=>{
+
+    if(brokerList?.length>0){
+      navigation.navigate("AddTrade")
+    }else{
+      Alert.alert("Please add broker then you can add trade")
+    }
+    
+  }
   return (
     <SafeAreaView style={{flex:1}}>
       
@@ -52,7 +64,7 @@ const HomeScreen = ({navigation}) => {
           right:0,
           zIndex:1
         }}
-        onPress={() => navigation.navigate("AddTrade")}
+        onPress={() => goToAddTrade()}
       />
         
     </SafeAreaView>

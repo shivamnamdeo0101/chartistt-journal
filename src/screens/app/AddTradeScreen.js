@@ -37,6 +37,8 @@ const AddTradeScreen = ({ navigation }) => {
         }
 
     ]
+    const data = useSelector((state) => state?.data)
+
     const [isModalVisible, setModalVisible] = useState(false);
     const [action, setaction] = useState("buy")
     const [segment, setsegment] = useState("equity")
@@ -48,7 +50,7 @@ const AddTradeScreen = ({ navigation }) => {
     const [optionType, setoptionType] = useState("call")
     const [broker, setbroker] = useState(data?.userBrokerList?.length > 0 ? data?.userBrokerList[0] : {})
 
-    const data = useSelector((state) => state?.data)
+
     const dispatch = useDispatch()
     const [loading, setloading] = useState(false)
 
@@ -144,7 +146,7 @@ const AddTradeScreen = ({ navigation }) => {
                     "trade": trade
                 }
 
-                //console.log(JSON.stringify(payload))
+               // console.log(JSON.stringify(payload))
                 const res = await TRADE_API.addTrade(payload, user?.token)
                 if (res) {
                     toggleModal()
