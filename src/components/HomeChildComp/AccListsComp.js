@@ -5,6 +5,13 @@ import { useSelector } from 'react-redux'
 const AccListsComp = ({filter,setFilter,navigation}) => {
 
   const userBrokerList = useSelector((state)=>state?.data?.userBrokerList)
+  const allBrokerList = useSelector((state)=>state?.data?.allBrokerList)
+
+  const getImg =(brokerName)=>{
+    const broker =   allBrokerList?.find((item)=>item?.label?.includes(brokerName))
+    return broker?.iconLink ? broker?.iconLink : "https://ui-avatars.com/api/?name=Others&background=random&color=fff"
+  }
+
 
   const pressFun = (e)=>{
     setFilter({...filter,"brokerId":e})
@@ -25,14 +32,14 @@ const AccListsComp = ({filter,setFilter,navigation}) => {
         <ScrollView horizontal={true}>
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity onPress={()=>pressFun(-1)} style={{ marginRight: 5 }}>
-              <Image style={{ width: 50, height: 50, borderRadius: 99, borderColor: filter?.brokerId === -1 ? "#001AFF" :"#fff", borderWidth: 2 ,}} source={{ uri: "https://ik.imagekit.io/lajz2ta7n/Brokers/Fyers.png" }} />
+              <Image style={{ width: 50, height: 50, borderRadius: 99, borderColor: filter?.brokerId === -1 ? "#001AFF" :"#fff", borderWidth: 2 ,}} source={{ uri: "https://ui-avatars.com/api/?name=All&background=random&color=fff" }} />
               <Text style={{ color: "#888", fontFamily: "Intro-Semi-Bold", textAlign: "center", fontSize: 12 }}>All</Text>
             </TouchableOpacity>
             {
              userBrokerList?.map((item, index) => {
                 return (
                   <TouchableOpacity onPress={()=>pressFun(item?.broker?._id)} key={index} style={{ marginRight: 5 }}>
-                    <Image style={{ width: 50, height: 50, borderRadius: 99, borderColor: filter?.brokerId === item?.broker?._id ? "#001AFF" :"#fff", borderWidth: 2}} source={{ uri: "https://ik.imagekit.io/lajz2ta7n/Brokers/Dhan.png" }} />
+                    <Image style={{ width: 50, height: 50, borderRadius: 99, borderColor: filter?.brokerId === item?.broker?._id ? "#001AFF" :"#fff", borderWidth: 2}} source={{ uri: getImg(item?.broker?.brokerName) }} />
                     <Text style={{ color: "#888", fontFamily: "Intro-Semi-Bold", textAlign: "center", fontSize: 12 }}>{item?.broker?.brokerName}</Text>
                   </TouchableOpacity>
                 )

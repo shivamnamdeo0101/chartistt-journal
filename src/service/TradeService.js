@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { EndPoint } from '../utils/Endpoint';
 
 export const TRADE_API = {
@@ -23,6 +24,9 @@ export const TRADE_API = {
   },
 
   getAllTrades: async function (payload, token) {
+
+    console.log("===============getAllTrades=================",moment(Date.now()).format())
+
     const { sortBy, start, end,userId ,brokerId,duration} = payload;
     const headers = {
       'Authorization': 'Bearer ' + token,

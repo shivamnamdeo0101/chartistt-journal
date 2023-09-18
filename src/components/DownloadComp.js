@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, PermissionsAndroid, Alert, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView } from 'react-native'
+import { View, Text, StyleSheet, PermissionsAndroid, ToastAndroid, Alert, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Button, Actionsheet, useDisclose, Box, Center } from "native-base";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Feather from 'react-native-vector-icons/Feather';
+import Share from 'react-native-share';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -27,12 +28,12 @@ function DownloadComp() {
 
     const [startDate, setstartDate] = useState(new Date());
     const [showStart, setshowStart] = useState(false)
-    const [startTimestamp, setstartTimestamp] = useState(0)
+    const [startTimestamp, setstartTimestamp] = useState(Date.now())
 
 
     const [endDate, setendDate] = useState(new Date());
     const [showEnd, setshowEnd] = useState(false)
-    const [endTimestamp, setendTimestamp] = useState(0)
+    const [endTimestamp, setendTimestamp] = useState(Date.now())
 
 
     const onStartDateChange = (event, selectedDate) => {
@@ -60,13 +61,13 @@ function DownloadComp() {
 
     const user = useSelector((state) => state?.userAuth?.user)
 
-    
 
-    const { control, handleSubmit, setError,formState: { errors } } = useForm();
+
+    const { control, handleSubmit, setError, formState: { errors } } = useForm();
 
     const onSubmit = () => {
 
-        if(endTimestamp < startTimestamp){
+        if (endTimestamp < startTimestamp) {
             setError('startDate', {
                 type: 'manual',
                 message: "Start date should be less than end date", // Set the error message from the API response
@@ -78,8 +79,8 @@ function DownloadComp() {
 
             return
         }
-
-        convertAndSaveDataToCSV()
+        createAndShareCSVWithNotification()
+        // convertAndSaveDataToCSV()
         toggleModal()
     };
 
@@ -88,6 +89,7 @@ function DownloadComp() {
     useEffect(() => {
         requestWriteFilePermission()
     }, [])
+
     async function requestWriteFilePermission() {
         try {
             const granted = await PermissionsAndroid.request(
@@ -103,26 +105,84 @@ function DownloadComp() {
             console.warn(err);
         }
     }
-    async function convertAndSaveDataToCSV() {
-        
-        
-        const payload = {
-            "userId": user?._id,
-            "start": startTimestamp,
-            "end": endTimestamp
-        }
+    // async function convertAndSaveDataToCSV() {
 
-        const list = await TRADE_API.getAllCalenderTrades(payload, user?.token)
+    //     const payload = {
+    //         "userId": user?._id,
+    //         "start": startTimestamp,
+    //         "end": endTimestamp
+    //     }
 
-        if (list?.length === 0) {
-            Alert.alert("Not Trade Found")
-            return
-        }
+    //     const list = await TRADE_API.getAllCalenderTrades(payload, user?.token)
 
-        const fileName = "Trades";
+    //     if (list?.length === 0) {
+    //         Alert.alert("Not Trade Found")
+    //         return
+    //     }
 
-        console.log(fileName)
+    //     const fileName = "Trades";
 
+    //     console.log(fileName)
+
+    //     let csvData = '';
+    //     const separator = ',';
+
+    //     // Add header row
+    //     const header = Object.keys(list[0]?.trade).join(separator);
+    //     csvData += `${header}\n`;
+    //     // Add rows
+    //     list.forEach((item) => {
+    //         const row = Object.values(item?.trade).join(separator);
+    //         csvData += `${row}\n`;
+    //     });
+
+    // const { config, fs } = RNFetchBlob;
+
+    // // Save file to device
+    // const path = `${fs.dirs.DownloadDir}/${fileName}.csv`;
+
+    // RNFS.writeFile(path, csvData, 'utf8')
+    //     .then(() => {
+    //         console.log('File written at:', path);
+    //         Alert.alert("File saved in download folder")
+    //     })
+    //     .catch((err) => {
+    //         console.log(err.message);
+    //     });
+
+
+
+    // }
+
+    // const downloadFile = () => {
+    //     const url = 'https://example.com/path/to/Trades.csv'; // Replace with your CSV file URL
+
+    //     const { DownloadDir, DocumentDir } = RNFetchBlob.fs;
+
+    //     RNFetchBlob.config({
+    //         fileCache: true,
+    //         addAndroidDownloads: {
+    //             useDownloadManager: true,
+    //             notification: true,
+    //             title: 'File Download',
+    //             description: 'Downloading file...',
+    //             mime: 'application/csv', // Specify the correct MIME type for your file
+    //             path: `${DownloadDir}/Trades.csv`,
+    //         },
+    //     })
+    //         .fetch('GET', url)
+    //         .then(res => {
+    //             // Handle the download success
+    //             console.log('File downloaded successfully');
+    //         })
+    //         .catch(error => {
+    //             // Handle download errors
+    //             console.error('File download error:', error);
+    //         });
+    // };
+
+
+    const convertToCSV = (list) => {
         let csvData = '';
         const separator = ',';
 
@@ -135,21 +195,64 @@ function DownloadComp() {
             csvData += `${row}\n`;
         });
 
-        const { config, fs } = RNFetchBlob;
+        return csvData;
+    };
 
-        // Save file to device
-        const path = `${fs.dirs.DownloadDir}/${fileName}.csv`;
+    const createAndShareCSVWithNotification = async () => {
+        try {
 
-        RNFS.writeFile(path, csvData, 'utf8')
+            const payload = {
+                "userId": user?._id,
+                "start": startTimestamp,
+                "end": endTimestamp
+            }
+
+            const list = await TRADE_API.getAllCalenderTrades(payload, user?.token)
+
+            if (list?.length === 0) {
+                Alert.alert("Not Trade Found")
+                return
+            }
+            // Convert JSON data to CSV
+            const csvData = convertToCSV(list);
+
+            const { config, fs } = RNFetchBlob;
+            // Define the file path where the CSV file will be stored
+            const path = `${fs.dirs.DownloadDir}/Trades.csv`;
+            //const filePath = `${RNFS.CachesDirectoryPath}/Trades.csv`;
+
+            // Write the CSV data to the file
+            await RNFS.writeFile(path, csvData, 'utf8')
             .then(() => {
-                console.log('File written at:', path);
-                Alert.alert("File saved in download folder")
+                    console.log('File written at:', path);
+                    
             })
             .catch((err) => {
-                console.log(err.message);
+                    console.log(err.message);
             });
 
-    }
+            // Display a custom download notification
+            ToastAndroid.showWithGravity(
+                'CSV file downloaded and saved in download folder.',
+                ToastAndroid.LONG,
+                ToastAndroid.CENTER
+            );
+
+           
+
+            // Share the CSV file
+            await Share.open({
+                url: `file://${path}`,
+                type: 'text/csv',
+                filename: 'Trades.csv',
+            });
+
+        } catch (error) {
+            console.log(error?.message)
+        }
+    };
+
+
 
 
 
@@ -201,7 +304,7 @@ function DownloadComp() {
                                                 }}
                                                 defaultValue={startDate}
                                                 render={({ field: { onChange, value } }) => (
-                                                    <View style={{flex:1,}}>
+                                                    <View style={{ flex: 1, }}>
                                                         {showStart &&
                                                             <DateTimePicker
                                                                 value={startDate}
@@ -211,9 +314,9 @@ function DownloadComp() {
                                                                 maximumDate={new Date()}
                                                             />}
 
-                                                        <TouchableOpacity onPress={() => setshowStart(!showStart)} style={{ borderRadius: 10, overflow: 'hidden',padding:14 }}>
+                                                        <TouchableOpacity onPress={() => setshowStart(!showStart)} style={{ borderRadius: 10, overflow: 'hidden', padding: 14 }}>
                                                             <Text style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#fff", }} >
-                                                                 {startDate.toLocaleDateString()}
+                                                                {startDate.toLocaleDateString()}
                                                             </Text>
                                                         </TouchableOpacity>
                                                     </View>
@@ -240,22 +343,22 @@ function DownloadComp() {
                                                 }}
                                                 defaultValue={endDate}
                                                 render={({ field }) => (
-                                                    <View style={{flex:1}}>
-                                                    {showEnd &&
-                                                        <DateTimePicker
-                                                            value={endDate}
-                                                            mode='date'
-                                                            display='calendar'
-                                                            onChange={onEndDateChange}
-                                                            maximumDate={new Date()}
-                                                        />}
+                                                    <View style={{ flex: 1 }}>
+                                                        {showEnd &&
+                                                            <DateTimePicker
+                                                                value={endDate}
+                                                                mode='date'
+                                                                display='calendar'
+                                                                onChange={onEndDateChange}
+                                                                maximumDate={new Date()}
+                                                            />}
 
-                                                    <TouchableOpacity onPress={() => setshowEnd(!showEnd)} style={{ borderRadius: 10,padding:14, overflow: 'hidden', marginBottom: 0 }}>
-                                                        <Text style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#fff", }} >
-                                                            {endDate.toLocaleDateString()}
-                                                        </Text>
-                                                    </TouchableOpacity>
-                                                </View>
+                                                        <TouchableOpacity onPress={() => setshowEnd(!showEnd)} style={{ borderRadius: 10, padding: 14, overflow: 'hidden', marginBottom: 0 }}>
+                                                            <Text style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#fff", }} >
+                                                                {endDate.toLocaleDateString()}
+                                                            </Text>
+                                                        </TouchableOpacity>
+                                                    </View>
                                                 )}
                                             />
                                         </View>

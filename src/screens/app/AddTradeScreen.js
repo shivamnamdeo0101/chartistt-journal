@@ -17,7 +17,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import BrokerSelect from '../../components/BrokerSelect';
 import SelectButton from '../../components/SelectButton';
 import { TRADE_API } from '../../service/TradeService';
-import { toggleRefresh } from '../../store/DataSlice';
+import { setTradeList, toggleRefresh } from '../../store/DataSlice';
 import LoadingComp from '../../components/LoadingComp';
 
 
@@ -66,6 +66,20 @@ const AddTradeScreen = ({ navigation }) => {
     };
 
 
+    const [filterObj, setfilterObj] = useState({
+        "sortBy": "date",
+        "start": 0,
+        "end": Date.now(),
+        "brokerId": -1,
+        "userId": user?._id,
+        "duration": { "name": "ALL TRADES", "value": "a", "start": 0 }
+    })
+
+    const payload = {
+        ...filterObj
+    }
+
+
 
 
 
@@ -75,7 +89,7 @@ const AddTradeScreen = ({ navigation }) => {
         let targetWatch = parseFloat(e?.targetPoint);
         let stopLossWatch = parseFloat(e?.stopLoss);
 
-      
+
         // console.log(action, "entryPrice", typeof entryWatch, "Target Point", targetWatch, "Stop Loss", stopLossWatch)
 
         if (action === "buy") {
@@ -122,45 +136,53 @@ const AddTradeScreen = ({ navigation }) => {
 
     const onSubmitCall = async (e) => {
 
-        if(date === 0){
+        setloading(true)
+        dispatch(toggleRefresh(false))
+
+        if (date === 0) {
             Alert.alert("Please select date")
             return false
         }
 
 
-        setloading(true)
         try {
-            const trade = { ...e,
-                    
-                "action":action,
-                "segment":segment,
-                "tradeType":tradeType,
-                "chartTimeFrame":chartTimeFrame,
-                "mindSetBeforeTrade":mindSetBeforeTrade,
-                "mindSetAfterTrade":mindSetAfterTrade,
-                "session":session,
-                 "brokerId": broker?.broker?._id, "date": dateTimestamp,"addOn":Date.now(),"updateOn":Date.now() }
+            const trade = {
+                ...e,
+
+                "action": action,
+                "segment": segment,
+                "tradeType": tradeType,
+                "chartTimeFrame": chartTimeFrame,
+                "mindSetBeforeTrade": mindSetBeforeTrade,
+                "mindSetAfterTrade": mindSetAfterTrade,
+                "session": session,
+                "brokerId": broker?.broker?._id, "date": dateTimestamp, "addOn": Date.now(), "updateOn": Date.now()
+            }
             if (validateFun(trade)) {
                 const payload = {
                     "userId": user?._id,
                     "trade": trade
                 }
 
-               // console.log(JSON.stringify(payload))
+
+
+                // console.log(JSON.stringify(payload))
                 const res = await TRADE_API.addTrade(payload, user?.token)
+
                 if (res) {
                     toggleModal()
                     reset()
                     dispatch(toggleRefresh(true))
-                    setTimeout(() => {
-                        dispatch(toggleRefresh(false))
-                    }, 2000); // Simulated delay (2 seconds)
+                    // After the data fetching is complete, set refreshing to false
+                    dispatch(toggleRefresh(false))
                     setloading(false)
                     navigation.goBack()
-                    Alert.alert("Trade Added")
+                    Alert.alert("Trade Updated")
+
 
                 }
             } else {
+                dispatch(toggleRefresh(false))
                 setloading(false)
                 return
             }
@@ -178,7 +200,7 @@ const AddTradeScreen = ({ navigation }) => {
     };
 
 
-    if(loading){
+    if (loading) {
         return <LoadingComp />
     }
 

@@ -10,7 +10,7 @@ import BottomTabNavigator from './src/navigation/BottomTabNavigator';
 
 import messaging from '@react-native-firebase/messaging';
 import { USER_API } from './src/service/UserService';
-import { setActionList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setFilterObjRedux, setSegmentList, setSessionList, setTradeTypeList, setUserBrokerList } from './src/store/DataSlice';
+import { setActionList, setAllBrokerList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setFilterObjRedux, setSegmentList, setSessionList, setTradeTypeList, setUserBrokerList } from './src/store/DataSlice';
 import { BROKER_API } from './src/service/BrokerService';
 import notifee from '@notifee/react-native';
 import VersionCheck from 'react-native-version-check';
@@ -90,7 +90,7 @@ const Container = () => {
       })
 
       await USER_API.getData("brokers").then((res) => {
-        dispatch(setAllBrokerListRedux(res))
+        dispatch(setAllBrokerList(res))
       })
 
 

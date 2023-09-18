@@ -26,11 +26,17 @@ function BrokerComp({ item, index }) {
 
     const [isModalVisible, setModalVisible] = useState(false);
     const refresh = useSelector((state) => state?.data?.refresh)
+    const allBrokerList = useSelector((state) => state?.data?.allBrokerList)
+
     const dispatch = useDispatch()
 
     const accAmtForOneBroker = getAccForOneBroker(item)
     const pAndL = getProfitOrLossPercentageForOneBroker(item?.broker?.amtDeposit, accAmtForOneBroker)
 
+    const getImg = (brokerName) => {
+        const broker = allBrokerList?.find((item) => item?.label?.includes(brokerName))
+        return broker?.iconLink ? broker?.iconLink : "https://ui-avatars.com/api/?name=Others&background=random&color=fff&rounded=true"
+    }
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
@@ -40,6 +46,8 @@ function BrokerComp({ item, index }) {
     const user = useSelector((state) => state?.userAuth?.user)
     const { control, handleSubmit, setError, reset, formState: { errors } } = useForm({ defaultValues: item?.broker });
     const [loading, setloading] = useState(false)
+
+
     useEffect(() => {
         if (Object.keys(item?.broker).length > 0) {
             reset(item?.broker);
@@ -123,19 +131,19 @@ function BrokerComp({ item, index }) {
         try {
             setloading(true)
             const res = await BROKER_API.remBroker(payload, user?.token)
-                toggleModal()
-                reset()
-                setloading(false)
-                dispatch(toggleRefresh(true))
-                setTimeout(() => {
-                    // After the data fetching is complete, set refreshing to false
-                    dispatch(toggleRefresh(false))
-                }, 2000); // Simulated delay (2 seconds)
-                Alert.alert("Broker Deleted")
-            
+            toggleModal()
+            reset()
+            setloading(false)
+            dispatch(toggleRefresh(true))
+            setTimeout(() => {
+                // After the data fetching is complete, set refreshing to false
+                dispatch(toggleRefresh(false))
+            }, 2000); // Simulated delay (2 seconds)
+            Alert.alert("Broker Deleted")
+
         } catch (e) {
             setloading(false)
-            console.log(e,"Broker Deleted ")
+            console.log(e, "Broker Deleted ")
         }
     }
 
@@ -148,9 +156,9 @@ function BrokerComp({ item, index }) {
     return (
         <View>
             <TouchableOpacity onPress={toggleModal} style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", padding: 10, backgroundColor: "#fff", marginBottom: 10, borderRadius: 5 }}>
-                <View style={{alignItems: "center" }}>
-                    <Image source={{ uri: "https://ik.imagekit.io/lajz2ta7n/Brokers/Paytm_Money.png" }} style={{ width: 50, height: 50 }} />
-                    <Text style={{fontSize:12, color: pAndL >= 0 ? "#00BF63" : "#f03", fontFamily: "Intro-Semi-Bold" }}>{pAndL} % </Text>
+                <View style={{ alignItems: "center" }}>
+                    <Image source={{ uri: getImg(item?.broker?.brokerName) }} style={{ width: 50, height: 50 }} />
+                    <Text style={{ fontSize: 12, color: pAndL >= 0 ? "#00BF63" : "#f03", fontFamily: "Intro-Semi-Bold" }}>{pAndL} % </Text>
                 </View>
                 <View>
                     <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", fontSize: 12 }}>BROKER NAME</Text>
@@ -212,12 +220,13 @@ function BrokerComp({ item, index }) {
                                                 name="brokerName"
                                                 control={control}
                                                 defaultValue=""
+                                               
                                                 rules={{
                                                     required: 'Broker Name is required',
-
                                                 }}
                                                 render={({ field }) => (
                                                     <TextInput
+                                                        editable={false}
                                                         placeholder="Enter Broker Name"
                                                         onChangeText={field.onChange}
                                                         value={field.value}

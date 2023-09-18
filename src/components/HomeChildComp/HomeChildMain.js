@@ -1,5 +1,5 @@
-import { View, Text,RefreshControl, ScrollView } from 'react-native'
-import React,{useState,useEffect} from 'react'
+import { View, Text, RefreshControl, ScrollView } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import TFTRComp from './TFTRComp'
 import AccListsComp from './AccListsComp'
 import AllTradesComp from './AllTradesComp'
@@ -11,22 +11,24 @@ import { useDispatch, useSelector } from 'react-redux'
 import LoadingComp from '../LoadingComp'
 import { setTradeList, toggleRefresh } from '../../store/DataSlice'
 
-const HomeChildMain = ({TFTR,AccLists,Filter,AllTrades,OverView,Stat,navigation}) => {
+const HomeChildMain = ({ TFTR, AccLists, Filter, AllTrades, OverView, Stat, navigation }) => {
 
-  const user = useSelector((state)=>state?.userAuth?.user)
-  const refresh = useSelector((state)=>state?.data?.refresh)
-  const tradeList = useSelector((state)=>state?.data?.tradeList)
+  const user = useSelector((state) => state?.userAuth?.user)
+  const refresh = useSelector((state) => state?.data?.refresh)
+  const tradeList = useSelector((state) => state?.data?.tradeList)
+
+  console.log(refresh,"refresh")
 
   const dispatch = useDispatch()
   const [list, setlist] = useState([])
   const [loading, setloading] = useState(true)
   const [filterObj, setfilterObj] = useState({
-    "sortBy":"date",
-    "start":0,
-    "end":Date.now(),
-    "brokerId":-1,
-     "userId":user?._id,
-     "duration":{ "name": "ALL TRADES", "value": "a", "start": 0 }
+    "sortBy": "date",
+    "start": 0,
+    "end": Date.now(),
+    "brokerId": -1,
+    "userId": user?._id,
+    "duration": { "name": "ALL TRADES", "value": "a", "start": 0 }
   })
 
   const payload = {
@@ -35,15 +37,27 @@ const HomeChildMain = ({TFTR,AccLists,Filter,AllTrades,OverView,Stat,navigation}
 
   useEffect(() => {
     //setloading(true)
-    const fetchData = async ()=>{
-      const res = await TRADE_API.getAllTrades(payload,user?.token)
+    const fetchData = async () => {
+      const res = await TRADE_API.getAllTrades(payload, user?.token)
       dispatch(setTradeList(res))
       setloading(false)
     }
     fetchData()
-  }, [filterObj,refresh])
+  }, [filterObj])
 
-  
+  useEffect(() => {
+    //setloading(true)
+    const fetchData = async () => {
+      const res = await TRADE_API.getAllTrades(payload, user?.token)
+      dispatch(setTradeList(res))
+      setloading(false)
+    }
+    fetchData()
+  }, [refresh])
+
+
+
+
   const handleRefresh = () => {
     // Set refreshing to true to show the loading indicator
     dispatch(toggleRefresh(true));
@@ -56,24 +70,24 @@ const HomeChildMain = ({TFTR,AccLists,Filter,AllTrades,OverView,Stat,navigation}
   };
 
 
-  if(loading){
+  if (loading) {
     return <LoadingComp />
   }
-  
-  
+
+  console.log(tradeList?.length)
 
   return (
 
-    <View style={{flex:1,backgroundColor:"#f0f3f5",padding:14,paddingTop:5}}>
-      <ScrollView  refreshControl={
+    <View style={{ flex: 1, backgroundColor: "#f0f3f5", padding: 14, paddingTop: 5 }}>
+      <ScrollView refreshControl={
         <RefreshControl refreshing={refresh} onRefresh={handleRefresh} />
       }>
-      {TFTR && <TFTRComp list={tradeList}/>}
-      {AccLists && <AccListsComp filter={filterObj} setFilter={setfilterObj} navigation={navigation}/>}
-      {Filter && <FilterComp list={tradeList} filter={filterObj} setFilter={setfilterObj}/>}
-      {AllTrades && <AllTradesComp list={tradeList} navigation={navigation} />}
-      {OverView && <OverViewComp list={tradeList}/>}
-      {Stat && <StatComp list={tradeList} />}
+        {TFTR && <TFTRComp list={tradeList} />}
+        {AccLists && <AccListsComp filter={filterObj} setFilter={setfilterObj} navigation={navigation} />}
+        {Filter && <FilterComp list={tradeList} filter={filterObj} setFilter={setfilterObj} />}
+        {AllTrades && <AllTradesComp list={tradeList} navigation={navigation} />}
+        {OverView && <OverViewComp list={tradeList} />}
+        {Stat && <StatComp list={tradeList} />}
       </ScrollView>
     </View>
   )

@@ -19,14 +19,6 @@ const ChartisttHeader = ({ title }) => {
 
       <View style={{ flexDirection: "row", alignItems: "center", }}>
         <DownloadComp />
-        <TouchableOpacity style={{ marginRight: 10, backgroundColor: "#f8f8f8", padding: 5, borderRadius: 99 }} >
-          <MaterialCommunityIcons
-            name={'history'}
-            size={26}
-            color="#888"
-
-          />
-        </TouchableOpacity>
       </View>
     </View>
   )

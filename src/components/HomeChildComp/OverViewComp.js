@@ -45,7 +45,7 @@ const OverViewComp = ({list}) => {
           <Text style={{ fontFamily: "Intro-Bold", color: "#fff" }}>{riskReward}</Text>
         </View>
         <View style={{ width: "45%", backgroundColor: "#001AFF", padding: 5, alignItems: "center" }}>
-          <Text style={{ fontFamily: "Intro-Semi-Bold", color: "#fff" }}>Win /Loss Ratio</Text>
+          <Text style={{ fontFamily: "Intro-Semi-Bold", color: "#fff" }}>Win /Loss</Text>
           <Text style={{ fontFamily: "Intro-Bold", color: "#fff" }}>{winLoss}</Text>
         </View>
       </View>

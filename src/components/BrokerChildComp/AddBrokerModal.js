@@ -16,10 +16,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import LoadingComp from '../LoadingComp';
 import { BROKER_API } from '../../service/BrokerService';
 import { toggleRefresh } from '../../store/DataSlice';
+import BrokerSelect from '../BrokerSelect';
+import SelectInput from '../SelectInput';
 
 function AddBrokerModal() {
 
-  
+
     const [isModalVisible, setModalVisible] = useState(false);
 
     const toggleModal = () => {
@@ -28,10 +30,13 @@ function AddBrokerModal() {
 
     const dispatch = useDispatch()
 
-    const user = useSelector((state)=>state?.userAuth?.user)
-    const refresh = useSelector((state)=>state?.data?.refresh)
+    const user = useSelector((state) => state?.userAuth?.user)
+    const refresh = useSelector((state) => state?.data?.refresh)
+    const allBrokerList = useSelector((state) => state?.data?.allBrokerList)
+    const [brokerName, setbrokerName] = useState(allBrokerList[0]?.label)
 
-    const { control, handleSubmit, setError,reset, formState: { errors } } = useForm();
+
+    const { control, handleSubmit, setError, reset, formState: { errors } } = useForm();
     const [loading, setloading] = useState(false)
     const onSubmit = async (data) => {
 
@@ -39,22 +44,27 @@ function AddBrokerModal() {
 
         try {
             const payload = {
-                "userId":user?._id,
-                "updateOn":Date.now(),
-                ...data
+                "userId": user?._id,
+                "updateOn": Date.now(),
+                ...data,
+                "brokerName":brokerName
+
             }
-            const res = await BROKER_API.addBroker(payload,user?.token)
-            if(res){
+
+            // console.log(payload)
+
+            const res = await BROKER_API.addBroker(payload, user?.token)
+            if (res) {
                 toggleModal()
                 reset()
                 dispatch(toggleRefresh(true))
                 setTimeout(() => {
                     // After the data fetching is complete, set refreshing to false
                     dispatch(toggleRefresh(false))
-                  }, 2000); // Simulated delay (2 seconds)
+                }, 2000); // Simulated delay (2 seconds)
                 Alert.alert("Broker Added")
             }
-            
+
 
         } catch (e) {
             if (e?.message?.includes("Broker Already Added")) {
@@ -67,7 +77,7 @@ function AddBrokerModal() {
                     type: 'manual',
                     message: e?.message, // Set the error message from the API response
                 });
-            }else {
+            } else {
                 Alert.alert(e?.message)
             }
         }
@@ -131,18 +141,18 @@ function AddBrokerModal() {
                                             <Controller
                                                 name="brokerName"
                                                 control={control}
-                                                defaultValue=""
+                                                value={brokerName}
                                                 rules={{
-                                                    required: 'Broker Name is required',
+                                                    required:brokerName ? false : 'Broker Name is required',
 
                                                 }}
                                                 render={({ field }) => (
-                                                    <TextInput
-                                                        placeholder="Enter Broker Name"
-                                                        onChangeText={field.onChange}
-                                                        value={field.value}
-                                                        placeholderTextColor={"#ccc"}
-                                                        style={styles.textInput}
+                                                    <SelectInput
+                                                        label="Broker"
+                                                        options={allBrokerList}
+                                                        value={brokerName}
+                                                        setValue={setbrokerName}
+
                                                     />
                                                 )}
                                             />
@@ -167,13 +177,13 @@ function AddBrokerModal() {
                                                     validate: (value) => {
                                                         const numericValue = parseFloat(value);
                                                         if (isNaN(numericValue)) {
-                                                          return 'Deposit Amount must be a number';
+                                                            return 'Deposit Amount must be a number';
                                                         }
                                                         if (numericValue < 1) {
-                                                          return 'Deposit Amount must be at least 1';
+                                                            return 'Deposit Amount must be at least 1';
                                                         }
                                                         return true; // Validation passed
-                                                      },
+                                                    },
                                                 }}
                                                 render={({ field }) => (
                                                     <TextInput

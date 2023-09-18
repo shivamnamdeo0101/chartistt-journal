@@ -25,6 +25,9 @@ export const DataSlice = createSlice({
         setUserBrokerList: (state, action) => {
             state.userBrokerList = action.payload;
         },
+        setAllBrokerList: (state, action) => {
+            state.allBrokerList = action.payload;
+        },
         toggleRefresh: (state,action) => {
             state.refresh = action.payload;
         },
@@ -68,6 +71,6 @@ export const DataSlice = createSlice({
 
     },
 });
-export const { setActionList,setUserBrokerList,toggleRefresh, setBrokerList, setBrokerEdit, setConfirm, setTradeList, setChartTimeFrameList, setSegmentList, setSessionList, setTradeTypeList, setEmotionList, flushAuthData, } = DataSlice.actions;
+export const { setActionList,setUserBrokerList,toggleRefresh,setAllBrokerList, setBrokerList, setBrokerEdit, setConfirm, setTradeList, setChartTimeFrameList, setSegmentList, setSessionList, setTradeTypeList, setEmotionList, flushAuthData, } = DataSlice.actions;
 
 export default DataSlice.reducer;

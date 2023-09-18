@@ -43,6 +43,7 @@
     "react-native-phone-number-input": "^2.1.0",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "^3.20.0",
+    "react-native-share": "^9.4.1",
     "react-native-svg": "^13.13.0",
     "react-native-vector-icons": "^9.2.0",
     "react-native-version-check": "^3.4.7",
