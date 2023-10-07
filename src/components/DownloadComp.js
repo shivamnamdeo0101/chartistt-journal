@@ -87,24 +87,34 @@ function DownloadComp() {
 
     //////////Downloadcsv ///////////
     useEffect(() => {
-        requestWriteFilePermission()
+        requestStoragePermission()
     }, [])
 
-    async function requestWriteFilePermission() {
+    async function requestStoragePermission() {
         try {
-            const granted = await PermissionsAndroid.request(
+            const granted = await PermissionsAndroid.requestMultiple([
+                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
                 PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: 'Storage Permission Required',
-                    message:
-                        'This app needs access to your storage to download the file',
-                },
-            );
-            return granted === PermissionsAndroid.RESULTS.GRANTED;
+            ]);
+
+            if (
+                granted['android.permission.READ_EXTERNAL_STORAGE'] === 'granted' &&
+                granted['android.permission.WRITE_EXTERNAL_STORAGE'] === 'granted'
+            ) {
+                // You have the necessary permissions, and you can now access the file.
+            } else {
+                console.log('Storage permissions denied.');
+            }
         } catch (err) {
             console.warn(err);
         }
     }
+
+
+
+
+
+
     // async function convertAndSaveDataToCSV() {
 
     //     const payload = {
@@ -198,8 +208,21 @@ function DownloadComp() {
         return csvData;
     };
 
+    function getCurrentDateTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+      
+        return `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
+      }
+
     const createAndShareCSVWithNotification = async () => {
-        try {
+        try {   
+
 
             const payload = {
                 "userId": user?._id,
@@ -218,31 +241,38 @@ function DownloadComp() {
 
             const { config, fs } = RNFetchBlob;
             // Define the file path where the CSV file will be stored
-            const path = `${fs.dirs.DownloadDir}/Trades.csv`;
+            //const path = `/storage/emulated/0/Download/Trades.csv`;
             //const filePath = `${RNFS.CachesDirectoryPath}/Trades.csv`;
+            const currentDateTime = getCurrentDateTime();
 
-            // Write the CSV data to the file
-            await RNFS.writeFile(path, csvData, 'utf8')
-            .then(() => {
-                    console.log('File written at:', path);
-                    
-            })
-            .catch((err) => {
-                    console.log(err.message);
-            });
+            const fileName = `Trades_${currentDateTime}.csv`; // New file name with timestamp          
+            const directory = RNFS.ExternalDirectoryPath; // You can specify the directory where you want to save the file
+            const filePath = `${directory}/${fileName}`;
 
-            // Display a custom download notification
+            try {
+                await RNFS.writeFile(filePath, csvData, 'utf8')
+                    .then(() => {
+                        console.log('File written at:', filePath);
+                    })
+                    .catch((err) => {
+                        console.log(err.message);
+                    });
+
+            } catch (error) {
+                console.error('Error saving file:', error);
+            }
+
             ToastAndroid.showWithGravity(
                 'CSV file downloaded and saved in download folder.',
                 ToastAndroid.LONG,
                 ToastAndroid.CENTER
             );
 
-           
+
 
             // Share the CSV file
             await Share.open({
-                url: `file://${path}`,
+                url: `file://${filePath}`,
                 type: 'text/csv',
                 filename: 'Trades.csv',
             });

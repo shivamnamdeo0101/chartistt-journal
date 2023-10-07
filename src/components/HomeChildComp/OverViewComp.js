@@ -24,17 +24,17 @@ const OverViewComp = ({list}) => {
           <Text style={{ fontFamily: "Intro-Semi-Bold", color: "#fff" }}>No. Of Trades</Text>
           <Text style={{ fontFamily: "Intro-Bold", color: "#fff" }}>{noOfTrades}</Text>
         </View>
-        <View style={{ width: "45%", backgroundColor: "#2EAE57", padding: 5, alignItems: "center" }}>
+        <View style={{ width: "45%", backgroundColor: "#43b5a2", padding: 5, alignItems: "center" }}>
           <Text style={{ fontFamily: "Intro-Semi-Bold", color: "#fff" }}>NET P & L</Text>
           <Text style={{ fontFamily: "Intro-Bold", color: "#fff" }}>{netpAndL?.sumOfnetPAndL}</Text>
         </View>
       </View>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
-        <View style={{ width: "45%", backgroundColor: "#2EAE57", padding: 5, alignItems: "center" }}>
+        <View style={{ width: "45%", backgroundColor: "#43b5a2", padding: 5, alignItems: "center" }}>
           <Text style={{ fontFamily: "Intro-Semi-Bold", color: "#fff" }}>Avg Profit</Text>
           <Text style={{ fontFamily: "Intro-Bold", color: "#fff" }}>{netpAndL?.sumOfavgProfit}</Text>
         </View>
-        <View style={{ width: "45%", backgroundColor: "#FF1616", padding: 5, alignItems: "center" }}>
+        <View style={{ width: "45%", backgroundColor: "#faa5be", padding: 5, alignItems: "center" }}>
           <Text style={{ fontFamily: "Intro-Semi-Bold", color: "#fff" }}>Avg Loss</Text>
           <Text style={{ fontFamily: "Intro-Bold", color: "#fff" }}>{netpAndL?.sumOfavgLoss}</Text>
         </View>

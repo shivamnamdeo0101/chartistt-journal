@@ -6,7 +6,13 @@ import { getTotalProfitLossPercentageForAllBroker, totalAccBal, totalDepositAmt 
 
 const BrokerChildMain = ({list}) => {
 
-  const totalPAndLPercentage = getTotalProfitLossPercentageForAllBroker(list)
+
+  const totalDeposit = totalDepositAmt(list)
+  const totalAcc = parseFloat(totalAccBal(list)).toFixed(2)
+  const change = totalAcc - totalDeposit
+  const per = (change *100) / totalDeposit
+  const totalPAndLPercentage = parseFloat(per).toFixed(2)
+
 
   return (
     <View style={{backgroundColor:"#fff",padding:10,borderRadius:5,marginBottom:10}}>
@@ -14,7 +20,7 @@ const BrokerChildMain = ({list}) => {
         <Text style={{fontFamily:"Intro-Bold",color:"#000",fontSize:26,marginBottom:5}}>{parseFloat(totalAccBal(list)).toFixed(2)}</Text>
         <Text style={{fontFamily:"Intro-Semi-Bold",color:"#fff",backgroundColor:totalPAndLPercentage>=0 ?  "#00BF63" :"#f03",alignSelf:"flex-start",padding:5,marginBottom:5}}>{parseFloat(totalPAndLPercentage).toFixed(2)} %</Text>
         <Text style={{fontFamily:"Intro-Semi-Bold",color:"#000",marginBottom:5}}>Total Deposit Amount</Text>
-        <Text style={{fontFamily:"Intro-Bold",color:"#000",fontSize:18}}>{totalDepositAmt(list)}</Text>
+        <Text style={{fontFamily:"Intro-Bold",color:"#000",fontSize:18}}>{totalDeposit}</Text>
 
     </View>
   )

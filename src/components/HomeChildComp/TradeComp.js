@@ -32,10 +32,10 @@ const TradeComp = ({ item,navigation }) => {
         <TouchableOpacity style={{ marginBottom: 10 }} onPress={()=>navigation.navigate("EditTrade",{"item":item})} >
 
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
-                <Text style={{ backgroundColor: "#001AFF", padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5, color: "#fff", fontFamily: "Intro-Semi-Bold" }}>{item?.broker?.brokerName} - Equity / Stocks</Text>
+                <Text style={{ backgroundColor: "#001AFF", padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5, color: "#fff", fontFamily: "Intro-Semi-Bold",textTransform:"capitalize" }}>{item?.broker?.brokerName} - {item?.trade?.segment} / {item?.trade?.tradeType}</Text>
                 <Text style={{ color: "#888", fontFamily: "Intro-Semi-Bold",fontSize:10 }}>Update On {moment(item?.trade?.updateOn).fromNow()}</Text>
             </View>
-            <LinearGradient colors={profitOrLossForOneTrade(item?.trade) < 0 ?['#ff3131', '#8d2e69'] : ['#2eae57', '#005148'] } style={{ borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }}>
+            <LinearGradient colors={profitOrLossForOneTrade(item?.trade) < 0 ?['#faa5be', '#8d2e69'] : ['#43b5a2', '#005148'] } style={{ borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }}>
                 <View style={{ padding: 10 }}>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
                         <View>

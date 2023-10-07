@@ -25,11 +25,16 @@ const HomeChildMain = ({ TFTR, AccLists, Filter, AllTrades, OverView, Stat, navi
   const [filterObj, setfilterObj] = useState({
     "sortBy": "date",
     "start": 0,
-    "end": Date.now(),
+    "end": Date.now() + 85987176,
     "brokerId": -1,
     "userId": user?._id,
-    "duration": { "name": "ALL TRADES", "value": "a", "start": 0 }
+    "duration": { "name": "ALL TRADES", "value": "a", "start": 0 },
+    "refresh":refresh
   })
+
+ console.log(filterObj)
+  
+
 
   const payload = {
     ...filterObj
@@ -43,17 +48,9 @@ const HomeChildMain = ({ TFTR, AccLists, Filter, AllTrades, OverView, Stat, navi
       setloading(false)
     }
     fetchData()
-  }, [filterObj])
+  }, [filterObj,refresh])
 
-  useEffect(() => {
-    //setloading(true)
-    const fetchData = async () => {
-      const res = await TRADE_API.getAllTrades(payload, user?.token)
-      dispatch(setTradeList(res))
-      setloading(false)
-    }
-    fetchData()
-  }, [refresh])
+
 
 
 

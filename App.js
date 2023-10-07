@@ -16,7 +16,9 @@ import notifee from '@notifee/react-native';
 import VersionCheck from 'react-native-version-check';
 import { NativeBaseProvider, Box } from "native-base";
 import AppNavigator from './src/navigation/AppNavigator';
-import { Alert, Linking } from 'react-native';
+import { Alert, Linking, View, Text } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
+import ChartisttHeader from './src/components/ChartisttHeader';
 
 
 const Container = () => {
@@ -31,7 +33,7 @@ const Container = () => {
         .then(async res => {
           console.log(res?.isNeeded);    // true
           if (res?.isNeeded) {
-           // handleVersionCheck(res.storeUrl);  // open store if update is needed.
+            // handleVersionCheck(res.storeUrl);  // open store if update is needed.
           }
         });
     }
@@ -39,38 +41,49 @@ const Container = () => {
     checkpdate()
   }, [])
 
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const handleVersionCheck = (link) => {
     // Display a confirmation dialog
     Alert.alert(
-        'Download Update',
-        'You can download the new version of the application',
-        [
-            {
-                text: 'Cancel',
-                style: 'cancel',
-            },
-            {
-                text: 'Download',
-                onPress: () => {
-                  Linking.openURL(link);
-                },
-            },
-        ],
-        { cancelable: false }
+      'Download Update',
+      'You can download the new version of the application',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Download',
+          onPress: () => {
+            Linking.openURL(link);
+          },
+        },
+      ],
+      { cancelable: false }
     );
-};
+  };
 
   useEffect(() => {
     const fetchData = async () => {
 
-    
+
       await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
         dispatch(setUserBrokerList(res))
       })
 
       await USER_API.getData("action").then((res) => {
-        console.log(res,"RES")
+        console.log(res, "RES")
         dispatch(setActionList(res))
       })
       await USER_API.getData("segment").then((res) => {
@@ -100,12 +113,30 @@ const Container = () => {
   }, [user])
 
 
+
+
+  if (isConnected) {
+
+    return (
+      <NavigationContainer>
+        {user?.isSuccess ? <AppNavigator /> : <AuthNavigator />}
+      </NavigationContainer>
+    )
+
+  }
+
+
   return (
-    <NavigationContainer>
-      {user?.isSuccess ? <AppNavigator /> : <AuthNavigator />}
-    </NavigationContainer>
+
+    <View style={{ flex: 1, backgroundColor: "#001AFF", alignItems: "center", justifyContent: "center" }}>
+      <Text style={{ color: "#fff", fontFamily: "Intro-Bold", fontSize: 22 }}>Please turn on your internet ! 🙄</Text>
+    </View>
   )
+
+
 }
+
+
 
 export const store = configureStore({
   reducer: persistedReducer,
@@ -188,13 +219,13 @@ function App() {
 
   return (
     <NativeBaseProvider>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistStore(store)}>
-        <React.Fragment>
-          <Container />
-        </React.Fragment>
-      </PersistGate>
-    </Provider >
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistStore(store)}>
+          <React.Fragment>
+            <Container />
+          </React.Fragment>
+        </PersistGate>
+      </Provider >
     </NativeBaseProvider>
   )
 }

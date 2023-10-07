@@ -155,6 +155,7 @@ function BrokerComp({ item, index }) {
 
     return (
         <View>
+            <Text style={{ color: "#ccc",textAlign:"right",fontSize:10, fontFamily: "Intro-Semi-Bold",padding:5 }}>Update On {moment(item?.broker?.updateOn).fromNow()}</Text>
             <TouchableOpacity onPress={toggleModal} style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", padding: 10, backgroundColor: "#fff", marginBottom: 10, borderRadius: 5 }}>
                 <View style={{ alignItems: "center" }}>
                     <Image source={{ uri: getImg(item?.broker?.brokerName) }} style={{ width: 50, height: 50 }} />
@@ -162,17 +163,16 @@ function BrokerComp({ item, index }) {
                 </View>
                 <View>
                     <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", fontSize: 12 }}>BROKER NAME</Text>
-                    <Text style={{ color: "#000", fontFamily: "Intro-Bold", }}>{item?.broker?.brokerName}</Text>
+                    <Text style={{ color: "#000", fontFamily: "Intro-Bold", }}>{item?.broker?.brokerName?.length > 15 ? item?.broker?.brokerName?.substring(1,15)+".."  : item?.broker?.brokerName}</Text>
 
                     <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", fontSize: 12, marginTop: 5 }}>DEPOSIT</Text>
                     <Text style={{ color: "#000", fontFamily: "Intro-Bold" }}>{item?.broker?.amtDeposit}</Text>
 
-                    <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", fontSize: 12, marginTop: 5 }}>TOTAL TRADES</Text>
-                    <Text style={{ color: "#000", fontFamily: "Intro-Bold" }}>{item?.trades?.length}</Text>
+                   
                 </View>
                 <View>
-                    <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", fontSize: 12 }}>DATE UPDATED</Text>
-                    <Text style={{ color: "#000", fontFamily: "Intro-Bold", }}>{moment(item?.broker?.updateOn).fromNow()}</Text>
+                <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", fontSize: 12, }}>TOTAL TRADES</Text>
+                    <Text style={{ color: "#000", fontFamily: "Intro-Bold" }}>{item?.trades?.length}</Text>
 
                     <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", fontSize: 12, marginTop: 5 }}>ACCUMULATED</Text>
                     <Text style={{ color: accAmtForOneBroker >= 0 ? "#00BF63" : "#f03", fontFamily: "Intro-Bold" }}>{parseFloat(accAmtForOneBroker).toFixed(2)}</Text>
