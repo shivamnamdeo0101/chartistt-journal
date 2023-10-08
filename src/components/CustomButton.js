@@ -1,11 +1,13 @@
-import { View, Text ,TouchableOpacity} from 'react-native'
+import { View, Text,TouchableOpacity } from 'react-native'
 import React from 'react'
 
-const CustomButton = ({ onPress, title,filled,width }) => {
+const CustomButton = ({text,onPress,filled}) => {
     return (
-        <TouchableOpacity style={{width: width ? width : "45%", backgroundColor: filled? "#0b5cd6" : 'transparent',borderWidth:2, borderColor: filled? "transparent" : '#0b5cd6', padding: 16, borderRadius: 10, margin: 10 }} onPress={onPress}>
-            <Text style={{ color: "#fff", fontSize: 16, fontWeight: "bold", textAlign: "center" }}>{title}</Text>
-        </TouchableOpacity>
+           <View style={{marginBottom:10}}>
+             <TouchableOpacity style={filled ? { backgroundColor: "#001AFF",borderRadius:5 } : {borderWidth:2,borderColor: "#001AFF",borderRadius:5}} onPress={onPress}>
+                <Text style={{padding:14,textAlign:"center",color:!filled ? "#001AFF" :"#fff" ,fontFamily:"Intro-Bold",textTransform:"uppercase"}}>{text}</Text>
+            </TouchableOpacity>
+           </View>
     )
 }
 

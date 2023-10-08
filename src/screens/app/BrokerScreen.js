@@ -1,95 +1,75 @@
-import { View, Text, TouchableOpacity, ScrollView ,RefreshControl} from 'react-native'
-import React, { useContext ,useState,useEffect} from 'react'
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { BrokerContext } from '../../providers/BrokerProvider';
-import TradeComp from '../../components/TradeComp';
-import BrokerComp from '../../components/BrokerComp';
-import { BROKER_API } from '../../service/BrokerService';
+import { View, RefreshControl, Text, StatusBar, SafeAreaView, Image, TouchableOpacity, ScrollView } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import BrokerChildMain from '../../components/BrokerChildComp/BrokerChildMain'
+import ChartisttHeader from '../../components/ChartisttHeader';
+import BrokerListComp from '../../components/BrokerChildComp/BrokerListComp';
+import AddBrokerModal from '../../components/BrokerChildComp/AddBrokerModal';
+import { USER_API } from '../../service/UserService';
+import LoadingComp from '../../components/LoadingComp';
 import { useDispatch, useSelector } from 'react-redux';
-import Loading from '../../components/Loading';
-import { AddBrokerContext } from '../../providers/AddBrokerProvider';
-import { setBrokerEdit } from '../../store/DataSlice';
+import { BROKER_API } from '../../service/BrokerService';
+import { setUserBrokerList, toggleRefresh } from '../../store/DataSlice';
 
 const BrokerScreen = ({ navigation }) => {
-    const [isOpen, setBrokerModal] = useContext(BrokerContext)
-    const [addBrokerOpen, setAddBrokerOpen] = useContext(AddBrokerContext)
-    const dispatch = useDispatch()
-    const user = useSelector(state=>state?.userAuth?.user)
-    const data = useSelector(state=>state?.data)
 
-    const [brokerList, setbrokerList] = useState([])
-    const [loading, setloading] = useState(false)
+  const user = useSelector(state => state?.userAuth?.user)
+  const userBrokerList = useSelector(state => state?.data?.userBrokerList)
 
-    const toggleModal = () => {
-        dispatch(setBrokerEdit(false))
-        setAddBrokerOpen(!addBrokerOpen);
-    };
+  const [list, setlist] = useState([])
+  const [loading, setloading] = useState(true)
+  const refresh = useSelector((state) => state?.data?.refresh)
+  const dispatch = useDispatch()
 
-    const [refreshing, setRefreshing] = React.useState(false);
-
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1000);
-    }, []);
-    
-    useEffect(() => {
-      const fetchData = async ()=>{
-        const res = await BROKER_API.getAllBrokers(user?._id,user?.token)
-        if(res?.status === 200){
-            setbrokerList(res?.data?.data)
-            setloading(false)
-        }
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await BROKER_API.getAllBrokers(user?._id, user?.token)
+      if (res) {
+        dispatch(setUserBrokerList(res))
+        setloading(false)
       }
-
-      fetchData()
-
-    }, [brokerList,refreshing,loading])
-
-    if(loading || refreshing){
-        return(
-            <Loading />
-        )
     }
 
+    fetchData()
     
+  }, [refresh])
 
 
+  if (loading) {
     return (
-        <View style={{ flex: 1, backgroundColor: "#1e294f", padding: 10, }}>
-            <View style={{ padding: 10, marginTop: 0, paddingTop: 0 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-                        <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>BROKER</Text>
-                        <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>LIST</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => toggleModal()}>
-                        <Ionicons name="add-circle-sharp" color={"#717da8"} size={26} />
-                    </TouchableOpacity>
-                </View>
-                <ScrollView
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                    }
-                >
-                    <View style={{flex:1,marginBottom:100}}>
-
-                   
-                        {
-                            brokerList?.map((item, index) => {
-                                return (
-                                    <View key={index}>
-                                        <BrokerComp item={item} />
-                                    </View>
-                                )
-                            })
-                        }
-                         </View>
-                </ScrollView>
-            </View>
-        </View>
+      <LoadingComp />
     )
+  }
+
+  const handleRefresh = () => {
+    // Set refreshing to true to show the loading indicator
+    dispatch(toggleRefresh(true));
+
+    // Simulate an asynchronous data fetching operation
+    setTimeout(() => {
+      // After the data fetching is complete, set refreshing to false
+      dispatch(toggleRefresh(false))
+    }, 2000); // Simulated delay (2 seconds)
+  };
+
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+
+      <ChartisttHeader title={"BROKERS"} />
+
+      <ScrollView style={{ flex: 1 }} refreshControl={
+        <RefreshControl refreshing={refresh} onRefresh={handleRefresh} />
+      }>
+        <View style={{ backgroundColor: "#f0f3f5", padding: 14, paddingTop: 5 }}>
+          <BrokerChildMain list={userBrokerList} />
+          <BrokerListComp list={userBrokerList} />
+        </View>
+
+
+      </ScrollView>
+      <AddBrokerModal />
+    </SafeAreaView>
+  )
 }
 
 export default BrokerScreen

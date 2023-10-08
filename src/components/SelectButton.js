@@ -14,11 +14,11 @@ const SelectButton = ({ label, value, setValue, options }) => {
 
     return (
         <View>
-            <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-around"}}>
+            <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-evenly",width:"100%"}}>
             
            {options?.map((option,index) => (
-                <TouchableOpacity key={index} style={{borderWidth:2,borderColor: option?.value === value ? "#975bd9" : "#070f4a", width:"48%",borderRadius:10, padding:14,backgroundColor: "#070f4a"}} onPress={() => setViewFalse(option)}>
-                    <Text style={{color:"#fff",fontWeight:"bold",textAlign:"center"}}>{option.label}</Text>
+                <TouchableOpacity key={index} style={{width:"48%", borderWidth:2,borderColor: option?.value === value ? "#001AFF" : "#fff",borderRadius:5, padding:10,backgroundColor: "#fff"}} onPress={() => setViewFalse(option)}>
+                    <Text style={{color:"#000",fontWeight:"bold",textAlign:"center"}}>{option.label}</Text>
                 </TouchableOpacity>
             ))}
             

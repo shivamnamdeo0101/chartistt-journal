@@ -1,105 +1,57 @@
 {
   "project_info": {
-    "project_number": "1070846552778",
-    "project_id": "chartistt-journal",
-    "storage_bucket": "chartistt-journal.appspot.com"
+    "project_number": "102910788936",
+    "project_id": "thechartisttjournal-1a78e",
+    "storage_bucket": "thechartisttjournal-1a78e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1070846552778:android:b2566ba7d416cb01362233",
+        "mobilesdk_app_id": "1:102910788936:android:2077403eef0e59d067df7d",
         "android_client_info": {
-          "package_name": "com.chartistt_journal"
+          "package_name": "com.thechartisttjournal"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1070846552778-0hnhe1v94li1po74jvfukhurhvk56rc3.apps.googleusercontent.com",
+          "client_id": "102910788936-bhk1ufhpstmg12h52660cnset9inip0p.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "8082661f951067215fc5b4cb5424f7d9f5f23242"
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "b9f4bf183ebe3abb3dcd587a51fd2cfa8a4c8c84"
           }
         },
         {
-          "client_id": "1070846552778-0uj87n0hud6n77h9u8tg8vv5laoieae1.apps.googleusercontent.com",
+          "client_id": "102910788936-q2pmcni88msj25p85j9h47hf4086p79i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "606a0caf0e0e68107d2411fc491bb8970d65729e"
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "7b4b598bc3578eb3de9b487e1200b5a1ec92e508"
           }
         },
         {
-          "client_id": "1070846552778-7ngmiei5mhvnbc8dkim5alui0p2seulm.apps.googleusercontent.com",
+          "client_id": "102910788936-s230mgmtd58r4ep6o1mo9367ip5lvr8k.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "04720640ad45c5ba8c290c4a10410e8d449f99a2"
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "5c6df4f12fc851709091aa024d5ee93263ce8925"
           }
         },
         {
-          "client_id": "1070846552778-8qlt34nmr8c8pm1jq5mpopovqr75vm1o.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "71836ce2bd1a8cbfdf49f4824058cc850a668445"
-          }
-        },
-        {
-          "client_id": "1070846552778-cnhu1a7509blqutjvvlpcecv6d30egjj.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "7d5298d45f4d70e6f82ff194db9b2ac34a46a4fc"
-          }
-        },
-        {
-          "client_id": "1070846552778-iupd8l8ta9igdur4r4vet1pnq6i6egr9.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
-        {
-          "client_id": "1070846552778-oqn4ugbvllv05ipabsuqls1lr2vn91h7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "96e9ada005fa8a4623640036898e717592609f0b"
-          }
-        },
-        {
-          "client_id": "1070846552778-piakgopcugknv088l5rsa9q5d060606h.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "c68c70e02fd2c1767117b4d9b972071c6cea7a88"
-          }
-        },
-        {
-          "client_id": "1070846552778-ub2gvuudvf5recgdponb018ih0g0hadt.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.chartistt_journal",
-            "certificate_hash": "b1bda5d1af10e91c843e4bbccf748233ad39b38a"
-          }
-        },
-        {
-          "client_id": "1070846552778-6fefn05h8q6q7eeuac0b9agv2b48rrb3.apps.googleusercontent.com",
+          "client_id": "102910788936-mmsc8n09o9o8b5kllp6vuiqqe4o74hjt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCdGNEPmthn24RcUEqnRGzCX2iMIY2T4gs"
+          "current_key": "AIzaSyBOf5aaY4_0fGWA5pjAwE4TuvodDuLWLYI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1070846552778-6fefn05h8q6q7eeuac0b9agv2b48rrb3.apps.googleusercontent.com",
+              "client_id": "102910788936-mmsc8n09o9o8b5kllp6vuiqqe4o74hjt.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

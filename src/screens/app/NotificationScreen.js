@@ -1,13 +1,9 @@
-import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet, Linking } from 'react-native'
-import React, { useContext, useState, useEffect } from 'react'
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { BrokerContext } from '../../providers/BrokerProvider';
-import TradeComp from '../../components/TradeComp';
-import BrokerComp from '../../components/BrokerComp';
-import { BROKER_API } from '../../service/BrokerService';
-import { useSelector } from 'react-redux';
-import Loading from '../../components/Loading';
-import { USER_API } from '../../service/UserService';
+import { View, Text, Image, SafeAreaView, ScrollView,Linking } from 'react-native'
+import React,{useState,useEffect} from 'react'
+import ChartisttHeader from '../../components/ChartisttHeader'
+import { USER_API } from '../../service/UserService'
+import { useSelector } from 'react-redux'
+import LoadingComp from '../../components/LoadingComp'
 import moment from 'moment';
 
 const NotificationScreen = ({ navigation }) => {
@@ -19,8 +15,8 @@ const NotificationScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       const res = await USER_API.getAllNotifications(user?.token)
-      if (res?.status === 200) {
-        setlist(res?.data?.data)
+      if (res) {
+        setlist(res)
         setloading(false)
       }
     }
@@ -31,7 +27,7 @@ const NotificationScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <Loading />
+      <LoadingComp />
     )
   }
 
@@ -45,57 +41,33 @@ const NotificationScreen = ({ navigation }) => {
 
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#1e294f", padding: 10, }}>
-      <View style={{ padding: 10, marginTop: 0, paddingTop: 0 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-            <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>NOTIFICATIONS</Text>
-            {/* <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>LIST</Text> */}
-          </View>
-          {/* <TouchableOpacity onPress={() => toggleModal()}>
-            <Ionicons name="add-circle-sharp" color={"#717da8"} size={26} />
-          </TouchableOpacity> */}
-        </View>
-        <ScrollView>
-          <View style={{ flex: 1, marginBottom: 100 }}>
+    <SafeAreaView style={{ flex: 1 }}>
 
-
-            {
-              list?.map((item, index) => {
-                return (
-                  <View key={index} style={{ backgroundColor: "#070f4a", margin: 5, padding: 10, borderRadius: 10 }}>
-                    <Text style={styles.timestamp}>{moment(item?.timestamp).fromNow()}</Text>
-                    <Text style={styles.title}>{item?.title}</Text>
-                    <Text style={styles.text}>{item?.text} </Text>
-                    { item?.linkUrl &&  <Text style={{ ...styles.text, backgroundColor: "#975bd9", marginTop: 10, alignSelf: "flex-start", padding: 10, paddingTop: 5, paddingBottom: 5, borderRadius: 10, fontSize: 12 }} onPress={() => OpenUrl(item)}> {item?.linkTitle}</Text>}                 
+      <ChartisttHeader title={"NOTIFICATIONS"} />
+      <ScrollView>
+        <View style={{ padding: 10 }}>
+          {
+            list?.map((item, index) => {
+              return (
+                <View key={index} style={{ borderBottomWidth: 1, borderColor: "#ccc", padding: 10, marginBottom: 5 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <Image source={require("../../assets/clogo.png")} style={{ width: 60, height: 40 }} />
+                    <Text style={{ color: "#000", fontFamily: "Intro-Light", fontSize: 12 }}>{moment(item?.timestamp).fromNow()}</Text>
                   </View>
-                )
-              })
-            }
-          </View>
-        </ScrollView>
-      </View>
-    </View>
+                  <Text style={{ color: "#000", fontFamily: "Intro-Semi-Bold", fontSize: 14, }}>{item?.title}</Text>
+                  <Text style={{ color: "#888", fontFamily: "Intro-Semi-Bold", fontSize: 12, }}>{item?.text}</Text>
+                  {item?.linkUrl&& <Text onPress={() => OpenUrl(item)} style={{ color: "#000", fontFamily: "Intro-Semi-Bold", textDecorationLine: "underline", color: "#001AFF" }}>{item?.linkTitle}</Text>
+                  }
+
+
+                </View>
+              )
+            })
+          }
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
 export default NotificationScreen
-
-const styles = StyleSheet.create({
-  text: {
-    fontSize: 14,
-    color: "#ccc",
-    fontWeight: "400",
-
-  },
-  title: {
-    fontSize: 14,
-    color: "#717da8",
-    fontWeight: "600"
-  },
-  timestamp: {
-    color: "#ccc",
-    fontSize: 10
-  }
-
-});

@@ -1,401 +1,785 @@
-import { View, Text, TextInput, Button,ScrollView } from 'react-native';
-import React, { useState } from 'react'
-import Entypo from 'react-native-vector-icons/Entypo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Modal from "react-native-modal";
+import Feather from 'react-native-vector-icons/Feather';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+
+
+import { View, Text, StyleSheet, StatusBar, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView, Alert } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import Fontisto from 'react-native-vector-icons/Fontisto';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+
 import { useForm, Controller } from 'react-hook-form';
-import { Picker } from '@react-native-picker/picker';
+import CustomButton from '../../components/CustomButton';
+import SelectInput from '../../components/SelectInput';
+import { useDispatch, useSelector } from 'react-redux';
+import { USER_API } from '../../service/UserService';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import BrokerSelect from '../../components/BrokerSelect';
+import SelectButton from '../../components/SelectButton';
+import { TRADE_API } from '../../service/TradeService';
+import { setTradeList, toggleRefresh } from '../../store/DataSlice';
+import LoadingComp from '../../components/LoadingComp';
 
-const AddTradeScreen = ({ route, navigation }) => {
 
-    //const {defaultData} = route?.params;
+const AddTradeScreen = ({ navigation }) => {
 
+    const user = useSelector((state) => state?.userAuth?.user)
+
+    const optionTypeList = [
+
+        {
+            "label": "Put",
+            "value": "put"
+        },
+        {
+            "label": "Call",
+            "value": "call"
+        }
+
+    ]
+    const data = useSelector((state) => state?.data)
 
     const [isModalVisible, setModalVisible] = useState(false);
+    const [action, setaction] = useState("buy")
+    const [segment, setsegment] = useState("equity")
+    const [tradeType, settradeType] = useState("intraday")
+    const [chartTimeFrame, setchartTimeFrame] = useState("1min")
+    const [mindSetBeforeTrade, setmindSetBeforeTrade] = useState("angry")
+    const [mindSetAfterTrade, setmindSetAfterTrade] = useState("angry")
+    const [session, setsession] = useState("morning")
+    const [optionType, setoptionType] = useState("call")
+    const [broker, setbroker] = useState(data?.userBrokerList?.length > 0 ? data?.userBrokerList[0] : {})
+
+
+    const dispatch = useDispatch()
+    const [loading, setloading] = useState(false)
+
+    const [date, setDate] = useState(new Date());
+    const [selectDate, setselectDate] = useState(false)
+    const [dateTimestamp, setdateTimestamp] = useState(Date.now())
+
+    const onDateChange = (event, selectedDate) => {
+        setselectDate(!selectDate)
+        const currentDate = selectedDate || endDate;
+        setDate(currentDate);
+        setdateTimestamp(Date.parse(currentDate));
+    };
+
+
+    const [filterObj, setfilterObj] = useState({
+        "sortBy": "date",
+        "start": 0,
+        "end": Date.now(),
+        "brokerId": -1,
+        "userId": user?._id,
+        "duration": { "name": "ALL TRADES", "value": "a", "start": 0 }
+    })
+
+    const payload = {
+        ...filterObj
+    }
+
+
+
+
+
+    const validateFun = (e) => {
+
+        let entryWatch = parseFloat(e?.entryPrice);
+        let targetWatch = parseFloat(e?.targetPoint);
+        let stopLossWatch = parseFloat(e?.stopLoss);
+
+
+        // console.log(action, "entryPrice", typeof entryWatch, "Target Point", targetWatch, "Stop Loss", stopLossWatch)
+
+        if (action === "buy") {
+
+            if (targetWatch > entryWatch) {
+                if (entryWatch > stopLossWatch) {
+                    return true
+                } else {
+                    Alert.alert("Entry price should be greater then Stop Loss")
+                    return false
+                }
+            } else {
+                Alert.alert("Target Price should be greater then Entry Price")
+                return false
+            }
+
+
+        } else if (action === "sell") {
+
+            if (stopLossWatch > entryWatch) {
+                if (entryWatch > targetWatch) {
+                    return true
+                } else {
+                    Alert.alert("Entry Price should be greater then Target Price")
+                    return false
+                }
+            } else {
+                Alert.alert("Stop Loss should be greater then Entry Price")
+                return false
+            }
+
+
+        }
+    }
+
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
-    const { control, handleSubmit, formState: { errors } } = useForm();
 
-    const onSubmit = (data) => {
-        console.log(data);
+
+    const { control, reset, watch, setValue, validate, setError, getValues, handleSubmit, formState: { errors } } = useForm();
+
+
+    const onSubmitCall = async (e) => {
+
+        setloading(true)
+        dispatch(toggleRefresh(false))
+
+        if (date === 0) {
+            Alert.alert("Please select date")
+            return false
+        }
+
+
+        try {
+            const trade = {
+                ...e,
+
+                "action": action,
+                "segment": segment,
+                "tradeType": tradeType,
+                "chartTimeFrame": chartTimeFrame,
+                "mindSetBeforeTrade": mindSetBeforeTrade,
+                "mindSetAfterTrade": mindSetAfterTrade,
+                "session": session,
+                "brokerId": broker?.broker?._id, "date": dateTimestamp, "addOn": Date.now(), "updateOn": Date.now()
+            }
+            if (validateFun(trade)) {
+                const payload = {
+                    "userId": user?._id,
+                    "trade": trade
+                }
+
+
+
+                // console.log(JSON.stringify(payload))
+                const res = await TRADE_API.addTrade(payload, user?.token)
+
+                if (res) {
+                    toggleModal()
+                    reset()
+                    dispatch(toggleRefresh(true))
+                    // After the data fetching is complete, set refreshing to false
+                    dispatch(toggleRefresh(false))
+                    setloading(false)
+                    navigation.goBack()
+                    Alert.alert("Trade Updated")
+
+
+                }
+            } else {
+                dispatch(toggleRefresh(false))
+                setloading(false)
+                return
+            }
+            setloading(false)
+
+        } catch (e) {
+            Alert.alert(e?.message)
+            setloading(false)
+
+        }
+
+        setloading(false)
+
+
     };
 
 
+    if (loading) {
+        return <LoadingComp />
+    }
+
+
+
     return (
-        <View style={{ flex: 1, backgroundColor: "#1e294f" }}>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={{ fontWeight: "500", color: "#fff", fontSize: 16 }}>ADD YOUR TRADE</Text>
-                    <Text style={{ marginLeft: 4, fontWeight: "500", color: "#975bd9", fontSize: 16 }}>HERE...</Text>
-                </View>
-
-
+        <View style={{ flex: 1, backgroundColor: "#fff" }}>
+            <StatusBar
+                animated={true}
+                backgroundColor="#fff"
+                barStyle={"dark-content"}
+                showHideTransition={"fade"}
+                hidden={false}
+            />
+            <View style={{ backgroundColor: "#fff", flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14, paddingBottom: 8, paddingTop: 8 }}>
+                <TouchableOpacity style={{ padding: 5, borderRadius: 99 }}>
+                    <SimpleLineIcons
+                        name={'arrow-left'}
+                        size={20}
+                        color="#001AFF"
+                        onPress={() => navigation.goBack()}
+                    />
+                </TouchableOpacity>
+                <Text style={{ color: "#001AFF", fontFamily: "Intro-Semi-Bold", fontSize: 20, }}>ADD TRADE</Text>
             </View>
 
-            <View style={{ flex: 1, flexDirection: "column", justifyContent: "space-between" }} >
-            <ScrollView>
 
-            
-                <View style={{flex:1}}>
+            <View style={{ flexDirection: "column", justifyContent: "space-around", flex: 1, backgroundColor: "#f8f8f8", padding: 10 }}>
 
-                    <View style={{ marginTop: 16 }}>
 
-                        
-                        <Controller
-                            control={control}
-                            name="date"
-                            rules={{ required: true }}
-                            defaultValue=""
-                            render={({ field: { onChange, value } }) => (
-                                <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
+                <ScrollView>
 
-                                    <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Date</Text>
-                                    <TextInput
-                                        style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                        placeholderTextColor={"#636b75"}
-                                        onChangeText={onChange}
-                                        value={value}
-                                        placeholder="Date"
-                                        keyboardType="numeric"
-                                    />
+                    <View>
 
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>DATE</Text>
+                            <View style={styles.textView}>
+                                <Fontisto
+                                    name={"date"}
+                                    size={20}
+                                    color="#888"
+
+                                />
+                                <Controller
+                                    name="date"
+                                    control={control}
+                                    defaultValue={date}
+                                    rules={{
+                                        required: 'Date is required',
+
+                                    }}
+                                    render={({ field: { onChange, value } }) => (
+                                        <View style={{ flex: 1 }}>
+                                            {selectDate &&
+                                                <DateTimePicker
+                                                    value={date}
+                                                    mode='date'
+                                                    display='calendar'
+                                                    onChange={onDateChange}
+                                                    maximumDate={new Date()}
+                                                />}
+
+                                            <TouchableOpacity onPress={() => setselectDate(!selectDate)} style={{ borderRadius: 10, overflow: 'hidden' }}>
+                                                <Text style={{ color: "#ccc", fontFamily: "Intro-Bold", padding: 16, borderRadius: 10, }} >
+                                                    {date?.toLocaleDateString()}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    )}
+                                />
+                            </View>
+                            {errors.date && <Text style={styles.errors}>{errors.date.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>BROKER NAME</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="brokerId"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <BrokerSelect
+                                            label="Broker"
+                                            options={data?.userBrokerList}
+                                            value={broker}
+                                            setValue={setbroker}
+
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.brokerId && <Text style={styles.errors}>{errors.brokerId.message}</Text>}
+                        </View>
+
+
+
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>TRADE NAME</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="tradeName"
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Trade Name is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <TextInput
+                                            placeholder="Enter Trade Name"
+                                            onChangeText={field.onChange}
+                                            value={field.value}
+                                            placeholderTextColor={"#ccc"}
+                                            style={styles.textInput}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.tradeName && <Text style={styles.errors}>{errors.tradeName.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>SELECT ACTION</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="action"
+                                    control={control}
+                                    defaultValue={action}
+                                    value={action}
+                                    rules={{
+                                        required: 'Action is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <SelectButton
+                                            label={"Action"}
+                                            value={action}
+                                            setValue={setaction}
+                                            options={data?.actionList}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.action && <Text style={styles.errors}>{errors.action.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>SELECT SEGMENT TYPE</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="segment"
+                                    control={control}
+                                    defaultValue={segment}
+                                    rules={{
+                                        required: 'Segment Type is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <SelectInput
+                                            label={"Segment Type"}
+                                            value={segment}
+                                            setValue={setsegment}
+                                            options={data?.segmentList}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.segment && <Text style={styles.errors}>{errors.segment.message}</Text>}
+                        </View>
+
+                        {
+                            segment === "option" &&
+
+                            <View>
+                                <View style={styles.textInputContainer}>
+                                    <Text style={styles.textInputLabel}>STRIKE PRICE</Text>
+                                    <View style={styles.textView}>
+
+                                        <Controller
+                                            name="strikePrice"
+                                            control={control}
+                                            defaultValue=""
+                                            rules={{
+                                                required: segment === 'option' ? 'Stike price is required' : false,
+                                            }}
+                                            render={({ field }) => (
+                                                <TextInput
+                                                    placeholder="Enter Strike Price"
+                                                    onChangeText={field?.onChange}
+                                                    value={field?.value?.toString()}
+                                                    placeholderTextColor={"#ccc"}
+                                                    style={styles.textInput}
+                                                    keyboardType={"number-pad"}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                    {errors.strikePrice && <Text style={styles.errors}>{errors.strikePrice.message}</Text>}
                                 </View>
-                            )}
-                        />
-                        {errors.date && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
+                                <View style={styles.textInputContainer}>
+                                    <Text style={styles.textInputLabel}>SELECT OPTION TYPE</Text>
+                                    <View style={styles.textView}>
+
+                                        <Controller
+                                            name="optionType"
+                                            control={control}
+                                            defaultValue={optionType}
+                                            rules={{
+                                                required: segment === 'option' ? 'Option Type is required' : false,
+                                            }}
+                                            render={({ field: { onChange, value } }) => (
+                                                <View style={{ borderRadius: 10, overflow: 'hidden', marginBottom: 0 }}>
+                                                    <SelectButton
+                                                        options={optionTypeList}
+                                                        value={optionType}
+                                                        setValue={setoptionType}
+                                                    />
+                                                </View>
+                                            )}
+                                        />
+                                    </View>
+                                    {errors.optionType && <Text style={styles.errors}>{errors.optionType.message}</Text>}
+                                </View>
+                            </View>
+
+                        }
+
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>SELECT TRADE TYPE</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="tradeType"
+                                    control={control}
+                                    defaultValue={tradeType}
+                                    rules={{
+                                        required: 'Trade Type is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <SelectInput
+                                            label={"Trade Type"}
+                                            options={data?.tradeTypeList}
+                                            value={tradeType}
+                                            setValue={settradeType}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.tradeType && <Text style={styles.errors}>{errors.tradeType.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>SELECT CHART TIME FRAME</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="chartTimeFrame"
+                                    control={control}
+                                    defaultValue={chartTimeFrame}
+                                    rules={{
+                                        required: 'Chart Time Frame is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <SelectInput
+                                            label={"Chart Time Frame"}
+                                            options={data?.chartTimeFrameList}
+                                            value={chartTimeFrame}
+                                            setValue={setchartTimeFrame}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.chartTimeFrame && <Text style={styles.errors}>{errors.chartTimeFrame.message}</Text>}
+                        </View>
+
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>SELECT MINDSET BEFORE TRADE</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="mindSetBeforeTrade"
+                                    control={control}
+                                    defaultValue={mindSetBeforeTrade}
+                                    rules={{
+                                        required: 'Mindset Before Trade is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <SelectInput
+                                            label={"Mindset Before Trade"}
+                                            options={data?.emotionList}
+                                            value={mindSetBeforeTrade}
+                                            setValue={setmindSetBeforeTrade}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.mindSetBeforeTrade && <Text style={styles.errors}>{errors.mindSetBeforeTrade.message}</Text>}
+                        </View>
+
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>SELECT MINDSET AFTER TRADE</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="mindSetAfterTrade"
+                                    control={control}
+                                    defaultValue={mindSetAfterTrade}
+                                    rules={{
+                                        required: 'Mindset After Trade is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <SelectInput
+                                            label={"Mindset Before Trade"}
+                                            options={data?.emotionList}
+                                            value={mindSetAfterTrade}
+                                            setValue={setmindSetAfterTrade}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.mindSetAfterTrade && <Text style={styles.errors}>{errors.mindSetAfterTrade.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>SELECT SESSION</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="session"
+                                    control={control}
+                                    defaultValue={session}
+                                    rules={{
+                                        required: 'Session Is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <View style={{ flex: 1 }}>
+                                            <SelectInput
+                                                label={"Session"}
+                                                options={data?.sessionList}
+                                                value={session}
+                                                setValue={setsession}
+                                            />
+                                        </View>
+                                    )}
+                                />
+                            </View>
+                            {errors.session && <Text style={styles.errors}>{errors.session.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>ENTER QUANTITY</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="quantity"
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Quantity Is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <TextInput
+                                            placeholder="Select Quantity"
+                                            onChangeText={field.onChange}
+                                            value={field.value}
+                                            placeholderTextColor={"#ccc"}
+                                            style={styles.textInput}
+                                            keyboardType={"number-pad"}
+
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.quantity && <Text style={styles.errors}>{errors.quantity.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>ENTER ENTRY PRICE</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="entryPrice"
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Entry Price Is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <TextInput
+                                            placeholder="Enter Entry Price"
+                                            onChangeText={field.onChange}
+                                            value={field.value}
+                                            placeholderTextColor={"#ccc"}
+                                            style={styles.textInput}
+                                            keyboardType={"number-pad"}
+
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.entryPrice && <Text style={styles.errors}>{errors.entryPrice.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>ENTER EXIT PRICE</Text>
+                            <View style={styles.textView}>
+
+                                <Controller
+                                    name="exitPrice"
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Exit Price Is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <TextInput
+                                            placeholder="Enter Entry Price"
+                                            onChangeText={field.onChange}
+                                            value={field.value}
+                                            placeholderTextColor={"#ccc"}
+                                            style={styles.textInput}
+                                            keyboardType={"number-pad"}
+
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.exitPrice && <Text style={styles.errors}>{errors.exitPrice.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>ENTER STOP LOSS</Text>
+                            <View style={styles.textView}>
+                                <Controller
+                                    name="stopLoss"
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Stop Loss Is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <TextInput
+                                            placeholder="Enter Stop Loss"
+                                            onChangeText={field.onChange}
+                                            value={field.value}
+                                            placeholderTextColor={"#ccc"}
+                                            style={styles.textInput}
+                                            keyboardType={"number-pad"}
+
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.stopLoss && <Text style={styles.errors}>{errors.stopLoss.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>ENTER TARGET POINT</Text>
+                            <View style={styles.textView}>
+                                <Controller
+                                    name="targetPoint"
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Target Point Is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <TextInput
+                                            placeholder="Enter Target Point"
+                                            onChangeText={field.onChange}
+                                            value={field.value}
+                                            placeholderTextColor={"#ccc"}
+                                            style={styles.textInput}
+                                            keyboardType={"number-pad"}
+
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.targetPoint && <Text style={styles.errors}>{errors.targetPoint.message}</Text>}
+                        </View>
+
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>ENTER ENTRY NOTE</Text>
+                            <View style={styles.textView}>
+                                <Controller
+                                    name="entryNote"
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Entry Note Is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <TextInput
+                                            placeholder="Enter Entry Note"
+                                            onChangeText={field.onChange}
+                                            value={field.value}
+                                            placeholderTextColor={"#ccc"}
+                                            style={styles.textInput}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.entryNote && <Text style={styles.errors}>{errors.entryNote.message}</Text>}
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <Text style={styles.textInputLabel}>ENTER EXIT NOTE</Text>
+                            <View style={styles.textView}>
+                                <Controller
+                                    name="exitNote"
+                                    control={control}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Exit Note Is required',
+                                    }}
+                                    render={({ field }) => (
+                                        <TextInput
+                                            placeholder="Enter Exit Note"
+                                            onChangeText={field.onChange}
+                                            value={field.value}
+                                            placeholderTextColor={"#ccc"}
+                                            style={styles.textInput}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            {errors.exitNote && <Text style={styles.errors}>{errors.exitNote.message}</Text>}
+                        </View>
+
+
                     </View>
-
-
-                    <Controller
-                        control={control}
-                        name="tradeName"
-
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Enter Trade name</Text>
-                                <TextInput
-                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                    onChangeText={onChange}
-                                    placeholderTextColor={"#636b75"}
-                                    value={value}
-                                    placeholder="Trade Name"
-                                />
-                            </View>
-                        )}
+                </ScrollView>
+                <View>
+                    <CustomButton
+                        text={"Submit"}
+                        filled={true}
+                        onPress={handleSubmit(onSubmitCall)}
                     />
-                    {errors.tradeName && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
 
-                    <Controller
-                        control={control}
-                        name="action"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Action</Text>
-                                <Picker
-                                    style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                    selectedValue={value}
-                                    onValueChange={onChange}
-                                >
-                                    <Picker.Item label="Buy" value="buy" />
-                                    <Picker.Item label="Sell" value="sell" />
-                                </Picker>
-                            </View>
-                        )}
-                    />
-                    {errors.action && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
+                    <View style={{ flexDirection: "row", alignItems: "flex-start", alignSelf: "center", margin: 10, }}>
 
-                    <Controller
-                        control={control}
-                        name="segment"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{ color: "#ccc", paddingLeft: 5, marginBottom: 5, fontWeight: "bold" }}>Select Segment</Text>
-                                <Picker
-                                    style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                    selectedValue={value}
-                                    onValueChange={onChange}
-                                >
-                                    <Picker.Item label="Equity" value="equity" />
-                                    <Picker.Item label="Future" value="future" />
-                                    <Picker.Item label="Option" value="option" />
-                                    <Picker.Item label="Commodity" value="commodity" />
-                                    <Picker.Item label="Currency" value="currency" />
-                                    <Picker.Item label="Crypto Currency" value="crypto" />
-                                </Picker>
-                            </View>
-                        )}
-                    />
-                    {errors.segment && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-
-                    <Controller
-                        control={control}
-                        name="tradeType"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Select Trade Type</Text>
-                                <Picker
-                                    style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                    selectedValue={value}
-                                    onValueChange={onChange}
-                                >
-                                    <Picker.Item label="Intraday" value="intraday" />
-                                    <Picker.Item label="Positional" value="positional" />
-                                    <Picker.Item label="Investment" value="investment" />
-                                </Picker>
-                            </View>
-                        )}
-                    />
-                    {errors.tradeType && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-
-                    <Controller
-                        control={control}
-                        name="chartTimeFrame"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Select Chart Time Frame</Text>
-                                <Picker
-                                    style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                    selectedValue={value}
-                                    onValueChange={onChange}
-                                >
-                                    <Picker.Item label="1min" value="1min" />
-                                    <Picker.Item label="2min" value="2min" />
-                                    <Picker.Item label="3min" value="3min" />
-                                    <Picker.Item label="5min" value="5min" />
-                                    <Picker.Item label="10min" value="10min" />
-                                    <Picker.Item label="15min" value="15min" />
-                                    <Picker.Item label="30min" value="30min" />
-                                    <Picker.Item label="45min" value="45min" />
-                                    <Picker.Item label="1hr" value="1hr" />
-                                    <Picker.Item label="2hr" value="2hr" />
-                                    <Picker.Item label="3hr" value="3hr" />
-                                    <Picker.Item label="4hr" value="4hr" />
-                                    <Picker.Item label="5hr" value="5hr" />
-                                    <Picker.Item label="1week" value="1week" />
-                                    <Picker.Item label="1month" value="1month" />
-                                </Picker>
-                            </View>
-                        )}
-                    />
-                    {errors.chartTimeFrame && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-
-
-                    <Controller
-                        control={control}
-                        name="mindSetBeforeTrade"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Mindset Before Trade</Text>
-                                <Picker
-                                    style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                    selectedValue={value}
-                                    onValueChange={onChange}
-                                >
-                                    <Picker.Item label="Angry" value="angry" />
-                                    <Picker.Item label="Confident" value="confident" />
-                                    <Picker.Item label="Excited" value="excited" />
-                                    <Picker.Item label="Fear" value="fear" />
-                                    <Picker.Item label="Fomo" value="fomo" />
-                                    <Picker.Item label="Greedy" value="greedy" />
-                                    <Picker.Item label="Happy" value="happy" />
-                                    <Picker.Item label="Joyful" value="joyful" />
-                                    <Picker.Item label="Lazy" value="lazy" />
-                                    <Picker.Item label="Non Confident" value="nonconfident" />
-                                    <Picker.Item label="Other" value="other" />
-                                    <Picker.Item label="Regret" value="regret" />
-                                    <Picker.Item label="Sad" value="sad" />
-                                    <Picker.Item label="Sentimental" value="sentimental" />
-                                    <Picker.Item label="Sorrow" value="sorrow" />
-                                    <Picker.Item label="Confident" value="confident" />
-                                    <Picker.Item label="Gut Feeling" value="gutfelling" />
-                                   
-
-                                </Picker>
-                            </View>
-                        )}
-                    />
-                    
-                    {errors.mindSetBeforeTrade && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-                    <Controller
-                        control={control}
-                        name="mindSetAfterTrade"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Mindset After Trade</Text>
-                                <Picker
-                                    style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                    selectedValue={value}
-                                    onValueChange={onChange}
-                                >
-                                    <Picker.Item label="Angry" value="angry" />
-                                    <Picker.Item label="Confident" value="confident" />
-                                    <Picker.Item label="Excited" value="excited" />
-                                    <Picker.Item label="Fear" value="fear" />
-                                    <Picker.Item label="Fomo" value="fomo" />
-                                    <Picker.Item label="Greedy" value="greedy" />
-                                    <Picker.Item label="Happy" value="happy" />
-                                    <Picker.Item label="Joyful" value="joyful" />
-                                    <Picker.Item label="Lazy" value="lazy" />
-                                    <Picker.Item label="Non Confident" value="nonconfident" />
-                                    <Picker.Item label="Other" value="other" />
-                                    <Picker.Item label="Regret" value="regret" />
-                                    <Picker.Item label="Sad" value="sad" />
-                                    <Picker.Item label="Sentimental" value="sentimental" />
-                                    <Picker.Item label="Sorrow" value="sorrow" />
-                                    <Picker.Item label="Confident" value="confident" />
-                                    <Picker.Item label="Gut Feeling" value="gutfelling" />
-                                   
-
-                                </Picker>
-                            </View>
-                        )}
-                    />
-                    {errors.mindSetAfterTrade && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-
-                    <Controller
-                        control={control}
-                        name="session"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Select Session</Text>
-                                <Picker
-                                    style={{ color: "#ccc", backgroundColor: "#070f4a", }}
-                                    selectedValue={value}
-                                    onValueChange={onChange}
-                                >
-                                    <Picker.Item label="Morning" value="morning" />
-                                    <Picker.Item label="Mid" value="mid" />
-                                    <Picker.Item label="Last" value="investment" />
-                                </Picker>
-                            </View>
-                        )}
-                    />
-                    {errors.session && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-                    <Controller
-                        control={control}
-                        name="quantity"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Quantity</Text>
-                                <TextInput
-                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                    onChangeText={onChange}
-                                    placeholderTextColor={"#ccd3db"}
-                                    value={value}
-                                    placeholder="Quantity"
-                                />
-                            </View>
-                        )}
-                    />
-                    {errors.mindSetBeforeTrade && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-                    <Controller
-                        control={control}
-                        name="enrtyPrice"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Entry Price</Text>
-                                <TextInput
-                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                    onChangeText={onChange}
-                                    placeholderTextColor={"#ccd3db"}
-                                    value={value}
-                                    placeholder="Entry Price"
-                                />
-                            </View>
-                        )}
-                    />
-                    {errors.enrtyPrice && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-
-                    <Controller
-                        control={control}
-                        name="exitPrice"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Exit Price</Text>
-                                <TextInput
-                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                    onChangeText={onChange}
-                                    placeholderTextColor={"#ccd3db"}
-                                    value={value}
-                                    placeholder="Exit Price"
-                                />
-                            </View>
-                        )}
-                    />
-                    {errors.exitPrice && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-
-                    <Controller
-                        control={control}
-                        name="entryNote"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 0 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Entry Note</Text>
-                                <TextInput
-                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                    onChangeText={onChange}
-                                    placeholderTextColor={"#ccd3db"}
-                                    value={value}
-                                    placeholder="Entry Note"
-                                />
-                            </View>
-                        )}
-                    />
-                    {errors.entryNote && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-                    <Controller
-                        control={control}
-                        name="exitNote"
-                        rules={{ required: true }}
-                        defaultValue=""
-                        render={({ field: { onChange, value } }) => (
-                            <View style={{ borderRadius: 10, overflow: 'hidden', margin: 10, marginBottom: 16 }}>
-                                <Text style={{color:"#ccc",paddingLeft:5,marginBottom:5,fontWeight:"bold"}}>Exit Note</Text>
-                                <TextInput
-                                    style={{ color: "#ccc", borderRadius: 10, backgroundColor: "#070f4a", paddingLeft: 10, }}
-                                    onChangeText={onChange}
-                                    placeholderTextColor={"#ccd3db"}
-                                    value={value}
-                                    placeholder="Exit Note"
-                                />
-                            </View>
-                        )}
-                    />
-                    {errors.exitNote && <Text style={{paddingLeft:16,color:"#975bd9"}}>This field is required</Text>}
-
+                        <Text style={{ color: "#000", textAlign: "justify", fontSize: 12, fontFamily: "Intro-Bold", width: "90%", textAlign: "center" }}>
+                            <Text style={{ color: "#001AFF", marginRight: 10, fontFamily: "Intro-Bold", textAlign: "center" }}>Note :- </Text>
+                            YOU'RE ADDING THIS ACCOUNT ONLY FOR
+                            CALCULATION PURPOSE</Text>
+                    </View>
                 </View>
 
-                </ScrollView>
-                <Button title="Submit" onPress={handleSubmit(onSubmit)}/>
             </View>
-
-
         </View>
     )
 }
 
 export default AddTradeScreen
+
+
+const styles = StyleSheet.create({
+    container: {
+
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modal: {
+        justifyContent: 'flex-end',
+        margin: 0,
+    },
+    modalContent: {
+        flex: 1 / 3,
+        backgroundColor: 'white',
+        padding: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        minHeight: 300,
+    },
+    swipeIndicator: {
+        width: 60,
+        height: 3,
+        backgroundColor: '#ccc',
+        alignSelf: 'center',
+        marginBottom: 10,
+    },
+    half: {
+
+    },
+    errors: { color: 'red', fontFamily: "Intro-Semi-Bold", fontSize: 14 },
+
+    textInputContainer: { marginBottom: 10, },
+    textInputLabel: { color: "#000", fontFamily: "Intro-Bold" },
+    textInput: { color: "#000", flex: 1, fontFamily: "Intro-Bold" },
+    textView: { borderColor: "#f0f3f5", paddingLeft: 10, paddingRight: 10, borderWidth: 2, borderRadius: 8, flexDirection: 'row', alignItems: 'center' }
+});

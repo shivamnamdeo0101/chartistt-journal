@@ -1,79 +1,111 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistedReducer } from './src/store/RootReducer';
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import AppNavigator from './src/navigation/AppNavigator';
+import { configureStore, } from '@reduxjs/toolkit';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
-import { TradeProvider } from './src/providers/TradeProvider';
-import { BrokerProvider } from './src/providers/BrokerProvider';
+
 import messaging from '@react-native-firebase/messaging';
-import { DateModalProvider } from './src/providers/DateModalProvider';
 import { USER_API } from './src/service/UserService';
-import { setActionList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setFilterObjRedux, setSegmentList, setSessionList, setTradeTypeList } from './src/store/DataSlice';
+import { setActionList, setAllBrokerList, setAllBrokerListRedux, setBrokerList, setBrokerListRedux, setBrokerUpdateObj, setChartTimeFrameList, setDefaultBrokerObj, setEmotionList, setFilterObjRedux, setSegmentList, setSessionList, setTradeTypeList, setUserBrokerList } from './src/store/DataSlice';
 import { BROKER_API } from './src/service/BrokerService';
-import Loading from './src/components/Loading';
-import { setFilterObj } from './src/store/UserSlice';
 import notifee from '@notifee/react-native';
-import { AddBrokerProvider } from './src/providers/AddBrokerProvider';
+import VersionCheck from 'react-native-version-check';
+import { NativeBaseProvider, Box } from "native-base";
+import AppNavigator from './src/navigation/AppNavigator';
+import { Alert, Linking, View, Text } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
+import ChartisttHeader from './src/components/ChartisttHeader';
+
 
 const Container = () => {
 
-
   const userAuth = useSelector(state => state?.userAuth?.user)
-
-  const data = useSelector(state => state?.data)
   const dispatch = useDispatch()
-  const [brokerList, setbrokerList] = useState([])
   const user = useSelector(state => state?.userAuth)
 
-  // useEffect(() => {
-   
-  //   dispatch(setFilterObjRedux({
-  //     "userId": userAuth?._id,
-  //     "filterType": "a",
-  //     "brokerId": "0"
-  //    }))
+  useEffect(() => {
+    const checkpdate = () => {
+      VersionCheck.needUpdate()
+        .then(async res => {
+          console.log(res?.isNeeded);    // true
+          if (res?.isNeeded) {
+            // handleVersionCheck(res.storeUrl);  // open store if update is needed.
+          }
+        });
+    }
 
-  // }, [])
-  
+    checkpdate()
+  }, [])
 
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const handleVersionCheck = (link) => {
+    // Display a confirmation dialog
+    Alert.alert(
+      'Download Update',
+      'You can download the new version of the application',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Download',
+          onPress: () => {
+            Linking.openURL(link);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   useEffect(() => {
     const fetchData = async () => {
 
+
       await BROKER_API.getAllBrokers(userAuth?._id, userAuth?.token).then((res) => {
-        dispatch(setBrokerList(res?.data?.data))
+        dispatch(setUserBrokerList(res))
       })
 
       await USER_API.getData("action").then((res) => {
-        dispatch(setActionList(res?.data?.data))
+        console.log(res, "RES")
+        dispatch(setActionList(res))
       })
       await USER_API.getData("segment").then((res) => {
-        dispatch(setSegmentList(res?.data?.data))
+        dispatch(setSegmentList(res))
       })
       await USER_API.getData("session").then((res) => {
-        dispatch(setSessionList(res?.data?.data))
+        dispatch(setSessionList(res))
       })
       await USER_API.getData("emotions").then((res) => {
-        dispatch(setEmotionList(res?.data?.data))
+        dispatch(setEmotionList(res))
       })
       await USER_API.getData("tradetype").then((res) => {
-        dispatch(setTradeTypeList(res?.data?.data))
+        dispatch(setTradeTypeList(res))
       })
       await USER_API.getData("charttimeframe").then((res) => {
-        dispatch(setChartTimeFrameList(res?.data?.data))
+        dispatch(setChartTimeFrameList(res))
       })
 
       await USER_API.getData("brokers").then((res) => {
-        dispatch(setAllBrokerListRedux(res?.data?.data))
+        dispatch(setAllBrokerList(res))
       })
-   
+
 
     }
 
@@ -81,12 +113,30 @@ const Container = () => {
   }, [user])
 
 
-  return (
+
+
+  if (isConnected) {
+
+    return (
       <NavigationContainer>
-        {user?.isSuccess ? <BottomTabNavigator /> : <AuthNavigator />}
+        {user?.isSuccess ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
+    )
+
+  }
+
+
+  return (
+
+    <View style={{ flex: 1, backgroundColor: "#001AFF", alignItems: "center", justifyContent: "center" }}>
+      <Text style={{ color: "#fff", fontFamily: "Intro-Bold", fontSize: 22 }}>Please turn on your internet ! 🙄</Text>
+    </View>
   )
+
+
 }
+
+
 
 export const store = configureStore({
   reducer: persistedReducer,
@@ -136,7 +186,7 @@ function App() {
     }
   };
 
- 
+
   useEffect(() => {
     getFCMToken();
 
@@ -168,21 +218,15 @@ function App() {
   }, []);
 
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistStore(store)}>
-        <AddBrokerProvider>
-        <BrokerProvider>
-          <DateModalProvider>
-            <TradeProvider>
-              <React.Fragment>
-                <Container />
-              </React.Fragment>
-            </TradeProvider>
-          </DateModalProvider>
-        </BrokerProvider>
-        </AddBrokerProvider>
-      </PersistGate>
-    </Provider >
+    <NativeBaseProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistStore(store)}>
+          <React.Fragment>
+            <Container />
+          </React.Fragment>
+        </PersistGate>
+      </Provider >
+    </NativeBaseProvider>
   )
 }
 
