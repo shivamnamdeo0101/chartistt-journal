@@ -19,7 +19,7 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import CustomButton from '../../components/CustomButton';
 import { useDispatch } from 'react-redux';
 import { USER_API } from '../../service/UserService';
-import { setAuthSuccess, setUserDetails } from '../../store/UserSlice';
+import { setAuthSuccess, setLoggedTime, setUserDetails } from '../../store/UserSlice';
 import LoadingComp from '../../components/LoadingComp';
 
 const { height } = Dimensions.get('window');
@@ -58,6 +58,7 @@ const RegisterScreen = ({ navigation }) => {
         try {
             const res = await USER_API.userEmailReg(temp)
             dispatch(setUserDetails(res))
+            dispatch(setLoggedTime(Date.now()))
             dispatch(setAuthSuccess())
 
         } catch (e) {

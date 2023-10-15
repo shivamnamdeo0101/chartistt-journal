@@ -15,7 +15,7 @@ const OverViewComp = ({list}) => {
   const profitLoss = getPAndLForAllTrade(list)
   const totalFund = parseFloat(totalDepositAmt(userBrokerList)).toFixed(2)
   const totalReturn =parseFloat(parseFloat(profitLoss?.sumOfnetPAndL) + parseFloat(totalFund)).toFixed(2)
-  const rateOfReturn = parseFloat(((totalReturn - totalFund)/totalReturn)*100).toFixed(2)
+  const rateOfReturn =list?.length > 0 ?  parseFloat(((totalReturn - totalFund)/totalReturn)*100).toFixed(2) : 0
 
   return (
     <View >

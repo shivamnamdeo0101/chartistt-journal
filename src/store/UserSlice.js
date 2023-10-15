@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const initialState = {
   user: {},
+  loggedTime:null,
   isLoading: false,
   isSuccess: false,
   errMsg: '',
@@ -20,10 +21,14 @@ export const UserSlice = createSlice({
     setUserDetails: (state, action) => {
       state.user = action.payload;
     },
-   
+    
+    setLoggedTime: (state, action) => {
+      state.loggedTime = action.payload;
+    },
 
     flushAuthUser: (state) => {
       state.user= {};
+      state.loggedTime = null;
       state.isLoading =  false;
       state.isSuccess = false;
       state.errMsg = '';
@@ -33,6 +38,6 @@ export const UserSlice = createSlice({
     
   },
 });
-export const {setUserDetails,flushAuthUser,setAuthSuccess} = UserSlice.actions;
+export const {setUserDetails,flushAuthUser,setAuthSuccess,setLoggedTime} = UserSlice.actions;
 
 export default UserSlice.reducer;

@@ -10,14 +10,38 @@ import { TRADE_API } from '../../service/TradeService'
 import { useDispatch, useSelector } from 'react-redux'
 import LoadingComp from '../LoadingComp'
 import { setTradeList, toggleRefresh } from '../../store/DataSlice'
+import { flushAuthUser } from '../../store/UserSlice'
 
 const HomeChildMain = ({ TFTR, AccLists, Filter, AllTrades, OverView, Stat, navigation }) => {
 
   const user = useSelector((state) => state?.userAuth?.user)
   const refresh = useSelector((state) => state?.data?.refresh)
   const tradeList = useSelector((state) => state?.data?.tradeList)
+  
+  ///Auto Logout
+  const loggedTime = useSelector((state)=>state?.userAuth?.loggedTime)
+  const currTime = Date.now()
+  const logoutUser = ()=>{
+    try{
+      dispatch(flushAuthUser())
+    }catch(e){
+      console.log(e)
+    }
+  }
 
-  console.log(refresh,"refresh")
+  useEffect(() => {
+    
+      console.log(currTime - loggedTime)
+      if(loggedTime!=null){
+          if((Date.now() - loggedTime) > 172800000){
+              logoutUser()
+              console.log(currTime - loggedTime,"loggout")
+          }
+      }
+  }, [currTime])
+  ///Auto Logout
+  
+
 
   const dispatch = useDispatch()
   const [list, setlist] = useState([])
@@ -32,10 +56,7 @@ const HomeChildMain = ({ TFTR, AccLists, Filter, AllTrades, OverView, Stat, navi
     "refresh":refresh
   })
 
- console.log(filterObj)
-  
-
-
+ 
   const payload = {
     ...filterObj
   }
@@ -49,6 +70,8 @@ const HomeChildMain = ({ TFTR, AccLists, Filter, AllTrades, OverView, Stat, navi
     }
     fetchData()
   }, [filterObj,refresh])
+
+
 
 
 

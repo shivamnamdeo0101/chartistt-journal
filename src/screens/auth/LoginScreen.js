@@ -17,7 +17,7 @@ import messaging from '@react-native-firebase/messaging';
 
 import ForgotPass from '../../components/ForgotPass';
 import { useDispatch } from 'react-redux';
-import { setAuthSuccess, setUserDetails } from '../../store/UserSlice';
+import { setAuthSuccess, setLoggedTime, setUserDetails } from '../../store/UserSlice';
 import { USER_API } from '../../service/UserService';
 import LoadingComp from '../../components/LoadingComp';
 const { height } = Dimensions.get('window');
@@ -44,6 +44,7 @@ const LoginScreen = ({ navigation }) => {
 
       const res = await USER_API.userEmailLogin(data)
       dispatch(setUserDetails(res))
+      dispatch(setLoggedTime(Date.now()))
       dispatch(setAuthSuccess())
 
     } catch (e) {
@@ -76,7 +77,7 @@ const LoginScreen = ({ navigation }) => {
   useEffect(() => {
     GoogleSignin.configure({
       scopes: ['https://www.googleapis.com/auth/userinfo.profile'], // what API you want to access on behalf of the user, default is email and profile
-      webClientId: '1070846552778-6fefn05h8q6q7eeuac0b9agv2b48rrb3.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
+      webClientId: '102910788936-e3b1i2076q96uleddjjqvtdj3ai8l7tu.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
       offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
       forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
       profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
@@ -121,11 +122,16 @@ const LoginScreen = ({ navigation }) => {
       .catch(error => {
         console.log('Error subscribing to topic:', error);
       });
-  }
+  } 
+  
 
+  
   const googleLogin = async () => {
 
     try {
+
+      
+
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       const payload = {
@@ -136,6 +142,7 @@ const LoginScreen = ({ navigation }) => {
       console.log(login)
       if (login) {
         dispatch(setUserDetails(login))
+        dispatch(setLoggedTime(Date.now()))
         dispatch(setAuthSuccess())
       }
 

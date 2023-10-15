@@ -4,10 +4,17 @@ import AddTradeScreen from "../screens/app/AddTradeScreen"
 import { NavigationContainer } from "@react-navigation/native"
 import BottomTabNavigator from "./BottomTabNavigator"
 import EditTradeScreen from "../screens/app/EditTradeScreen"
+import { flushAuthUser } from "../store/UserSlice"
+import { useDispatch, useSelector } from "react-redux"
+import {useEffect} from "react";
 
 const AppStack = createNativeStackNavigator()
 
 const AppNavigator = ({ navigation }) => {
+
+   
+
+
 
     return (
         <AppStack.Navigator initialRouteName="Home">
