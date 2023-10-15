@@ -22,11 +22,43 @@
           }
         },
         {
+          "client_id": "102910788936-calh643perfksm20etit79tm4kggci39.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "f492858197df178d5ea7669263d3e9b6329bb701"
+          }
+        },
+        {
+          "client_id": "102910788936-lfqehmtu7cp2gk1gd64lrqj7hdutivp7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "7d5298d45f4d70e6f82ff194db9b2ac34a46a4fc"
+          }
+        },
+        {
+          "client_id": "102910788936-ms2gmao4s52apode4qbppet33u821ja5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "70d9e11e890eea15b6d071e43776bde4e9c21b5e"
+          }
+        },
+        {
           "client_id": "102910788936-q2pmcni88msj25p85j9h47hf4086p79i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.thechartisttjournal",
             "certificate_hash": "7b4b598bc3578eb3de9b487e1200b5a1ec92e508"
+          }
+        },
+        {
+          "client_id": "102910788936-r75t3c64va55tod9mob20g75btiode2e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "8e7036b66d726e92890faaf5794ea00af15126c6"
           }
         },
         {
@@ -38,7 +70,7 @@
           }
         },
         {
-          "client_id": "102910788936-mmsc8n09o9o8b5kllp6vuiqqe4o74hjt.apps.googleusercontent.com",
+          "client_id": "102910788936-e3b1i2076q96uleddjjqvtdj3ai8l7tu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -51,7 +83,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "102910788936-mmsc8n09o9o8b5kllp6vuiqqe4o74hjt.apps.googleusercontent.com",
+              "client_id": "102910788936-e3b1i2076q96uleddjjqvtdj3ai8l7tu.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

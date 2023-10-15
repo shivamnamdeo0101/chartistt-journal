@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity,StyleSheet } from 'react-native'
 import React from 'react'
 import LinearGradient from 'react-native-linear-gradient';
 import moment from 'moment';
@@ -39,31 +39,31 @@ const TradeComp = ({ item,navigation }) => {
                 <View style={{ padding: 10 }}>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
                         <View>
-                            <Text style={{ fontFamily: "Intro-Semi-Bold", padding: 5, backgroundColor: "#8003" }}>{item?.trade?.tradeName?.length > 10 ? item?.trade?.tradeName?.substring(0,10)+"..." : item?.trade?.tradeName}</Text>
+                            <Text style={{ fontFamily: "Intro-Semi-Bold", padding: 5, backgroundColor: "#8003" ,color:"#fff"}}>{item?.trade?.tradeName?.length > 10 ? item?.trade?.tradeName?.substring(0,10)+"..." : item?.trade?.tradeName}</Text>
                         </View>
                         <ProfitOrLoss />
                         <View>
-                            <Text style={{ fontFamily: "Intro-Semi-Bold" }}>Risk/Reward</Text>
-                            <Text style={{ fontFamily: "Intro-Bold" }}>{riskRewardForOneTrade()}</Text>
+                            <Text style={styles.heading}>Risk/Reward</Text>
+                            <Text style={styles.text}>{riskRewardForOneTrade()}</Text>
                         </View>
                     </View>
                     <View style={{ borderBottomWidth: 1, margin: 5, borderColor: "#cccccc" }}></View>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         <View>
-                            <Text style={{ fontFamily: "Intro-Semi-Bold" }}>Entry Price</Text>
-                            <Text style={{ fontFamily: "Intro-Bold" }}>RS {item?.trade?.entryPrice}</Text>
+                            <Text style={styles.heading}>Entry Price</Text>
+                            <Text style={styles.text}>RS {item?.trade?.entryPrice}</Text>
                         </View>
                         <View>
-                            <Text style={{ fontFamily: "Intro-Semi-Bold" }}>Action</Text>
-                            <Text style={{ fontFamily: "Intro-Bold",textTransform:"capitalize" }}>{item?.trade?.action}</Text>
+                            <Text style={styles.heading}>Action</Text>
+                            <Text style={{color:"#fff", fontFamily: "Intro-Bold",textTransform:"capitalize" }}>{item?.trade?.action}</Text>
                         </View>
                         <View>
-                            <Text style={{ fontFamily: "Intro-Semi-Bold" }}>Quantity</Text>
-                            <Text style={{ fontFamily: "Intro-Bold" }}>{item?.trade?.quantity}</Text>
+                            <Text style={styles.heading}>Quantity</Text>
+                            <Text style={styles.text}>{item?.trade?.quantity}</Text>
                         </View>
                         <View>
-                            <Text style={{ fontFamily: "Intro-Semi-Bold" }}>Exit price</Text>
-                            <Text style={{ fontFamily: "Intro-Bold" }}>{item?.trade?.exitPrice}</Text>
+                            <Text style={styles.heading}>Exit price</Text>
+                            <Text style={styles.text}>{item?.trade?.exitPrice}</Text>
                         </View>
                     </View>
                 </View>
@@ -73,3 +73,8 @@ const TradeComp = ({ item,navigation }) => {
 }
 
 export default TradeComp
+
+const styles = StyleSheet.create({
+    heading:{ fontFamily: "Intro-Semi-Bold",color:"#fff" },
+    text:{ fontFamily: "Intro-Bold",color:"#fff" }
+});

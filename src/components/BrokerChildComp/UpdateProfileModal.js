@@ -110,11 +110,11 @@ function UpdateProfileModal() {
             <View style={{flexDirection:"row",alignItems:"center"}}>
               <SimpleLineIcons
                 name={"user"}
-                size={20}
+                size={16}
                 color="#888"
                 style={{backgroundColor:"#fff",padding:10,borderRadius:99}}
               />
-              <Text style={{fontFamily:"Intro-Semi-Bold",color:"#000",fontSize:18,marginLeft:10}}>Edit Profile</Text>
+              <Text style={{fontFamily:"Intro-Semi-Bold",color:"#000",fontSize:14,marginLeft:10}}>Edit Profile</Text>
             </View>
             <SimpleLineIcons
               name={"arrow-right"}

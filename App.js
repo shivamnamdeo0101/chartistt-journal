@@ -195,22 +195,22 @@ function App() {
       console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
     });
 
-    messaging().onNotificationOpenedApp(remoteMessage => {
-      onDisplayNotification(remoteMessage)
-      console.log('onNotificationOpenedApp: ', JSON.stringify(remoteMessage));
-    });
+    // messaging().onNotificationOpenedApp(remoteMessage => {
+    //   onDisplayNotification(remoteMessage)
+    //   console.log('onNotificationOpenedApp: ', JSON.stringify(remoteMessage));
+    // });
 
-    messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage) {
-          onDisplayNotification(remoteMessage)
-          console.log(
-            'Notification caused app to open from quit state:',
-            JSON.stringify(remoteMessage),
-          );
-        }
-      });
+    // messaging()
+    //   .getInitialNotification()
+    //   .then(remoteMessage => {
+    //     if (remoteMessage) {
+    //       onDisplayNotification(remoteMessage)
+    //       console.log(
+    //         'Notification caused app to open from quit state:',
+    //         JSON.stringify(remoteMessage),
+    //       );
+    //     }
+    //   });
     messaging().setBackgroundMessageHandler(async remoteMessage => {
       onDisplayNotification(remoteMessage)
       console.log('Message handled in the background!', remoteMessage);
