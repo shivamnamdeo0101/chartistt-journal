@@ -1,16 +1,18 @@
 import { View, Text, StatusBar, SafeAreaView, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
-import React from 'react'
+import React,{useState} from 'react'
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ChartisttHeader from '../../components/ChartisttHeader';
 import HomeChildMain from '../../components/HomeChildComp/HomeChildMain';
 import { FAB } from 'react-native-paper';
 import { useSelector } from 'react-redux';
+import PopupModal from '../../components/PopupModal';
 
 const HomeScreen = ({navigation}) => {
 
   const user = useSelector((state)=>state?.userAuth?.user)
   const brokerList = useSelector((state)=>state?.data?.userBrokerList)
+  const [isModalVisible, setModalVisible] = useState(true);
 
 
   const goToAddTrade = ()=>{
@@ -22,10 +24,18 @@ const HomeScreen = ({navigation}) => {
     }
     
   }
+
+  if(isModalVisible){
+    return(
+      <SafeAreaView style={{flex:1,backgroundColor:"#fff"}}>
+        <PopupModal setModalVisible={setModalVisible} isModalVisible={isModalVisible} />
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={{flex:1}}>
-      
-      
+
         <StatusBar
           animated={true}
           backgroundColor="#fff"
