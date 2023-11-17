@@ -36,8 +36,8 @@ const ProfileScreen = () => {
     try {
       const result = await Share.share({
         title: 'Chartistt Journal',
-        message: 'You can install the Chartistt Journal app by clicking on the link below , AppLink :https://play.google.com/store/apps/details?id=com.chartistt_journal',
-        url: 'https://play.google.com/store/apps/details?id=com.chartistt_journal'
+        message: 'You can install the Chartistt Journal app by clicking on the link below , AppLink :https://play.google.com/store/apps/details?id=com.thechartisttjournal',
+        url: 'https://play.google.com/store/apps/details?id=com.thechartisttjournal'
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -138,7 +138,7 @@ const ProfileScreen = () => {
 
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>Linking.openURL("https://play.google.com/store/apps/details?id=com.chartistt_journal")} style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+          <TouchableOpacity onPress={()=>Linking.openURL("https://play.google.com/store/apps/details?id=com.thechartisttjournal")} style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
             <View style={{flexDirection:"row",alignItems:"center"}}>
               <MaterialIcons
                 name={"star-rate"}

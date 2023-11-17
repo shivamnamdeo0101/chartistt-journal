@@ -46,6 +46,14 @@
           }
         },
         {
+          "client_id": "102910788936-ofjeejl8h3t4br2s5a35q3rn5bq79d55.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thechartisttjournal",
+            "certificate_hash": "3b3aa6836482f62b6c46144c0f897a49f3f21aa3"
+          }
+        },
+        {
           "client_id": "102910788936-q2pmcni88msj25p85j9h47hf4086p79i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
