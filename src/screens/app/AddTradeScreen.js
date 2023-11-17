@@ -735,8 +735,7 @@ const AddTradeScreen = ({ navigation }) => {
 
                         <Text style={{ color: "#000", textAlign: "justify", fontSize: 12, fontFamily: "Intro-Bold", width: "90%", textAlign: "center" }}>
                             <Text style={{ color: "#001AFF", marginRight: 10, fontFamily: "Intro-Bold", textAlign: "center" }}>Note :- </Text>
-                            YOU'RE ADDING THIS ACCOUNT ONLY FOR
-                            CALCULATION PURPOSE</Text>
+                            The trades recorded within this app are for informational and analytical purposes only.</Text>
                     </View>
                 </View>
 

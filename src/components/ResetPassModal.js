@@ -275,12 +275,12 @@ function ResetPassModal() {
                                     onPress={handleSubmit(onSubmit)}
                                 />
 
-                                <View style={{ flexDirection: "row", alignItems: "flex-start", alignSelf: "center", margin: 10, }}>
+                                {/* <View style={{ flexDirection: "row", alignItems: "flex-start", alignSelf: "center", margin: 10, }}>
                                     <Text style={{ color: "#001AFF", marginRight: 10, fontFamily: "Intro-Bold", }}>Note :- </Text>
                                     <Text style={{ color: "#000", textAlign: "justify", fontSize: 12, fontFamily: "Intro-Bold", width: "90%" }}>
                                         YOU'RE ADDING THIS ACCOUNT ONLY FOR
                                         CALCULATION PURPOSE</Text>
-                                </View>
+                                </View> */}
                             </View>
 
                         </View>
