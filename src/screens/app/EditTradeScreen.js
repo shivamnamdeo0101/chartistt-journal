@@ -653,7 +653,7 @@ const EditTradeScreen = ({ navigation, route }) => {
                                     }}
                                     render={({ field }) => (
                                         <TextInput
-                                            placeholder="Enter Entry Price"
+                                            placeholder="Enter Exit Price"
                                             onChangeText={field.onChange}
                                             value={field.value?.toString()}
                                             placeholderTextColor={"#ccc"}
