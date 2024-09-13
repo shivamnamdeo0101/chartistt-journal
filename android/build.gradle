@@ -2,14 +2,14 @@
 
 buildscript {
     ext {
-        buildToolsVersion = "33.0.0"
-        minSdkVersion = 21
-        compileSdkVersion = 33
-        targetSdkVersion = 33
-
-        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
-        ndkVersion = "23.1.7779620"
+        buildToolsVersion = "34.0.0"  // This is fine as it matches the latest tools.
+        minSdkVersion = 21            // Change this to a lower value to support older devices.
+        compileSdkVersion = 34        // Keep this at 34 to ensure your app uses the latest APIs.
+        targetSdkVersion = 34         // Keep this at 34 to meet the Play Store requirements for Android 14.
+        
+        ndkVersion = "23.1.7779620"   // NDK version is fine.
     }
+
     repositories {
         google()
         mavenCentral()
