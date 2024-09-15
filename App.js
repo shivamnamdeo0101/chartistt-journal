@@ -19,6 +19,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { Alert, Linking, View, Text } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import ChartisttHeader from './src/components/ChartisttHeader';
+import { PermissionsAndroid, Platform } from 'react-native';
 
 
 const Container = () => {
@@ -27,7 +28,19 @@ const Container = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state?.userAuth)
 
+  async function requestNotificationPermission() {
+    if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            console.log("Notification permission denied");
+        }
+    }
+}
+
   useEffect(() => {
+    requestNotificationPermission()
     const checkpdate = () => {
       VersionCheck.needUpdate()
         .then(async res => {

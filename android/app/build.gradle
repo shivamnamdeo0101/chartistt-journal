@@ -100,8 +100,8 @@ android {
         applicationId "com.thechartisttjournal"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 16
-        versionName "0.0.16"
+        versionCode 17
+        versionName "0.0.17"
     }
 
     splits {
@@ -166,6 +166,8 @@ dependencies {
     implementation project(':react-native-fs')
     implementation("androidx.browser:browser:1.2.0")
     implementation project(':react-native-version-check')
+    implementation 'org.jetbrains:annotations:16.0.2'
+
 
 
 
